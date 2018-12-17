@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="author" content="react">
+    <title>报表平台</title>
+    <script type="text/javascript">
+        function getServerUrl()
+        {
+            if(location.hostname)
+            {
+                return "http://"+location.hostname+":"+"80"+"/";
+            }else
+            {
+                return 'http://localhost:80/';
+            }
+        }
+        //  alert(getServerUrl());
+    </script>
+    <!-- <link href="http://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+</head>
+
+<body>
+    <div id="app">app启动...</div>
+</body>
+
+</html>
