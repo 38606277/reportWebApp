@@ -49,23 +49,35 @@ export default class Chat extends React.Component {
 
     return (
       <div className="content">
-       
-        <div className="msg-list" ref="msgList">
+       {/* <div className="header">
+            <span style={{float: "left"}}>业余草:模拟微信聊天界面</span>
+            <span style={{float: "right"}}>{new Date().toLocaleTimeString()}</span>
+        </div> */}
+        <div className="contentes" ref="msgList">
           {megArray.map((elem,index) => (
-            <div className="container" key={index}>
-              <div className="message">
-                  <span>{elem} </span>
-                  <span><img src={require("../assets/a.png")} width="15" height="15"/></span>
+            <ul>
+            <li><img src={require("../assets/a.png")} className="imgright"/><span style={{float:"right"}}>{elem} </span></li>
+            <li><img src={require("../assets/a.png")} className="imgleft"/><span style={{float:"left"}}>{respon[index]} </span></li>
+            </ul>
+            // <div className="container" key={index}>
+            //   <div className="message">
+            //       <span>{elem} </span>
+            //       <span><img src={require("../assets/a.png")} width="15" height="15"/></span>
                 
-              </div>
-              <div className="response">{respon[index]}</div>
-            </div>)
+            //   </div>
+            //   <div className="response">{respon[index]}</div>
+            // </div>
+            )
            )}
         </div>
-         <div className="fixedBottom">
+        <div className="footer">
+            <input id="text" type="text" placeholder="说点什么吧..." value={meg} onChange={this.handleData.bind(this)} />
+            <span id="btn"  onClick={this.sendMessage.bind(this)}>发送</span>
+        </div>
+         {/* <div className="fixedBottom">
            <input className="input" value={meg} onChange={this.handleData.bind(this)} />
            <button className="button" onClick={this.sendMessage.bind(this)}>发送</button>
-         </div>
+         </div> */}
       </div>
     )
   }

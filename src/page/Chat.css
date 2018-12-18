@@ -1,14 +1,23 @@
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: '微软雅黑'
   }
   
 
   
   
   .content {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    /* display: flex;
+    flex-direction: column; */
+    /* height: 100%; */
+    background: #eee;
+    min-height: 600px;
+    margin: 0 auto 0;
+    position: relative;
+    box-shadow: 20px 20px 55px #777;
   }
   
   .msg-list {
@@ -63,3 +72,106 @@
     flex: 0 0 auto;
     padding: 10px;
   }
+  .header {
+    background: #000;
+    height: 40px;
+    color: #fff;
+    line-height: 34px;
+    font-size: 20px;
+    padding: 0 10px;
+}
+  .footer {
+    width: 100%;
+    height: 55px;
+    background: #666;
+    position: absolute;
+    bottom: 0;
+    padding: 5px;
+  }
+  .footer input {
+    width: 85%;
+    height: 45px;
+    outline: none;
+    font-size: 20px;
+    text-indent: 10px;
+    position: absolute;
+    border-radius: 6px;
+    /* right: 80px; */
+  }
+  .footer span {
+    display: inline-block;
+    width: 10%;
+    height: 48px;
+    background: #ccc;
+    font-weight: 900;
+    line-height: 45px;
+    cursor: pointer;
+    text-align: center;
+    position: absolute;
+    right: 10px;
+    border-radius: 6px;
+  }
+  .footer span:hover {
+    color: #fff;
+    background: #999;
+  }
+  .user_face_icon {
+    display: inline-block;
+    background: red;
+    width: 30%;
+    height: 60px;
+    border-radius: 30px;
+    position: absolute;
+    bottom: 6px;
+    left: 14px;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  img {
+    width: 60px;
+    height: 60px;
+  }
+
+
+.contentes {
+    font-size: 20px;
+    width: 100%;
+    min-height: 500px;
+    overflow: auto;
+    padding: 5px;
+}
+.contentes ul li {
+    margin-top: 10px;
+    padding-left: 10px;
+    /* width: 412px; */
+    display: block;
+    clear: both;
+    overflow: hidden;
+}
+.contentes ul li img {
+    float: left;
+}
+.contentes li span{
+    background: #7cfc00;
+    padding: 10px;
+    border-radius: 10px;
+    float: left;
+    margin: 6px 10px 0 10px;
+    max-width: 400px;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 3px #ccc;
+}
+.contentes ul li img.imgleft { 
+    float: left; 
+}
+.contentes ul li img.imgright { 
+    float: right; 
+}
+.contentes ul li span.spanleft { 
+    float: left;
+    background: #fff;
+}
+.contentes ul li span.spanright { 
+    float: right;
+    background: #7cfc00;
+}
