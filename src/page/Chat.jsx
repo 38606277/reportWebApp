@@ -56,8 +56,8 @@ export default class Chat extends React.Component {
         <div className="contentes" ref="msgList">
           {megArray.map((elem,index) => (
             <ul>
-            <li><img src={require("../assets/a.png")} className="imgright"/><span style={{float:"right"}}>{elem} </span></li>
-            <li><img src={require("../assets/a.png")} className="imgleft"/><span style={{float:"left"}}>{respon[index]} </span></li>
+            <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{elem} </span></li>
+            <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left"}}>{respon[index]} </span></li>
             </ul>
             // <div className="container" key={index}>
             //   <div className="message">
