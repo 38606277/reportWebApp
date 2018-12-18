@@ -37,15 +37,14 @@ export default class Chat extends React.Component {
         return (that.setState({
           respon: [...that.state.respon, "nihao"]
         }, () => {
-         
+          var el = ReactDOM.findDOMNode(that.refs.msgList);
+          console.log(el.scrollHeight);
+          el.scrollTop=el.scrollTop+el.scrollHeight;
         }))
       })
       this.state.meg = ''
-      var el = ReactDOM.findDOMNode(that.refs.msgList);
-      const { clientHeight} = that.refs.msgList;
-      console.log(clientHeight);
-      el.scrollTop = el.scrollHeight;
      
+      
     }
   }
   render() {
