@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { List, WhiteSpace, WingBlank, Checkbox, SwipeAction,  NavBar, Icon } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import './Chat.css';
@@ -18,6 +19,7 @@ export default class Chat extends React.Component {
     })
   }
   sendMessage() {
+    
     var message = this.state.meg
     if (message === '') {
       alert('不能发送空白消息哦')
@@ -35,11 +37,15 @@ export default class Chat extends React.Component {
         return (that.setState({
           respon: [...that.state.respon, "nihao"]
         }, () => {
-          // var el = ReactDOM.findDOMNode(that.refs.msgList);
-          // el.scrollTop = el.scrollHeight;
+         
         }))
       })
       this.state.meg = ''
+      var el = ReactDOM.findDOMNode(that.refs.msgList);
+      const { clientHeight} = that.refs.msgList;
+      console.log(clientHeight);
+      el.scrollTop = el.scrollHeight;
+     
     }
   }
   render() {
@@ -53,12 +59,12 @@ export default class Chat extends React.Component {
             <span style={{float: "left"}}>业余草:模拟微信聊天界面</span>
             <span style={{float: "right"}}>{new Date().toLocaleTimeString()}</span>
         </div> */}
-        <div className="contentes" ref="msgList">
+        <ul className="contentes" ref="msgList"  id="scrolldIV">
           {megArray.map((elem,index) => (
-            <ul>
-            <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{elem} </span></li>
-            <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left"}}>{respon[index]} </span></li>
-            </ul>
+            <div>
+              <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{elem} </span></li>
+              <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left"}}>{respon[index]} </span></li>
+              </div>
             // <div className="container" key={index}>
             //   <div className="message">
             //       <span>{elem} </span>
@@ -69,7 +75,7 @@ export default class Chat extends React.Component {
             // </div>
             )
            )}
-        </div>
+        </ul>
         <div className="footer">
             <input id="text" type="text" placeholder="说点什么吧..." value={meg} onChange={this.handleData.bind(this)} />
             <span id="btn"  onClick={this.sendMessage.bind(this)}>发送</span>

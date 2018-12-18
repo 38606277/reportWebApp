@@ -18,6 +18,7 @@
     margin: 0 auto 0;
     position: relative;
     box-shadow: 20px 20px 55px #777;
+    padding-bottom:5px;
   }
   
   .msg-list {
@@ -77,22 +78,26 @@
     height: 40px;
     color: #fff;
     line-height: 34px;
-    font-size: 18px;
+    font-size: 14px;
     padding: 0 10px;
 }
   .footer {
     width: 100%;
     height: 55px;
     background: #666;
-    position: absolute;
-    bottom: 0;
+    /* position: absolute; */
     padding: 5px;
+    display: flex;
+    flex: 0 0 auto;
+    position:fixed; 
+    bottom:0px; 
+    z-index:9999;
   }
   .footer input {
     width: 85%;
     height: 45px;
     outline: none;
-    font-size: 18px;
+    font-size: 14px;
     text-indent: 10px;
     position: absolute;
     border-radius: 6px;
@@ -128,27 +133,27 @@
     overflow: hidden;
   }
   img {
-    width: 60px;
-    height: 60px;
+    width: 45px;
+    height: 45px;
   }
 
 
 .contentes {
-    font-size: 18px;
+    font-size: 14px;
     width: 100%;
     min-height: 500px;
     overflow: auto;
     padding: 5px;
 }
-.contentes ul li {
+.contentes  li {
     margin-top: 10px;
-    padding-left: 10px;
-    /* width: 412px; */
+    /* padding-left: 10px;
+    width: 412px; */
     display: block;
     clear: both;
     overflow: hidden;
 }
-.contentes ul li img {
+.contentes  li img {
     float: left;
 }
 .contentes li span{
@@ -161,17 +166,17 @@
     border: 1px solid #ccc;
     box-shadow: 0 0 3px #ccc;
 }
-.contentes ul li img.imgleft { 
+.contentes  li img.imgleft { 
     float: left; 
 }
-.contentes ul li img.imgright { 
+.contentes  li img.imgright { 
     float: right; 
 }
-.contentes ul li span.spanleft { 
+.contentes  li span.spanleft { 
     float: left;
     background: #fff;
 }
-.contentes ul li span.spanright { 
+.contentes  li span.spanright { 
     float: right;
     background: #7cfc00;
 }
