@@ -52,10 +52,10 @@ export default class Chat extends React.Component {
 
     return (
       <div className="content">
-       {/* <div className="header">
-            <span style={{float: "left"}}>业余草:模拟微信聊天界面</span>
+       <div className="header">
+            <span style={{float: "left"}}>智能机器人</span>
             <span style={{float: "right"}}>{new Date().toLocaleTimeString()}</span>
-        </div> */}
+        </div>
         <ul className="contentes" ref="msgList">
           {megArray.map((elem,index) => (
             <div>
