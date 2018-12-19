@@ -3,7 +3,13 @@ import ReactDOM from 'react-dom';
 import { List, WhiteSpace, WingBlank, Checkbox, SwipeAction,  NavBar, Icon } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import './Chat.css';
-
+function ticking(){
+  const element = (new Date().toLocaleTimeString());
+  ReactDOM.render(
+    element,
+    document.getElementById('root')
+  );
+}
 export default class Chat extends React.Component {
   constructor() {
     super()
@@ -12,6 +18,8 @@ export default class Chat extends React.Component {
       respon: [],
       megArray: []
     }
+    
+setInterval(ticking, 1000);
   }
   handleData(e) {
     this.setState({
@@ -87,7 +95,7 @@ export default class Chat extends React.Component {
       <div className="content">
        <div className="header">
             <span style={{float: "left"}}><a href="#Main"><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></a></span>
-            <span style={{float: "right"}}>{new Date().toLocaleTimeString()}</span>
+            <span style={{float: "right"}} id="root"></span>
         </div>
         <ul className="contentes" ref="msgList">
           {megArray.map((elem,index) => (
