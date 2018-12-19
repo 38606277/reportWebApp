@@ -73,6 +73,11 @@ export default class Chat extends React.Component {
       this.state.meg = ''
     }
   }
+  onInputKeyUp(e){
+    if(e.keyCode === 13){
+      this.sendMessage();
+    }
+}
   render() {
     var meg = this.state.meg
     var megArray = this.state.megArray
@@ -81,7 +86,7 @@ export default class Chat extends React.Component {
     return (
       <div className="content">
        <div className="header">
-            <span style={{float: "left"}}>智能机器人</span>
+            <span style={{float: "left"}}><a href="#Main"><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></a></span>
             <span style={{float: "right"}}>{new Date().toLocaleTimeString()}</span>
         </div>
         <ul className="contentes" ref="msgList">
@@ -105,8 +110,8 @@ export default class Chat extends React.Component {
             <div className="user_face_icon">
               <img src={require("../assets/jp_btn.png")}/>
             </div>
-            <input id="text" type="text" placeholder="说点什么吧..." value={meg} onChange={this.handleData.bind(this)} />
-            <span id="btn"  onClick={this.sendMessage.bind(this)}>发送</span>
+            <input id="text" type="text" placeholder="说点什么吧..." value={meg} onChange={this.handleData.bind(this)} onKeyUp={e => this.onInputKeyUp(e)}/>
+            <span id="btn"  onClick={this.sendMessage.bind(this)} >发送</span>
         </div>
         <div id="scrolld"> </div>
          {/* <div className="fixedBottom">
