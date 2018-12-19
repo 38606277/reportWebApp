@@ -32,15 +32,43 @@ export default class Chat extends React.Component {
         method: 'POST',
         type: 'cors'
       }).then(function(response) {
-        return "hello";//response.json()
-      }).then(function(detail) {
-        return (that.setState({respon: [...that.state.respon, "nihao"]}, () => {
-          // var el = ReactDOM.findDOMNode(that.refs.msgList);
-          // el.scrollTop=el.scrollHeight;
-          let anchorElement = document.getElementById("scrolld");
-          anchorElement.scrollIntoView();
+        let d=response.json();
+        d.then(function(responses){
+            if(responses.code==100000){
+              return (that.setState({respon: [...that.state.respon, responses.text]}, () => {
+                // var el = ReactDOM.findDOMNode(that.refs.msgList);
+                // el.scrollTop=el.scrollHeight;
+                let anchorElement = document.getElementById("scrolld");
+                anchorElement.scrollIntoView();
+              }))
+            }else{
+              return (that.setState({respon: [...that.state.respon, "不知道你说什么,好像发生了错误"]}, () => {
+                // var el = ReactDOM.findDOMNode(that.refs.msgList);
+                // el.scrollTop=el.scrollHeight;
+                let anchorElement = document.getElementById("scrolld");
+                anchorElement.scrollIntoView();
+              }))
+            }
+        })
+        //return "hello";//response.json()
+     // }).then(function(detail) {
+        // if(detail.code===1000){
+        //   return (that.setState({respon: [...that.state.respon, detail.text]}, () => {
+        //     // var el = ReactDOM.findDOMNode(that.refs.msgList);
+        //     // el.scrollTop=el.scrollHeight;
+        //     let anchorElement = document.getElementById("scrolld");
+        //     anchorElement.scrollIntoView();
 
-        }))
+        //   }))
+        // }else{
+        //   return (that.setState({respon: [...that.state.respon, "不知道你说什么"]}, () => {
+        //     // var el = ReactDOM.findDOMNode(that.refs.msgList);
+        //     // el.scrollTop=el.scrollHeight;
+        //     let anchorElement = document.getElementById("scrolld");
+        //     anchorElement.scrollIntoView();
+
+        //   }))
+        // }
       })
       this.state.meg = ''
     }
