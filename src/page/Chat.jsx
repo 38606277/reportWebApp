@@ -34,17 +34,15 @@ export default class Chat extends React.Component {
       }).then(function(response) {
         return "hello";//response.json()
       }).then(function(detail) {
-        return (that.setState({
-          respon: [...that.state.respon, "nihao"]
-        }, () => {
-          var el = ReactDOM.findDOMNode(that.refs.msgList);
-          console.log(el.scrollHeight);
-          el.scrollTop=el.scrollTop+el.scrollHeight;
+        return (that.setState({respon: [...that.state.respon, "nihao"]}, () => {
+          // var el = ReactDOM.findDOMNode(that.refs.msgList);
+          // el.scrollTop=el.scrollHeight;
+          let anchorElement = document.getElementById("scrolld");
+          anchorElement.scrollIntoView();
+
         }))
       })
       this.state.meg = ''
-     
-      
     }
   }
   render() {
@@ -58,7 +56,7 @@ export default class Chat extends React.Component {
             <span style={{float: "left"}}>业余草:模拟微信聊天界面</span>
             <span style={{float: "right"}}>{new Date().toLocaleTimeString()}</span>
         </div> */}
-        <ul className="contentes" ref="msgList"  id="scrolldIV">
+        <ul className="contentes" ref="msgList">
           {megArray.map((elem,index) => (
             <div>
               <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{elem} </span></li>
@@ -79,6 +77,7 @@ export default class Chat extends React.Component {
             <input id="text" type="text" placeholder="说点什么吧..." value={meg} onChange={this.handleData.bind(this)} />
             <span id="btn"  onClick={this.sendMessage.bind(this)}>发送</span>
         </div>
+        <div id="scrolld"> </div>
          {/* <div className="fixedBottom">
            <input className="input" value={meg} onChange={this.handleData.bind(this)} />
            <button className="button" onClick={this.sendMessage.bind(this)}>发送</button>
