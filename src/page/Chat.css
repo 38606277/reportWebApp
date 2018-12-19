@@ -13,11 +13,10 @@
     /* display: flex;
     flex-direction: column; */
     /* height: 100%; */
-    background: #eee;
+    /* background: #eee; */
     min-height: 600px;
     margin: 0 auto 0;
     position: relative;
-    box-shadow: 20px 20px 55px #777;
     padding-bottom:5px;
   }
   
@@ -84,7 +83,7 @@
   .footer {
     width: 100%;
     height: 55px;
-    background: #666;
+    background: #eee;
     /* position: absolute; */
     padding: 5px;
     display: flex;
@@ -94,20 +93,20 @@
     z-index:9999;
   }
   .footer input {
-    width: 85%;
+    width: 72%;
     height: 45px;
     outline: none;
     font-size: 14px;
     text-indent: 10px;
     position: absolute;
     border-radius: 6px;
-    /* right: 80px; */
+    margin-left: 65px;
   }
   .footer span {
     display: inline-block;
     width: 10%;
     height: 48px;
-    background: #ccc;
+    background: #6ad447fa;
     font-weight: 900;
     line-height: 45px;
     cursor: pointer;
@@ -122,12 +121,12 @@
   }
   .user_face_icon {
     display: inline-block;
-    background: red;
-    width: 30%;
-    height: 60px;
-    border-radius: 30px;
+    /* background: red; */
+    width: 10%;
+    height: 55px;
+    /* border-radius: 30px; */
     position: absolute;
-    bottom: 6px;
+    /* bottom: 6px; */
     left: 14px;
     cursor: pointer;
     overflow: hidden;

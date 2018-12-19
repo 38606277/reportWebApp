@@ -74,6 +74,9 @@ export default class Chat extends React.Component {
            )}
         </ul>
         <div className="footer">
+            <div className="user_face_icon">
+              <img src={require("../assets/jp_btn.png")}/>
+            </div>
             <input id="text" type="text" placeholder="说点什么吧..." value={meg} onChange={this.handleData.bind(this)} />
             <span id="btn"  onClick={this.sendMessage.bind(this)}>发送</span>
         </div>
