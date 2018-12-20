@@ -178,3 +178,13 @@
     float: right;
     background: #7cfc00;
 }
+.wenwen_text{
+  border-radius:5px;
+  padding: 0 5px;
+  font-size:14px;
+  color:#666;
+  line-height:40px;border:solid 1px #636162;
+  box-sizing:border-box;width:70%;
+  text-align:center;overflow:hidden;margin-left:20%;
+}
+.saying{position:fixed;bottom:30%;left:50%;width:120px;margin-left:-60px;}
