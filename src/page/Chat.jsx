@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { List, ListView,WhiteSpace, WingBlank, Checkbox, SwipeAction,  NavBar, Icon } from 'antd-mobile';
+import { List, ListView,PullToRefresh,WhiteSpace, WingBlank, Checkbox, SwipeAction,  NavBar, Icon } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import './Chat.css';
 function ticking(){
@@ -12,80 +12,28 @@ function ticking(){
 }
 
 //查看历史信息使用下列加载 开始
-function MyBody(props) {
-  return (
-    <div className="am-list-body my-body">
-      <span style={{ display: 'none' }}>you can custom body wrap element</span>
-      {props.children}
-    </div>
-  );
-}
-
-const data = [
-  {
-    img: 'https://zos.alipayobjects.com/rmsportal/dKbkpPXKfvZzWCM.png',
-    title: 'Meet hotel',
-    des: '不是所有的兼职汪都需要风吹日晒',
-  },
-  {
-    img: 'https://zos.alipayobjects.com/rmsportal/XmwCzSeJiqpkuMB.png',
-    title: 'McDonald\'s invites you',
-    des: '不是所有的兼职汪都需要风吹日晒',
-  },
-  {
-    img: 'https://zos.alipayobjects.com/rmsportal/hfVtzEhPzTUewPm.png',
-    title: 'Eat the week',
-    des: '不是所有的兼职汪都需要风吹日晒',
-  },
-];
-const NUM_SECTIONS = 5;
-const NUM_ROWS_PER_SECTION = 5;
-let pageIndex = 0;
-
-const dataBlobs = {};
-let sectionIDs = [];
-let rowIDs = [];
-function genData(pIndex = 0) {
-  for (let i = 0; i < NUM_SECTIONS; i++) {
-    const ii = (pIndex * NUM_SECTIONS) + i;
-    const sectionName = `Section ${ii}`;
-    sectionIDs.push(sectionName);
-    dataBlobs[sectionName] = sectionName;
-    rowIDs[ii] = [];
-
-    for (let jj = 0; jj < NUM_ROWS_PER_SECTION; jj++) {
-      const rowName = `S${ii}, R${jj}`;
-      rowIDs[ii].push(rowName);
-      dataBlobs[rowName] = rowName;
-    }
+function genData() {
+  const dataArr = [];
+  for (let i = 0; i < 20; i++) {
+    dataArr.push(i);
   }
-  sectionIDs = [...sectionIDs];
-  rowIDs = [...rowIDs];
+  return dataArr;
 }
 //查看历史信息使用下列加载 结束
 
 export default class Chat extends React.Component {
   constructor(props) {
     super(props);
-    const getSectionData = (dataBlob, sectionID) => dataBlob[sectionID];
-    const getRowData = (dataBlob, sectionID, rowID) => dataBlob[rowID];
-
-    const dataSource = new ListView.DataSource({
-      getRowData,
-      getSectionHeaderData: getSectionData,
-      rowHasChanged: (row1, row2) => row1 !== row2,
-      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
-    });
-
     this.state = {
       meg: '',
       respon: [],
       megArray: [],
       isWrite:true,
       saying:false,
-      dataSource,
-      isLoading: true,
-      height: document.documentElement.clientHeight * 3 / 4,
+      refreshing: false,
+      down: true,
+      height: document.documentElement.clientHeight,
+      data: [],
     }
     setInterval(ticking, 1000);
   }
@@ -131,45 +79,19 @@ export default class Chat extends React.Component {
       }
     }
     componentDidMount() {
-      // you can scroll to the specified position
-      // setTimeout(() => this.lv.scrollTo(0, 120), 800);
-  
-      const hei = document.documentElement.clientHeight - ReactDOM.findDOMNode(this.lv).parentNode.offsetTop;
-      // simulate initial Ajax
-      setTimeout(() => {
-        genData();
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRowsAndSections(dataBlobs, sectionIDs, rowIDs),
-          isLoading: false,
+        const hei = this.state.height - ReactDOM.findDOMNode(this.ptr).offsetTop;
+        setTimeout(() => this.setState({
           height: hei,
-        });
-      }, 600);
+          data: genData(),
+        }), 0);
     }
   
-    // If you use redux, the data maybe at props, you need use `componentWillReceiveProps`
-    // componentWillReceiveProps(nextProps) {
-    //   if (nextProps.dataSource !== this.props.dataSource) {
-    //     this.setState({
-    //       dataSource: this.state.dataSource.cloneWithRows(nextProps.dataSource),
-    //     });
-    //   }
-    // }
-  
-    onEndReached = (event) => {
-      // load new data
-      // hasMore: from backend data, indicates whether it is the last page, here is false
-      if (this.state.isLoading && !this.state.hasMore) {
-        return;
-      }
-      console.log('reach end', event);
-      this.setState({ isLoading: true });
-      setTimeout(() => {
-        genData(++pageIndex);
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRowsAndSections(dataBlobs, sectionIDs, rowIDs),
-          isLoading: false,
-        });
-      }, 1000);
+    onRefreshs(){
+        console.log(1);
+        this.setState({ refreshing: true });
+        setTimeout(() => {
+          this.setState({ refreshing: false });
+        }, 1000);
     }
   
     onInputKeyUp(e){
@@ -205,28 +127,28 @@ export default class Chat extends React.Component {
         }}
       />
     );
-    let index = data.length - 1;
-    const row = (rowData, sectionID, rowID) => {
-      if (index < 0) {
-        index = data.length - 1;
-      }
-      const obj = data[index--];
-      return (
-        <div key={rowID} style={{background:'#f5f5f9' }}>
-                  <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{obj.des} </span></li>
-                  <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left"}}>35 ¥ {rowID} </span></li>
-              </div>
-        // <div key={rowID} style={{ padding: '0 15px' }}>
-        //   <div style={{ display: '-webkit-box', display: 'flex', padding: '15px 0' }}>
-        //     <img style={{ height: '64px', marginRight: '15px' }} src={obj.img} alt="" />
-        //     <div style={{ lineHeight: 1 }}>
-        //       <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>{obj.des}</div>
-        //       <div><span style={{ fontSize: '30px', color: '#FF6E27' }}>35</span>¥ {rowID}</div>
-        //     </div>
-        //   </div>
-        // </div>
-      );
-    };
+    // let index = data.length - 1;
+    // const row = (rowData, sectionID, rowID) => {
+    //   if (index < 0) {
+    //     index = data.length - 1;
+    //   }
+    //   const obj = data[index--];
+    //   return (
+    //     <div key={rowID} style={{background:'#f5f5f9' }}>
+    //               <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{obj.des} </span></li>
+    //               <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left"}}>35 ¥ {rowID} </span></li>
+    //           </div>
+    //     // <div key={rowID} style={{ padding: '0 15px' }}>
+    //     //   <div style={{ display: '-webkit-box', display: 'flex', padding: '15px 0' }}>
+    //     //     <img style={{ height: '64px', marginRight: '15px' }} src={obj.img} alt="" />
+    //     //     <div style={{ lineHeight: 1 }}>
+    //     //       <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>{obj.des}</div>
+    //     //       <div><span style={{ fontSize: '30px', color: '#FF6E27' }}>35</span>¥ {rowID}</div>
+    //     //     </div>
+    //     //   </div>
+    //     // </div>
+    //   );
+    // };
 
     return (
       <div className="content">
@@ -235,29 +157,33 @@ export default class Chat extends React.Component {
             <span style={{float: "right"}} id="root"></span>
         </div>
         <ul className="contentes" ref="msgList">
-          <ListView
-            ref={el => this.lv = el}
-            dataSource={this.state.dataSource}
-            // renderHeader={() => <span>header</span>}
-            renderFooter={() => (<div style={{ padding: 30, textAlign: 'center' }}>
-              {this.state.isLoading ? 'Loading...' : 'Loaded'}
-            </div>)}
-            // renderSectionHeader={sectionData => (
-            //   <div>{`Task ${sectionData.split(' ')[1]}`}</div>
-            // )}
-            renderBodyComponent={() => <MyBody />}
-            renderRow={row}
-            // renderSeparator={separator}
+        <PullToRefresh
+            damping={60}
+            ref={el => this.ptr = el}
             style={{
               height: this.state.height,
               overflow: 'auto',
             }}
-            pageSize={4}
-            onScroll={() => { console.log('scroll'); }}
-            scrollRenderAheadDistance={500}
-            onEndReached={this.onEndReached}
-            onEndReachedThreshold={10}
-          />
+            indicator={this.state.down ? {} : { deactivate: '上拉可以刷新' }}
+            direction={this.state.down ? 'down' : 'up'}
+            refreshing={this.state.refreshing}
+            onRefresh={()=>this.onRefreshs()
+              // () => {
+              // this.setState({ refreshing: true });
+              // setTimeout(() => {
+              //   this.setState({ refreshing: false });
+              // }, 1000);}
+            }
+        >
+        {this.state.data.map(i => (
+          <div key={i} style={{ textAlign: 'center', padding: 20 }}>
+           <div style={{background:'#f5f5f9' }}>
+                   <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{i} </span></li>
+                   <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left"}}>35 ¥ {i} </span></li>
+               </div>
+          </div>
+        ))}
+      </PullToRefresh>
           {megArray.map((elem,index) => (
               <div>
                   <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{elem} </span></li>
