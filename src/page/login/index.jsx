@@ -55,8 +55,14 @@ class Login extends React.Component{
             _user.encodePwd(loginInfo.Pwd).then((response) => {
                 loginInfo.Pwd=response.encodePwd;
                 _user.login(loginInfo).then((response) => {
-                    localStorge.setStorage('userInfo', response.data);
-                    this.props.history.push(this.state.redirect);
+                    if(!window.localStorage){
+                        alert("浏览器不支持localstorage");
+                        return false;
+                    }else{
+                        localStorge.setStorage('userInfo', response.data);
+                        this.props.history.push(this.state.redirect);
+                    }
+                    
                 }, (errMsg) => {
                     localStorge.errorTips(errMsg);
                 });
