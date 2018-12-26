@@ -12,8 +12,8 @@ function ticking(){
 }
 
 //查看历史信息使用下列加载 开始
-function genData() {
-  const dataArr = [];
+function genData(dataArr) {
+  // const dataArr = [];
   for (let i = 0; i < 20; i++) {
     dataArr.push(i);
   }
@@ -82,15 +82,16 @@ export default class Chat extends React.Component {
         const hei = this.state.height - ReactDOM.findDOMNode(this.ptr).offsetTop;
         setTimeout(() => this.setState({
           height: hei,
-          data: genData(),
+          data: genData(this.state.data),
         }), 0);
     }
   
     onRefreshs(){
-        console.log(1);
         this.setState({ refreshing: true });
         setTimeout(() => {
-          this.setState({ refreshing: false });
+          this.setState({ refreshing: false,
+            data: genData(this.state.data), 
+          });
         }, 1000);
     }
   
@@ -119,37 +120,7 @@ export default class Chat extends React.Component {
     var meg = this.state.meg
     var megArray = this.state.megArray
     var respon = this.state.respon
-    const separator = (sectionID, rowID) => (
-      <div
-        key={`${sectionID}-${rowID}`}
-        style={{
-          backgroundColor: '#f5f5f9',
-        }}
-      />
-    );
-    // let index = data.length - 1;
-    // const row = (rowData, sectionID, rowID) => {
-    //   if (index < 0) {
-    //     index = data.length - 1;
-    //   }
-    //   const obj = data[index--];
-    //   return (
-    //     <div key={rowID} style={{background:'#f5f5f9' }}>
-    //               <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{obj.des} </span></li>
-    //               <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left"}}>35 ¥ {rowID} </span></li>
-    //           </div>
-    //     // <div key={rowID} style={{ padding: '0 15px' }}>
-    //     //   <div style={{ display: '-webkit-box', display: 'flex', padding: '15px 0' }}>
-    //     //     <img style={{ height: '64px', marginRight: '15px' }} src={obj.img} alt="" />
-    //     //     <div style={{ lineHeight: 1 }}>
-    //     //       <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>{obj.des}</div>
-    //     //       <div><span style={{ fontSize: '30px', color: '#FF6E27' }}>35</span>¥ {rowID}</div>
-    //     //     </div>
-    //     //   </div>
-    //     // </div>
-    //   );
-    // };
-
+    
     return (
       <div className="content">
        <div className="header">
@@ -161,28 +132,23 @@ export default class Chat extends React.Component {
             damping={60}
             ref={el => this.ptr = el}
             style={{
-              height: this.state.height,
+              // height: this.state.height,
               overflow: 'auto',
             }}
             indicator={this.state.down ? {} : { deactivate: '上拉可以刷新' }}
             direction={this.state.down ? 'down' : 'up'}
             refreshing={this.state.refreshing}
-            onRefresh={()=>this.onRefreshs()
-              // () => {
-              // this.setState({ refreshing: true });
-              // setTimeout(() => {
-              //   this.setState({ refreshing: false });
-              // }, 1000);}
-            }
+            onRefresh={()=>this.onRefreshs()}
         >
-        {this.state.data.map(i => (
-          <div key={i} style={{ textAlign: 'center', padding: 20 }}>
-           <div style={{background:'#f5f5f9' }}>
-                   <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{i} </span></li>
-                   <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left"}}>35 ¥ {i} </span></li>
+        {this.state.data.map((elem,index) => (
+          // <div key={index} style={{ textAlign: 'center', padding: 20 }}>
+              <div style={{background:'#f5f5f9' }}>
+                   <li ><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{elem} </span></li>
+                   <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left"}}>35 ¥ {elem} </span></li>
                </div>
-          </div>
+          // </div>
         ))}
+         <div id="scrolld" style={{paddingBottom:'40px'}}> </div>
       </PullToRefresh>
           {megArray.map((elem,index) => (
               <div>
@@ -214,11 +180,8 @@ export default class Chat extends React.Component {
             : <div className="wenwen_text" id="wenwen" onClick={()=>this._touch_start(event)}>  按住 说话  </div>
             }
         </div>
-        <div id="scrolld"> </div>
-         {/* <div className="fixedBottom">
-           <input className="input" value={meg} onChange={this.handleData.bind(this)} />
-           <button className="button" onClick={this.sendMessage.bind(this)}>发送</button>
-         </div> */}
+        {/* <div id="scrolld"> </div> */}
+         
       </div>
     )
   }

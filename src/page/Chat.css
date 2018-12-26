@@ -103,7 +103,7 @@
     text-indent: 10px;
     position: absolute;
     border-radius: 6px;
-    margin-left: 65px;
+    margin-left: 40px;
   }
   .footer span {
     display: inline-block;
@@ -127,13 +127,14 @@
     width: 10%;
     height: 55px;
     position: absolute;
-    left: 14px;
+    left: 8px;
+    margin-top:5px;
     cursor: pointer;
     overflow: hidden;
   }
   img {
-    width: 45px;
-    height: 45px;
+    width: 30px;
+    height: 30px;
   }
 
 .contentes {
