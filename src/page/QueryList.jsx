@@ -2,39 +2,30 @@ import React from 'react';
 import { List, WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
-
-
 import UserService from '../service/UserService.jsx';
 import HttpService from '../util/HttpService.jsx';
-
+import QueryInParam from './QueryInParam.jsx';
 const userService = new UserService();
-
-
 const Item = List.Item;
 const CheckboxItem = Checkbox.CheckboxItem;
 const AgreeItem = Checkbox.AgreeItem;
 const Brief = Item.Brief;
 
-
-
-
 export default class QueryList extends React.Component {
   constructor(props) {
     super(props);
+    const renderResultParam=null;
     this.state = {
-      class_id:this.props.match.params.class_id,
-
-      data: [{ name: '南湖大路', driver: '120号' },
-      { name: '自由大路', driver: '338号' },
-      { name: '同街12', driver: '340号' }],
+      class_id:this.props.class_id,
+      data: [],
       imgHeight: 176,
-      driver: "aaaa"
+      driver: "aaaa",
+      paramClass:null
     }
   }
 
 
   loadData = () => {
-
     //var userService = new UserService();
     userService.getUserList()
       .then(json => {
@@ -44,9 +35,6 @@ export default class QueryList extends React.Component {
       .catch((error) => {
         alert(error)
       });
-
-
-
   };
 
   onReset() {
@@ -56,11 +44,12 @@ export default class QueryList extends React.Component {
 
   }
   onClassClick(qry_id) {
-    window.location.href = "#/QueryInParam/"+qry_id;
+    //window.location.href = "#/QueryInParam/"+qry_id;
+    this.setState({paramClass:qry_id});
+    this.renderResultParam=<QueryInParam qry_id={qry_id}/>;
   }
 
   componentDidMount() {
-
     this.getAllQueryClass();
   }
   getAllQueryClass() {
@@ -71,45 +60,45 @@ export default class QueryList extends React.Component {
           this.setState({ data: res.data })
         else
           message.error(res.message);
-
       });
-
-
   }
 
-
   render() {
-    return (
-      <div>
-        <NavBar
-          mode="light"
-          icon={<Icon type="left" />}
-          onLeftClick={() => window.location.href = "#/QueryClassList"}
-          rightContent={[
-            <Icon key="1" type="ellipsis" onClick={this.loadData} />
-          ]}
-        >
-          选择一个查询
-        </NavBar>
-
-        <list renderHeader={() => 'aa缴费'}>
-          {this.state.data.map(val => (
-            <Item
-              arrow="horizontal"
-              thumb={require("../assets/a.png")}
-              multipleLine
-              onClick={()=>this.onClassClick(val.qry_id)}
-              extra=""
+    if(this.state.data.length>0 && this.state.paramClass==null){
+      this.renderResultParam=(
+            <div>
+            <NavBar
+              mode="light"
+              icon={<Icon type="left" />}
+              onLeftClick={() => window.location.href = "#/QueryClassList"}
+              rightContent={[
+                <Icon key="1" type="ellipsis" onClick={this.loadData} />
+              ]}
             >
-              {val.qry_name}
-            </Item>
-          ))}
-        </list>
+              选择一个查询
+            </NavBar>
 
-        <WhiteSpace size="lg" />
-        <WingBlank><Link to='/UserPayList'>缴费记录</Link></WingBlank>
+            <list renderHeader={() => 'aa缴费'}>
+              {this.state.data.map(val => (
+                <Item
+                  arrow="horizontal"
+                  thumb={require("../assets/a.png")}
+                  multipleLine
+                  onClick={()=>this.onClassClick(val.qry_id)}
+                  extra=""
+                >
+                  {val.qry_name}
+                </Item>
+              ))}
+            </list>
 
-      </div>
+            <WhiteSpace size="lg" />
+            <WingBlank><Link to='/UserPayList'>缴费记录</Link></WingBlank>
+
+          </div>);
+    }
+    return (
+      <div>{this.renderResultParam}</div>
     )
   }
 }

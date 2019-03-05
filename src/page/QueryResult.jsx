@@ -43,8 +43,8 @@ export default class QueryResult extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      qry_id: this.props.match.params.qry_id,
-      inStrParam: this.props.match.params.inParam,
+      qry_id: this.props.qry_id,
+      inStrParam: this.props.inParam,
       data: [],
       inParam: {},
       imgHeight: 176,

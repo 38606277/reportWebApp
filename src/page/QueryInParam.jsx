@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 
 import UserService from '../service/UserService.jsx';
 import HttpService from '../util/HttpService.jsx';
+import QueryResult from './QueryResult.jsx';
 
 const userService = new UserService();
 
@@ -42,12 +43,14 @@ const seasons = [
 export default class QueryInParam extends React.Component {
   constructor(props) {
     super(props);
+    const renderQueryResult=null;
     this.state = {
-      qry_id: this.props.match.params.qry_id,
+      qry_id: this.props.qry_id,
       data: [],
       inParam: {},
       imgHeight: 176,
-      driver: "aaaa"
+      driver: "aaaa",
+      paramClass:null
     }
   }
 
@@ -105,7 +108,10 @@ export default class QueryInParam extends React.Component {
       paramStr = paramStr + "&" + key + '=' + this.state.inParam[key];
     }
     paramStr = paramStr.substring(1, paramStr.length);
-    window.location.href = "#/QueryResult/"+ this.state.qry_id+'/'+ paramStr;
+   // window.location.href = "#/QueryResult/"+ this.state.qry_id+'/'+ paramStr;
+    
+    this.setState({paramClass:this.state.qry_id});
+    this.renderQueryResult=<QueryResult qry_id={this.state.qry_id} inParam={paramStr}/>;
   }
   onValueChange(fieldName, value) {
     // const { inParam } = this.state;
@@ -178,32 +184,37 @@ export default class QueryInParam extends React.Component {
       }
     }
     );
+    if(this.state.data.length>0 && this.state.paramClass==null){
+      this.renderQueryResult=(
+          <div>
+              <NavBar
+                mode="light"
+                icon={<Icon type="left" />}
+                onLeftClick={() => window.location.href = "#/QueryClassList"}
+                rightContent={[
+                  <Icon key="1" type="ellipsis" onClick={this.loadData} />
+                ]}
+              >
+                输入查询条件
+              </NavBar>
 
+              <list renderHeader={() => 'aa缴费'}>
+                {html}
+                <Item>
+                  <Button type="primary" onClick={() => this.execQuery()} >执行查询</Button><WhiteSpace />
+                  {/* <Button type="primary" size="large" inline onClick={this.onSubmit}>Submit</Button> */}
+                </Item>
+              </list>
+
+              <WhiteSpace size="lg" />
+              <WingBlank><Link to='/UserPayList'>缴费记录</Link></WingBlank>
+
+            </div>);
+             
+    }
     return (
-      <div>
-        <NavBar
-          mode="light"
-          icon={<Icon type="left" />}
-          onLeftClick={() => window.location.href = "#/QueryClassList"}
-          rightContent={[
-            <Icon key="1" type="ellipsis" onClick={this.loadData} />
-          ]}
-        >
-          输入查询条件
-        </NavBar>
-
-        <list renderHeader={() => 'aa缴费'}>
-          {html}
-          <Item>
-            <Button type="primary" onClick={() => this.execQuery()} >执行查询</Button><WhiteSpace />
-            {/* <Button type="primary" size="large" inline onClick={this.onSubmit}>Submit</Button> */}
-          </Item>
-        </list>
-
-        <WhiteSpace size="lg" />
-        <WingBlank><Link to='/UserPayList'>缴费记录</Link></WingBlank>
-
-      </div>
+      
+      <div>{this.renderQueryResult}</div>
     )
   }
 }

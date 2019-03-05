@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { List, ListView,PullToRefresh,WhiteSpace, WingBlank, Checkbox, SwipeAction,  NavBar, Icon } from 'antd-mobile';
+import { Link, Redirect } from 'react-router-dom';
+
 import 'antd-mobile/dist/antd-mobile.css';
 import './Chat.css';
 function ticking(){
@@ -124,7 +126,7 @@ export default class Chat extends React.Component {
     return (
       <div className="content">
        <div className="header">
-            <span style={{float: "left"}}><a href="#Main"><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></a></span>
+            <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
             <span style={{float: "right"}} id="root"></span>
         </div>
         <ul className="contentes" ref="msgList">
