@@ -50,6 +50,7 @@ export default class QueryResult extends React.Component {
       imgHeight: 176,
       driver: "aaaa",
       animating: true,
+      isLoading:true
     }
   }
 
@@ -113,25 +114,25 @@ export default class QueryResult extends React.Component {
     HttpService.post('reportServer/query/getQueryParam/' + this.state.qry_id, null)
     .then(res => {
       if (res.resultCode == "1000") {
-        this.setState({ outParam: res.data.out });let aParam = []
+        this.setState({ outParam: res.data.out,isLoading:true });let aParam = []
         aParam.push({ "in": this.state.inParam })
         HttpService.post('reportServer/query/execQuery/2/' + this.state.qry_id, JSON.stringify(aParam))
           .then(res => {
             if (res.resultCode == "1000") {
               this.setState({ data: res.data.list });
-              this.setState({animating:false});
+              this.setState({animating:false,isLoading:false});
     
             }
             else
               Toast.fail(res.message, 1);
-              this.setState({animating:false});
+              this.setState({animating:false,isLoading:false});
     
           });
 
       }
       else
         Toast.fail(res.message, 1);
-        this.setState({animating:false});
+        this.setState({animating:false,isLoading:false});
 
     });
 
@@ -155,7 +156,11 @@ export default class QueryResult extends React.Component {
           显示查询结果
         </NavBar>
         <ActivityIndicator toast text="正在加载"   animating={this.state.animating}/>
-        <list renderHeader={() => 'aa缴费'}>
+        <list renderHeader={() => 'aa缴费'}
+         renderFooter={() => (<div style={{ padding: 30, textAlign: 'center' }}>
+         {this.state.isLoading ? 'Loading...' : 'Loaded'}
+       </div>)}
+        >
           {this.state.data.map(val => (
             <Item
               arrow="down"

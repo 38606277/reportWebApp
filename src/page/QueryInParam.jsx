@@ -104,9 +104,12 @@ export default class QueryInParam extends React.Component {
   }
     //设置当前页面加载的对象，如果是null，则加载首次数据与div
   onChildChanged=()=>{
-    this.setState({
-      paramClass: null
-    });
+    let clearparm={};
+    for (let key of Object.keys(this.state.inParam)) {
+      clearparm[key]=null;
+    }
+   // console.log(clearparm);
+    this.setState({ paramClass: null, inParam:clearparm });
   }
   execQuery() {
     let paramStr = "";

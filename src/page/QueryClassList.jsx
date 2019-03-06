@@ -20,7 +20,7 @@ export default class QueryClassList extends React.Component {
       imgHeight: 176,
       driver: "aaaa",
       paramClass:null,
-     
+      isLoading:true
     }
   }
 
@@ -67,11 +67,12 @@ export default class QueryClassList extends React.Component {
     let param = {};
     HttpService.post('reportServer/query/getAllQueryClass', null)
       .then(res => {
-        if (res.resultCode == "1000")
-          this.setState({ data: res.data })
-        else
+        if (res.resultCode == "1000"){
+          this.setState({ data: res.data ,isLoading:false})
+        }else{
           message.error(res.message);
-
+          this.setState({isLoading:false})
+        }
       });
 
 
@@ -93,7 +94,11 @@ export default class QueryClassList extends React.Component {
                   选择一个查询类别
                 </NavBar>
     
-                <list renderHeader={() => 'aa缴费'}>
+                <list renderHeader={() => 'aa缴费'}
+                      renderFooter={() => (<div style={{ padding: 30, textAlign: 'center' }}>
+                      {this.state.isLoading ? 'Loading...' : 'Loaded'}
+                    </div>)}
+                >
                   {this.state.data.map(val => (
                     <Item
                       arrow="horizontal"
