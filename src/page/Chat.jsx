@@ -5,13 +5,13 @@ import { Link, Redirect } from 'react-router-dom';
 
 import 'antd-mobile/dist/antd-mobile.css';
 import './Chat.css';
-function ticking(){
-  const element = (new Date().toLocaleTimeString());
-  ReactDOM.render(
-    element,
-    document.getElementById('root')
-  );
-}
+// function ticking(){
+//   const element = (new Date().toLocaleTimeString());
+//   ReactDOM.render(
+//     element,
+//     document.getElementById('root')
+//   );
+// }
 
 //查看历史信息使用下列加载 开始
 function genData(dataArr) {
@@ -37,7 +37,7 @@ export default class Chat extends React.Component {
       height: document.documentElement.clientHeight,
       data: [],
     }
-    setInterval(ticking, 1000);
+    // setInterval(ticking, 1000);
   }
   handleData(e) {
     this.setState({
@@ -125,10 +125,11 @@ export default class Chat extends React.Component {
     
     return (
       <div className="content">
-       <div className="header">
+      
+       {/* <div className="header">
             <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
             <span style={{float: "right"}} id="root"></span>
-        </div>
+        </div> */}
         <ul className="contentes" ref="msgList">
         <PullToRefresh
             damping={60}
