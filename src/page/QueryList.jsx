@@ -43,10 +43,16 @@ export default class QueryList extends React.Component {
   onOpenChange() {
 
   }
+  //设置当前页面加载的对象，如果是null，则加载首次数据与div
+  onChildChanged=()=>{
+    this.setState({
+      paramClass: null
+    });
+  }
   onClassClick(qry_id) {
     //window.location.href = "#/QueryInParam/"+qry_id;
     this.setState({paramClass:qry_id});
-    this.renderResultParam=<QueryInParam qry_id={qry_id}/>;
+    this.renderResultParam=<QueryInParam qry_id={qry_id} callbackParent={this.onChildChanged}/>;
   }
 
   componentDidMount() {
@@ -62,7 +68,10 @@ export default class QueryList extends React.Component {
           message.error(res.message);
       });
   }
-
+//设置上一窗口的数据进行显示，返回上一级
+  goback(){
+    this.props.callbackParent();
+  }
   render() {
     if(this.state.data.length>0 && this.state.paramClass==null){
       this.renderResultParam=(
@@ -70,7 +79,7 @@ export default class QueryList extends React.Component {
             <NavBar
               mode="light"
               icon={<Icon type="left" />}
-              onLeftClick={() => window.location.href = "#/QueryClassList"}
+              onLeftClick={() => this.goback()}
               rightContent={[
                 <Icon key="1" type="ellipsis" onClick={this.loadData} />
               ]}

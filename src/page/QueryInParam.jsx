@@ -102,6 +102,12 @@ export default class QueryInParam extends React.Component {
 
 
   }
+    //设置当前页面加载的对象，如果是null，则加载首次数据与div
+  onChildChanged=()=>{
+    this.setState({
+      paramClass: null
+    });
+  }
   execQuery() {
     let paramStr = "";
     for (let key of Object.keys(this.state.inParam)) {
@@ -111,7 +117,7 @@ export default class QueryInParam extends React.Component {
    // window.location.href = "#/QueryResult/"+ this.state.qry_id+'/'+ paramStr;
     
     this.setState({paramClass:this.state.qry_id});
-    this.renderQueryResult=<QueryResult qry_id={this.state.qry_id} inParam={paramStr}/>;
+    this.renderQueryResult=<QueryResult qry_id={this.state.qry_id} inParam={paramStr} callbackParent={this.onChildChanged}/>;
   }
   onValueChange(fieldName, value) {
     // const { inParam } = this.state;
@@ -139,8 +145,10 @@ export default class QueryInParam extends React.Component {
 
   }
 
-
-
+//设置上一窗口的数据进行显示，返回上一级
+  goback(){
+    this.props.callbackParent();
+  }
   render() {
     const html = this.state.data.map((item) => {
       if (item.render == 'Input') {
@@ -190,7 +198,7 @@ export default class QueryInParam extends React.Component {
               <NavBar
                 mode="light"
                 icon={<Icon type="left" />}
-                onLeftClick={() => window.location.href = "#/QueryClassList"}
+                onLeftClick={() => this.goback()}
                 rightContent={[
                   <Icon key="1" type="ellipsis" onClick={this.loadData} />
                 ]}

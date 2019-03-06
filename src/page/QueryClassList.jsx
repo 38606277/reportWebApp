@@ -19,7 +19,7 @@ export default class QueryClassList extends React.Component {
       data: [],
       imgHeight: 176,
       driver: "aaaa",
-      paramClass:this.props.paramClass,
+      paramClass:null,
      
     }
   }
@@ -47,14 +47,16 @@ export default class QueryClassList extends React.Component {
   onOpenChange() {
 
   }
+  //设置当前页面加载的对象，如果是null，则加载首次数据与div
+  onChildChanged=()=>{
+    this.setState({
+      paramClass: null
+    });
+  }
   onClassClick(item) {
     this.setState({paramClass:item});
      // window.location.href = "#/QueryList/"+item;
-      let url="#/QueryList/"+item;
-      console.log(url);
-      // alert(JSON.stringify(item));
-      this.renderResult=<QueryList class_id={item}/>;
-    
+      this.renderResult=<QueryList class_id={item} callbackParent={this.onChildChanged}/>;
   }
 
   componentDidMount() {

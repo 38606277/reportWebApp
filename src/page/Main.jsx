@@ -174,7 +174,7 @@ export default class TabBarExample extends React.Component {
     if(pageText=='query')
     {
       return (
-        <QueryClassList paramClass={null}/>
+        <QueryClassList/>
       )
        
     }else if (pageText=='AI'){
