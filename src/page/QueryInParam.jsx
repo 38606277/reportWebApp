@@ -96,8 +96,10 @@ export default class QueryInParam extends React.Component {
           this.state.data.map((item) => this.state.inParam[item.in_id]='' );
         }
         else
-          message.error(res.message);
+        Toast.fail(res.message);
 
+      }).catch((error)=>{
+        Toast.fail(error);
       });
 
 
@@ -123,29 +125,7 @@ export default class QueryInParam extends React.Component {
     this.renderQueryResult=<QueryResult qry_id={this.state.qry_id} inParam={paramStr} callbackParent={this.onChildChanged}/>;
   }
   onValueChange(fieldName, value) {
-    // const { inParam } = this.state;
-    // const newParam = inParam.map(item => ({ ...item }));
-    // aParam={};
     this.state.inParam[fieldName] = value;
-    //this.state.inParam.filter()
-    // this.setState({ inParam[fieldName]: newParam });
-
-    // let p={[field]:value};
-    // this.inParam
-    // this.setState({[field]:value});
-
-
-    // let nv={[fieldName]:value};
-    // let arrd=this.state.inParam;
-    // arrd.forEach(function(item,index){
-    //    for (var key in item) {
-    //        if(fieldName==key){
-    //            arrd.splice(index,1);     
-    //        }
-    //    }
-    //  });
-    // this.state.inParam.push(nv);
-
   }
 
 //设置上一窗口的数据进行显示，返回上一级

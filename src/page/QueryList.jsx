@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon } from 'antd-mobile';
+import { List, WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon ,Toast} from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import UserService from '../service/UserService.jsx';
@@ -33,7 +33,7 @@ export default class QueryList extends React.Component {
         this.setState({ data: json })
       })
       .catch((error) => {
-        alert(error)
+        Toast.fail(error)
       });
   };
 
@@ -65,7 +65,9 @@ export default class QueryList extends React.Component {
         if (res.resultCode == "1000")
           this.setState({ data: res.data })
         else
-          message.error(res.message);
+        Toast.fail(res.message);
+      }).catch((error)=>{
+        Toast.fail(error);
       });
   }
 //设置上一窗口的数据进行显示，返回上一级

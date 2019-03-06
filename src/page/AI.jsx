@@ -17,11 +17,15 @@ export default class AI extends React.Component {
     let param = {};
     HttpService.post('reportServer/nlp/getResult/'+value, null)
       .then(res => {
-        if (res.resultCode == "1000")
+        if (res.resultCode == "1000"){
+          console.log(res.data);
           this.setState({ data: res.data.list })
-        else
-          message.error(res.message);
-
+        }else{
+          Toast.fail(res.message);
+        }
+      })
+      .catch((error)=>{
+        Toast.fail(error);
       });
 
 
