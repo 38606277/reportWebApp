@@ -137,14 +137,17 @@ export default class QueryResult extends React.Component {
 
     
   }
-
+  //设置上一窗口的数据进行显示，返回上一级
+  goback(){
+    this.props.callbackParent();
+  }
   render() {
     return (
       <div>
         <NavBar
           mode="light"
           icon={<Icon type="left" />}
-          onLeftClick={() => window.location.href = "#/QueryClassList"}
+          onLeftClick={() => this.goback()}
           rightContent={[
             <Icon key="1" type="ellipsis" onClick={this.loadData} />
           ]}
