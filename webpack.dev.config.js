@@ -8,6 +8,8 @@ const webpackConfigDev = {
 
     devServer:{
         port: 8086,
+        host: '0.0.0.0',
+        disableHostCheck: true
     }
     
 }

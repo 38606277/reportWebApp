@@ -19,7 +19,9 @@ module.exports = {
         filename: '[name].js'
     },
     devServer: {
-        port: 8086
+        port: 8086,
+        host: '0.0.0.0',
+        disableHostCheck: true
     },
     module: {
         rules: [
