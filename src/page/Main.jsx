@@ -232,7 +232,7 @@ export default class TabBarExample extends React.Component {
             }}
             data-seed="logId"
           >
-            <ListViewExample />
+            {/* <ListViewExample /> */}
           </TabBar.Item>
           <TabBar.Item
             icon={

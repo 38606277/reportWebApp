@@ -5,6 +5,9 @@ import { Link } from 'react-router-dom';
 import { Brief } from 'antd-mobile/lib/list/ListItem';
 import HttpService from '../util/HttpService.jsx';
 
+const Item = List.Item;
+
+
 export default class AI extends React.Component {
   constructor(props) {
     super(props);
@@ -19,7 +22,7 @@ export default class AI extends React.Component {
       .then(res => {
         if (res.resultCode == "1000"){
           console.log(res.data);
-          this.setState({ data: res.data.list })
+          this.setState({ data: res.data.list,out: res.data.out })
         }else{
           Toast.fail(res.message);
         }
@@ -50,7 +53,7 @@ export default class AI extends React.Component {
         </List>
         {/* <WhiteSpace size="lg" /> */}
         <List renderHeader={() => '查询结果'}>
-        {this.state.data.map(val => (
+        {/* {this.state.data.map(val => (
             <List.Item
               arrow="horizontal"
               thumb={require("../assets/a.png")}
@@ -59,7 +62,33 @@ export default class AI extends React.Component {
             >
               {val.VENDOR_NAME}
             </List.Item>
+          ))} */}
+          <list renderHeader={() => 'aa缴费'}
+         renderFooter={() => (<div style={{ padding: 30, textAlign: 'center' }}>
+         {this.state.isLoading ? 'Loading...' : 'Loaded'}
+       </div>)}
+        >
+          {this.state.data.map(val => (
+            <Item
+              arrow="down"
+              thumb={require("../assets/a.png")}
+              multipleLine
+              onClick={() => this.onClassClick(val.class_id)}
+            // extra={<div><Brief>{val.CREATION_DATE}</Brief><Brief>{'2016-1'}</Brief></div>}
+            >
+              {this.state.out.map((item) => {
+                // if (item.out_id.toUpperCase() == val.out_id) {
+                  return <div>
+                    {}
+                    <Brief>{item.out_name}:{val[item.out_id.toUpperCase()]}</Brief>
+                  </div>
+                // }
+              }
+
+              )}
+            </Item>
           ))}
+        </list>
         </List>
       </div>
     );

@@ -183,8 +183,6 @@ export default class QueryResult extends React.Component {
           ))}
         </list>
 
-        <WhiteSpace size="lg" />
-        <WingBlank><Link to='/UserPayList'>缴费记录</Link></WingBlank>
 
       </div >
     )
