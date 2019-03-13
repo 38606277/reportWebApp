@@ -168,10 +168,12 @@ export default class QueryResult extends React.Component {
       });
   }
   onRefreshs(){
+    if(this.data.length==this.state.total){
       let startIndex=this.state.startIndex;
       this.setState({ refreshing: true, startIndex:startIndex+1},function(){
         this.pageexecQuery();
       });
+    }
       // setTimeout(() => {
       //   this.setState({ refreshing: false,
       //     data: genData(this.state.data), 
