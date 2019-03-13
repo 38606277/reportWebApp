@@ -1,7 +1,9 @@
 import React from 'react';
-import { List, Toast, WhiteSpace, WingBlank, Checkbox, ActivityIndicator,Action, NavBar, Icon, InputItem, Button, Picker, DatePicker } from 'antd-mobile';
+import { List, Toast, WhiteSpace, WingBlank, Checkbox, ActivityIndicator,Action, NavBar, Icon, PullToRefresh,InputItem, Button, Picker, DatePicker } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
+import ReactDOM from 'react-dom';
+
 import './QueryResult.scss';
 
 import UserService from '../service/UserService.jsx';
@@ -44,13 +46,15 @@ export default class QueryResult extends React.Component {
     super(props);
     this.state = {
       qry_id: this.props.qry_id,
+      class_id: this.props.class_id,
       inStrParam: this.props.inParam,
       data: [],
       inParam: {},
       imgHeight: 176,
       driver: "aaaa",
       animating: true,
-      isLoading:true
+      isLoading:true,
+      startIndex: 1, perPage: 10, searchResult: '', total: 0,
     }
   }
 
@@ -83,7 +87,10 @@ export default class QueryResult extends React.Component {
   }
 
   componentDidMount() {
-
+    const hei = this.state.height - ReactDOM.findDOMNode(this.ptr).offsetTop;
+    setTimeout(() => this.setState({
+      height: hei,
+    }), 0);
     // alert(this.state.inParam);
     let paramInIdValue = [];
     paramInIdValue = this.state.inStrParam.split("&");
@@ -111,12 +118,15 @@ export default class QueryResult extends React.Component {
   }
   execQuery() {
     this.setState({animating:true});
+    let page = {};
+    page.startIndex = this.state.startIndex;
+    page.perPage = this.state.perPage;
     HttpService.post('reportServer/query/getQueryParam/' + this.state.qry_id, null)
     .then(res => {
       if (res.resultCode == "1000") {
-        this.setState({ outParam: res.data.out,isLoading:true });let aParam = []
-        aParam.push({ "in": this.state.inParam })
-        HttpService.post('reportServer/query/execQuery/2/' + this.state.qry_id, JSON.stringify(aParam))
+        this.setState({ outParam: res.data.out,isLoading:true });
+        let aParam = [{ "in": this.state.inParam }, page];
+        HttpService.post('reportServer/query/execQuery/'+this.state.class_id+'/' + this.state.qry_id, JSON.stringify(aParam))
           .then(res => {
             if (res.resultCode == "1000") {
               this.setState({ data: res.data.list });
@@ -138,6 +148,36 @@ export default class QueryResult extends React.Component {
 
     
   }
+  pageexecQuery() {
+      this.setState({animating:true});
+      let page = {};
+      page.startIndex = this.state.startIndex;
+      page.perPage = this.state.perPage;
+      let aParam = [{ "in": this.state.inParam }, page];
+      HttpService.post('reportServer/query/execQuery/'+this.state.class_id+'/' + this.state.qry_id, JSON.stringify(aParam))
+        .then(res => {
+          if (res.resultCode == "1000") {
+            var moment_list = this.state.data;
+            for (var i = 0; i < res.data.list.length; i++) {
+              moment_list.push(res.data.list[i]);
+            }
+            this.setState({ data: moment_list,animating:false,isLoading:false,refreshing: false,total:res.data.totalSize });
+          }else
+            Toast.fail(res.message, 1);
+            this.setState({animating:false,isLoading:false,refreshing: false});
+      });
+  }
+  onRefreshs(){
+      let startIndex=this.state.startIndex;
+      this.setState({ refreshing: true, startIndex:startIndex+1},function(){
+        this.pageexecQuery();
+      });
+      // setTimeout(() => {
+      //   this.setState({ refreshing: false,
+      //     data: genData(this.state.data), 
+      //   });
+      // }, 1000);
+  }
   //设置上一窗口的数据进行显示，返回上一级
   goback(){
     this.props.callbackParent();
@@ -156,6 +196,18 @@ export default class QueryResult extends React.Component {
           显示查询结果
         </NavBar>
         <ActivityIndicator toast text="正在加载"   animating={this.state.animating}/>
+        <PullToRefresh
+            damping={60}
+            ref={el => this.ptr = el}
+            style={{
+              // height: this.state.height,
+              overflow: 'auto',
+            }}
+            indicator={this.state.down ? {} : { deactivate: '上拉可以刷新' }}
+            direction={this.state.down ? 'down' : 'up'}
+            refreshing={this.state.refreshing}
+            onRefresh={()=>this.onRefreshs()}
+        >
         <list renderHeader={() => 'aa缴费'}
          renderFooter={() => (<div style={{ padding: 30, textAlign: 'center' }}>
          {this.state.isLoading ? 'Loading...' : 'Loaded'}
@@ -192,8 +244,9 @@ export default class QueryResult extends React.Component {
             </Item>
           ))}
         </list>
-
-
+        </PullToRefresh>
+        {this.state.data.length==0?<div>{this.state.total==0?<div>---暂无数据---</div>:''}</div>:''}
+        {this.state.data.length==this.state.total?<div>{this.state.total>0?<div>---没有数据了---</div>:''}</div>:''}
       </div >
     )
   }

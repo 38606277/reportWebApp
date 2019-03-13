@@ -52,7 +52,7 @@ export default class QueryList extends React.Component {
   onClassClick(qry_id) {
     //window.location.href = "#/QueryInParam/"+qry_id;
     this.setState({paramClass:qry_id});
-    this.renderResultParam=<QueryInParam qry_id={qry_id} callbackParent={this.onChildChanged}/>;
+    this.renderResultParam=<QueryInParam class_id={this.state.class_id} qry_id={qry_id} callbackParent={this.onChildChanged}/>;
   }
 
   componentDidMount() {

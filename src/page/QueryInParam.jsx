@@ -46,6 +46,7 @@ export default class QueryInParam extends React.Component {
     const renderQueryResult=null;
     this.state = {
       qry_id: this.props.qry_id,
+      class_id:this.props.class_id,
       data: [],
       inParam: {},
       imgHeight: 176,
@@ -122,7 +123,7 @@ export default class QueryInParam extends React.Component {
    // window.location.href = "#/QueryResult/"+ this.state.qry_id+'/'+ paramStr;
     
     this.setState({paramClass:this.state.qry_id});
-    this.renderQueryResult=<QueryResult qry_id={this.state.qry_id} inParam={paramStr} callbackParent={this.onChildChanged}/>;
+    this.renderQueryResult=<QueryResult qry_id={this.state.qry_id} class_id={this.state.class_id} inParam={paramStr} callbackParent={this.onChildChanged}/>;
   }
   onValueChange(fieldName, value) {
     this.state.inParam[fieldName] = value;
