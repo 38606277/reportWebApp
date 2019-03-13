@@ -247,8 +247,8 @@ export default class QueryResult extends React.Component {
           ))}
         </list>
         </PullToRefresh>
-        {this.state.data.length==0?<div>{this.state.total==0?<div>---暂无数据---</div>:''}</div>:''}
-        {this.state.data.length==this.state.total?<div>{this.state.total>0?<div>---没有数据了---</div>:''}</div>:''}
+        {this.state.data.length==0?<div>{this.state.total==0?<div className='tips'>---暂无数据---</div>:''}</div>:''}
+        {this.state.data.length==this.state.total?<div>{this.state.total>0?<div className='tips'>---没有数据了---</div>:''}</div>:''}
       </div >
     )
   }
