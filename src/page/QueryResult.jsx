@@ -2,7 +2,7 @@ import React from 'react';
 import { List, Toast, WhiteSpace, WingBlank, Checkbox, ActivityIndicator,Action, NavBar, Icon, InputItem, Button, Picker, DatePicker } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
-
+import './QueryResult.scss';
 
 import UserService from '../service/UserService.jsx';
 import HttpService from '../util/HttpService.jsx';
@@ -173,7 +173,17 @@ export default class QueryResult extends React.Component {
                 // if (item.out_id.toUpperCase() == val.out_id) {
                   return <div>
                     {}
-                    <Brief>{item.out_name}:{val[item.out_id.toUpperCase()]}</Brief>
+                    <Brief>
+                    <div class='flex-wrp-row itemnew'>
+                      <div class='item-left flex-wrp-row'>
+                        <div class='text'>{item.out_name}:</div>
+                      </div>
+                      <div class='item-right flex-wrp-row'>
+                        <div class='text'>{val[item.out_id.toUpperCase()]}</div>
+                      </div>
+                    </div>
+
+                    </Brief>
                   </div>
                 // }
               }

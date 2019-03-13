@@ -1,0 +1,18 @@
+.flex-wrp-row {
+    display: flex;
+    flex-direction: row;
+  }
+   
+  .itemnew {
+    position: relative;
+  }
+   
+  .item-left {
+     flex: 1; /* 重要 */
+     align-items:center;
+  }
+   
+  .item-right {
+    position: relative;
+    align-items:center;
+  }
