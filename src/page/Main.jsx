@@ -4,6 +4,7 @@ import React        from 'react';
 import QueryClassList from './QueryClassList.jsx';
 import AI from './AI.jsx';
 import Chat from './Chat.jsx';
+import Home from './home.jsx';
 
 
 const data = [
@@ -232,6 +233,7 @@ export default class TabBarExample extends React.Component {
             }}
             data-seed="logId"
           >
+          <Home/>
             {/* <ListViewExample /> */}
           </TabBar.Item>
           <TabBar.Item

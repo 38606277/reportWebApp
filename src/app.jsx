@@ -60,6 +60,13 @@ const Chat = Loadable({
     loader: () => import('./page/Chat.jsx'),
     loading: loading
 });
+
+const IndexSearch = Loadable({
+    loader: () => import('./page/indexSearch.jsx'),
+    loading: loading,
+    delay:3000
+});
+
 // function loadPage(url){
 //    return Loadable({
 //     loader:()=>import(url),
@@ -98,7 +105,7 @@ class App extends React.Component {
                                                                 })} />
                         <Route path="/UserPayList" component={UserPayList} />
                         <Route path="/UserBill" component={UserBill} />
-                        {/* <Route path="/app1" component={app1} /> */}
+                        <Route path="/IndexSearch/:path" component={IndexSearch} />
 
                         {/* <Route component={Error}/> */}
                     </Switch>
