@@ -32,6 +32,9 @@ class IndexSearch extends React.Component{
     }
     clearLocalStorge(){
         localStorge.removeStorage('searchList');
+        this.setState({
+            localStorgeSearchList:[]
+        });
     }
     //设置上一窗口的数据进行显示，返回上一级
     goback(){
@@ -90,7 +93,7 @@ class IndexSearch extends React.Component{
                 {this.state.localStorgeSearchList.length>0?
                     <List>
                         <Item
-                            extra={<Button icon={<img src="./../src/assets/delete.png" style={{border:'0PX solid #ddd'}} />} style={{border:'0PX solid #ddd'}} size="small" inline  onClick={() => this.clearLocalStorge()}></Button>}
+                            extra={<Button style={{background:'url(./../src/assets/delete.png) center center /  21px 21px no-repeat',border:'0PX solid #ddd'}} size="small" inline  onClick={() => this.clearLocalStorge()}></Button>}
                             multipleLine
                             >搜索历史</Item>
                         <div className="tag-container">
