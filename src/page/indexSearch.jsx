@@ -22,7 +22,7 @@ class IndexSearch extends React.Component{
     }
     componentDidMount() {
         this.autoFocusInst.focus();
-        localStorge.removeStorage('searchList');
+        //localStorge.removeStorage('searchList');
         let  searchList=localStorge.getStorage('searchList');
         if( undefined ==searchList || searchList=='' || searchList==null){
             searchList=[]
