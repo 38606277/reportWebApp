@@ -1,5 +1,5 @@
 import React        from 'react';
-import {List,InputItem,Tag,Icon,SearchBar,Toast} from 'antd-mobile';
+import {List,InputItem,Tag,Icon,SearchBar,Toast,Button} from 'antd-mobile';
 import HttpService from '../util/HttpService.jsx';
 import LocalStorge from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
@@ -22,7 +22,6 @@ class IndexSearch extends React.Component{
     }
     componentDidMount() {
         this.autoFocusInst.focus();
-        //localStorge.removeStorage('searchList');
         let  searchList=localStorge.getStorage('searchList');
         if( undefined ==searchList || searchList=='' || searchList==null){
             searchList=[]
@@ -31,7 +30,9 @@ class IndexSearch extends React.Component{
             localStorgeSearchList:searchList
         });
     }
-    
+    clearLocalStorge(){
+        localStorge.removeStorage('searchList');
+    }
     //设置上一窗口的数据进行显示，返回上一级
     goback(){
         window.location.href = "#/"+this.state.path;
@@ -42,6 +43,10 @@ class IndexSearch extends React.Component{
         if( undefined !=searchList && searchList!='' && searchList!=null && searchList.length>0){
             this.setState({
                 localStorgeSearchList:searchList
+            });
+        }else{
+            this.setState({
+                localStorgeSearchList:[]
             });
         }
     }
@@ -84,7 +89,10 @@ class IndexSearch extends React.Component{
                 <div style={{display:'block'}}>
                 {this.state.localStorgeSearchList.length>0?
                     <List>
-                        <Item>搜索历史</Item>
+                        <Item
+                            extra={<Button icon={<img src="./../src/assets/delete.png" style={{border:'0PX solid #ddd'}} />} style={{border:'0PX solid #ddd'}} size="small" inline  onClick={() => this.clearLocalStorge()}></Button>}
+                            multipleLine
+                            >搜索历史</Item>
                         <div className="tag-container">
                             {this.state.localStorgeSearchList.map((item,index) =>(
                                 <Tag color="magenta">{item}</Tag>
