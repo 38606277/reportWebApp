@@ -1,5 +1,5 @@
 import React        from 'react';
-import './indexSearch.scss';
+import './commonSearch.scss';
 class CommonSearch extends React.Component{
     constructor(props){
         super(props);

@@ -1,7 +1,9 @@
 import React        from 'react';
 import {List,InputItem,Tag,Icon,SearchBar,Toast} from 'antd-mobile';
 import HttpService from '../util/HttpService.jsx';
-// import './indexSearch.scss';
+import LocalStorge from '../util/LogcalStorge.jsx';
+const localStorge = new LocalStorge();
+ import './indexSearch.scss';
 const isIPhone = new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent);
 let moneyKeyboardWrapProps;
 if (isIPhone) {
@@ -15,30 +17,45 @@ class IndexSearch extends React.Component{
         super(props);
         this.state = {
             path: this.props.match.params.path,
-            searchKeyword   : ''
+            localStorgeSearchList:[]
         }
     }
-    // 数据变化的时候
-    onValueChange(e){
-        let name    = e.target.name,
-            value   = e.target.value.trim();
+    componentDidMount() {
+        this.autoFocusInst.focus();
+        localStorge.removeStorage('searchList');
+        let  searchList=localStorge.getStorage('searchList');
+        if( undefined ==searchList || searchList=='' || searchList==null){
+            searchList=[]
+        }
         this.setState({
-            [name] : value
+            localStorgeSearchList:searchList
         });
     }
     
-    // 输入关键字后按回车，自动提交
-    onSearchKeywordKeyUp(e){
-        if(e.keyCode === 13){
-            this.getQueryResult();
-        }
-    }
     //设置上一窗口的数据进行显示，返回上一级
     goback(){
         window.location.href = "#/"+this.state.path;
        // this.props.callbackParent();
     }
+    searchfouce(){
+        const  searchList=localStorge.getStorage('searchList');
+        if( undefined !=searchList && searchList!='' && searchList!=null && searchList.length>0){
+            this.setState({
+                localStorgeSearchList:searchList
+            });
+        }
+    }
     getQueryResult(value) {
+       let  searchList=localStorge.getStorage('searchList');
+       if( undefined ==searchList || searchList=='' || searchList==null){
+            searchList=[value];
+        }else if(searchList.length==10){
+            searchList.pop();
+            searchList.unshift(value);
+        }else{
+            searchList.unshift(value);
+        }
+        localStorge.setStorage('searchList', searchList);
         let param = {};
         HttpService.post('reportServer/nlp/getResult/' + value, null)
           .then(res => {
@@ -53,12 +70,6 @@ class IndexSearch extends React.Component{
             Toast.fail(error);
           });
     }
-    searchBarOnFocus() {
-        this.setState({
-            searchKeyword: 'search focus',
-        });
-        am-search-value
-      }
     render(){
         return (
             <div>
@@ -67,18 +78,19 @@ class IndexSearch extends React.Component{
                     <Icon type="left"  onClick={() => this.goback()} style={{float:'left',backgroundColor: '#efeff4',
                         height: '44px'}}/>
                     <SearchBar  placeholder="说出你要查询什么..." onSubmit={(value) => this.getQueryResult(value)}
-                     onFocus={this.searchBarOnFocus.bind(this)}  ref={ref => this.autoFocusInst = ref} /></div>
+                      ref={ref => this.autoFocusInst = ref} onFocus={() => this.searchfouce()}/></div>
                 </List>
                 
                 <div style={{display:'block'}}>
+                {this.state.localStorgeSearchList.length>0?
                     <List>
                         <Item>搜索历史</Item>
                         <div className="tag-container">
-                            <Tag color="magenta">查询亚信科技的采购订单</Tag>
-                            <Tag>查询亚信的采购订单</Tag>
-                            <Tag>查询来信的供应商信息</Tag>
+                            {this.state.localStorgeSearchList.map((item,index) =>(
+                                <Tag color="magenta">{item}</Tag>
+                            ))}
                         </div>
-                    </List>
+                    </List>:''}
                 </div> 
             </div>
         )
