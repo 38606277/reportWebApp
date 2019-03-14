@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, Toast, WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon, InputItem, Button, Picker, DatePicker } from 'antd-mobile';
+import { List, Toast, WhiteSpace, WingBlank,Table,Pagination, Modal,Checkbox, SwipeAction, NavBar, Icon, InputItem, Button, Picker, DatePicker } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import UserService from '../service/UserService.jsx';
@@ -19,15 +19,13 @@ export default class QueryInParam extends React.Component {
     this.state = {
       qry_id: this.props.qry_id,
       class_id:this.props.class_id,
-      data: [],
-      inParam: {},
-      displayInParam:{},
-      imgHeight: 176,
-      driver: "aaaa",
-      paramClass:null,
-      dictData:{},
-      dateInParam:{},
-      colorValue: []
+      data: [],      inParam: {},
+      displayInParam:{},      imgHeight: 176,
+      driver: "aaaa",      paramClass:null,
+      dictData:{},      dateInParam:{},
+      visible:false,colorValue: [],paramValue:'',
+      pageNumd: 1, perPaged: 5, searchDictionary: '', totald: 0,
+      paramName: '', selectedRowKeys: [], dictionaryList: []
     }
   }
   onChangeColor=(color)=> {
@@ -142,6 +140,17 @@ export default class QueryInParam extends React.Component {
     }
     this.state.inParam[fieldName] = value;
   }
+  
+  onCheckChange(fieldName, value) {
+    if(value.target.checked){
+      value='1';
+    }else{
+      value='0';
+    }
+    const {inParam}=this.state;
+    inParam[fieldName] = value;
+    this.setState({inParam:inParam});
+  }
   onDateChange(fieldName, value) {
     if(null!=value && ''!=value){
       var d = new Date(value);  
@@ -156,9 +165,85 @@ export default class QueryInParam extends React.Component {
       this.setState({inParam:inParam,dateInParam:dateInParam});
     }
   }
+  //打开模式窗口
+  openModelClick(e,name, dicId) {
+    e.preventDefault();
+      this.okdata = [];
+      this.setState({
+          visible: true,
+          dictionaryList: [], paramValue: dicId, paramName: name,
+          totald: 0, selectedRowKeys: []
+      }, function () {
+          this.loadModelData(dicId);
+      });
+  }
+  //调用模式窗口内的数据查询
+  loadModelData(dicId) {
+      let page = {};
+      page.pageNumd = this.state.pageNumd;
+      page.perPaged = this.state.perPaged;
+      page.searchDictionary = this.state.searchDictionary;
+      this.setState({ loading: true });
+      HttpService.post("reportServer/dict/getDictValueByID/"+dicId,JSON.stringify(page)).then(response => {
+          this.setState({ loading: false, dictionaryList: response.data, totald: response.totald }, function () { });
+      }).catch(error => {
+          this.setState({ loading: false });
+          Toast.fail(error);
+      });
+  }
+  // 字典页数发生变化的时候
+  onPageNumdChange(pageNumd) {
+      this.setState({
+          pageNumd: pageNumd
+      }, () => {
+          this.loadModelData(this.state.paramValue);
+      });
+  }
+   //模式窗口点击确认
+   handleOk = (e) => {
+    let values = this.state.selectedRowKeys.join(",");
+    let name = this.state.paramName;
+    this.state.inParam[name] = values;
+    // this.props.form.setFieldsValue({ [name]: values });
+    this.setState({ visible: false, pageNumd: 1, });
+}
+//模式窗口点击取消
+handleCancel = (e) => {
+    this.okdata = [];
+    this.setState({
+        visible: false,
+        selectedRowKeys: []
+    });
+}
+//数据字典选中事件
+onSelectChangeDic = (selectedRowKeys) => {
+    this.okdata = selectedRowKeys;
+    this.setState({ selectedRowKeys });
+}
 //设置上一窗口的数据进行显示，返回上一级
   goback(){
     this.props.callbackParent();
+  }
+  
+  onDictChange=(v,name)=>{
+    //console.log(v,name);
+    const {selectedRowKeys}=this.state;
+    let newarr=[];
+    let v1=0;
+    for ( var i=0 ; i < selectedRowKeys.length ; i++ ) {
+      if(name!=selectedRowKeys[i]){
+        newarr.push(selectedRowKeys[i]);
+      }else{
+        v1=v1+1;
+      }
+    }
+    if(v1==0){
+      newarr.push(name);
+    }
+    this.setState({
+      selectedRowKeys:newarr
+    });
+      
   }
   render() {
     const html = this.state.data.map((item) => {
@@ -169,6 +254,16 @@ export default class QueryInParam extends React.Component {
           clear
           onChange={v => this.onValueChange(item.in_id, v)}
         >{item.in_name}:</InputItem>)
+      }else if (item.render == 'InputButton') {
+        return (<InputItem
+          type="text"
+          placeholder=""
+          clear
+          extra={<Button style={{background:'url(./../src/assets/more.png) center center /  21px 21px no-repeat',border:'0PX solid #ddd'}} 
+          size="small" inline  onClick={(e) => this.openModelClick(e,item.in_id,item.dict_id)}></Button>}
+          onChange={v => this.onValueChange(item.in_id, v)}
+          value={this.state.inParam[item.in_id]}
+        >{item.in_name}:</InputItem>)   
       }else if (item.render == 'Select') {
         return (<Picker
           data={this.state.dictData[item.in_id + item.dict_id]}
@@ -191,6 +286,13 @@ export default class QueryInParam extends React.Component {
         >
           <List.Item arrow="horizontal">{item.in_name}</List.Item>
         </Picker>)  
+      }else if (item.render == 'Checkbox') {
+          return (
+            <div>
+              <div  style={{float:'left'}}><List.Item>{item.in_name}:</List.Item></div>
+              <CheckboxItem key={1} onChange={(value) => this.onCheckChange(item.in_id,value)}></CheckboxItem>
+            </div>
+         )
       }else if (item.render == 'Datepicker') {
         return (<DatePicker
           mode="date"
@@ -225,17 +327,43 @@ export default class QueryInParam extends React.Component {
                 输入查询条件
               </NavBar>
 
-              <list>
+              <List>
                 {html}
                 <Item>
                   <Button type="primary" onClick={() => this.execQuery()} >执行查询</Button><WhiteSpace />
                   {/* <Button type="primary" size="large" inline onClick={this.onSubmit}>Submit</Button> */}
                 </Item>
-              </list>
+              </List>
 
               {/* <WhiteSpace size="lg" />
               <WingBlank><Link to='/UserPayList'>缴费记录</Link></WingBlank> */}
-
+              <WingBlank>
+                  <Modal popup={true} 
+                    title="字典查询" 
+                    visible={this.state.visible}
+                    maskClosable={false}
+                    closable={true}
+                    afterClose={this.handleOk} 
+                    onClose={this.handleOk}
+                    style={{paddingTop:'10px'}}
+                    >
+                     <List>
+                        {this.state.dictionaryList.map(i => (
+                          <CheckboxItem  key={i.value_code} onChange={() => this.onDictChange(i.value_code,i.value_name)}>
+                            {i.value_name}
+                          </CheckboxItem>
+                        ))}
+                      </List>
+                      {/* <InputItem
+                          style={{ width: 10, marginBottom: '10px' }}
+                          placeholder="请输入..." enterButton="查询"
+                          onSearch={value => this.onDictionarySearch(value)}
+                      /> */}
+                      <Pagination current={this.state.pageNumd}
+                          total={this.state.totald/this.state.perPaged}
+                          onChange={(pageNumd) => this.onPageNumdChange(pageNumd)} />
+                  </Modal>
+                  </WingBlank>
             </div>);
              
     }
