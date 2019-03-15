@@ -17,7 +17,8 @@ class IndexSearch extends React.Component{
         super(props);
         this.state = {
             path: this.props.match.params.path,
-            localStorgeSearchList:[]
+            localStorgeSearchList:[],
+            filterText:null
         }
     }
     componentDidMount() {
@@ -78,6 +79,10 @@ class IndexSearch extends React.Component{
             Toast.fail(error);
           });
     }
+    onClickTag(v){
+        this.autoFocusInst.focus();
+        this.setState({filterText:v.item});      
+    }
     render(){
         return (
             <div>
@@ -85,7 +90,7 @@ class IndexSearch extends React.Component{
                 <div>
                     <Icon type="left"  onClick={() => this.goback()} style={{float:'left',backgroundColor: '#efeff4',
                         height: '44px'}}/>
-                    <SearchBar  placeholder="说出你要查询什么..." onSubmit={(value) => this.getQueryResult(value)}
+                    <SearchBar  value={this.state.filterText} placeholder="说出你要查询什么..." onSubmit={(value) => this.getQueryResult(value)}
                       ref={ref => this.autoFocusInst = ref} onFocus={() => this.searchfouce()}/></div>
                 </List>
                 
@@ -98,7 +103,7 @@ class IndexSearch extends React.Component{
                             >搜索历史</Item>
                         <div className="tag-container">
                             {this.state.localStorgeSearchList.map((item,index) =>(
-                                <Tag color="magenta">{item}</Tag>
+                                <Tag color="magenta" onChange={()=>this.onClickTag({item})}>{item}</Tag>
                             ))}
                         </div>
                     </List>:''}
