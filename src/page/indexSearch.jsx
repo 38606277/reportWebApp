@@ -18,7 +18,7 @@ class IndexSearch extends React.Component{
         this.state = {
             path: this.props.match.params.path,
             localStorgeSearchList:[],
-            filterText:null
+            value:''
         }
     }
     componentDidMount() {
@@ -79,10 +79,16 @@ class IndexSearch extends React.Component{
             Toast.fail(error);
           });
     }
-    onClickTag(v){
+    onClickTag(value){
         this.autoFocusInst.focus();
-        this.setState({filterText:v.item});      
+        this.setState({value:value.item});      
     }
+    onClearSearch=()=>{
+        this.setState({value:''}); 
+    }
+    onChange= (value) => {
+        this.setState({ value });
+      };
     render(){
         return (
             <div>
@@ -90,8 +96,10 @@ class IndexSearch extends React.Component{
                 <div>
                     <Icon type="left"  onClick={() => this.goback()} style={{float:'left',backgroundColor: '#efeff4',
                         height: '44px'}}/>
-                    <SearchBar  value={this.state.filterText} placeholder="说出你要查询什么..." onSubmit={(value) => this.getQueryResult(value)}
-                      ref={ref => this.autoFocusInst = ref} onFocus={() => this.searchfouce()}/></div>
+                    <SearchBar  value={this.state.value} placeholder="请输入你想要查询的内容" onSubmit={(value)=> this.getQueryResult(value)} 
+                      ref={ref => this.autoFocusInst = ref} onFocus={() => this.searchfouce()} onClear={() => this.onClearSearch()}
+                      onChange={this.onChange}
+                      /></div>
                 </List>
                 
                 <div style={{display:'block'}}>
