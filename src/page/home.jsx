@@ -12,7 +12,7 @@ import 'echarts/lib/chart/bar';
 // 引入提示框和标题组件
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/title';
-
+import './home.scss';
 const _user = new User();
 const localStorge = new LocalStorge();
 
@@ -90,9 +90,11 @@ export default class Home extends React.Component {
     }
     return (
       <div>
+        <div className="headerBar">
          <CommonSearch onSearch={() => { this.onSearch() }}  toAI={()=>this.toAI()}/>
+         </div>
         {/* <Grid data={data1} columnNum={3} itemStyle={{ height: '150px', background: 'rgba(0,0,0,.05)' }} /> */}
-        <div >
+        <div style={{marginTop:'20px'}}>
           <Grid data={data} columnNum={4} hasLine={false} activeStyle={true} square={true} 
           onClick={(e,index) => this.onChangeClick(e,index)} />
         </div>

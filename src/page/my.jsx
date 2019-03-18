@@ -116,7 +116,7 @@ export default class My extends React.Component {
           mode="light"
           icon={<div style={{
             width: '22px',
-            height: '22px', background: 'url(../../src/assets/Home.png) center center /  21px 21px no-repeat'}}></div>}
+            height: '22px', background: 'url(../../src/assets/Home.png) no-repeat center center /  21px 21px '}}></div>}
           onLeftClick={() => this.goback()}
           style={{ backgroundColor: 'rgb(79,188,242)', color: 'rgb(255,255,255)' }}
           // rightContent={[
@@ -125,8 +125,16 @@ export default class My extends React.Component {
         >
           <span style={{ color: 'white' }}>我的设置</span>
         </NavBar>
-        <div style={{background:'url(../../src/assets/sandnab.jpg)'}}>
+        {/* <div style={{background:'url(../../src/assets/sandnab.jpg) no-repeat center center'}}>
           <div  className='head' ></div>
+        </div> */}
+        <div className="gerenzhonhx">
+          <div className="grzx_toub_beij"><img src="../../src/assets/sandnab.jpg"/></div>
+          <div className="grzx_toux_fus">
+            <div className="of">
+              <img src="../../src/assets/nh.jpg"/>
+            </div>
+         </div>
         </div>
         {this.state.isLogin==false?
           <List >
