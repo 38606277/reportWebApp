@@ -207,7 +207,7 @@ export default class TabBarExample extends React.Component {
     }else if(pageText=='My')
     {
       return (<div>
-        <My/>
+        <My callbackParent={this.onChildChanged}/>
       </div>)
     }
   }
