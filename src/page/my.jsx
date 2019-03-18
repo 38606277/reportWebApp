@@ -128,9 +128,9 @@ export default class My extends React.Component {
         <div style={{background:'url(../../src/assets/sandnab.jpg)'}}>
           <div  className='head' ></div>
         </div>
-        {this.state.isLogin==false?<div >
+        {this.state.isLogin==false?
           <List >
-            <List.Item>
+            <Item>
             {/* <InputItem
                 type="text"
                 name="address"
@@ -147,8 +147,8 @@ export default class My extends React.Component {
                 onKeyUp={e => this.onInputKeyUp(e)}
                 onChange={(v) => this.onInputChange('UserCode', v)}
               ></InputItem>
-            </List.Item>
-            <List.Item>
+            </Item>
+            <Item>
               <InputItem
                 type="password"
                 name="password"
@@ -156,31 +156,23 @@ export default class My extends React.Component {
                 onKeyUp={e => this.onInputKeyUp(e)}
                 onChange={v => this.onInputChange("Pwd", v)}
               ></InputItem>
-            </List.Item>
-            <List.Item>
+            </Item>
+            <Item>
               <Button type="primary" onClick={() => { this.onSubmit() }} >登录</Button><WhiteSpace />
-            </List.Item>
-          </List>
-        </div>    
-        :      
-        <div>
-        <List >
-            {/* <List.Item>
-            服务器地址:&nbsp;{this.state.address}
-            </List.Item> */}
-            <List.Item>
-            用&nbsp;&nbsp;户&nbsp;&nbsp;名:&nbsp;{this.state.UserCode}
-            </List.Item> 
-            <List.Item>
-            密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码:&nbsp;{this.state.Pwd}
-            </List.Item>
-            <List.Item>
+            </Item>
+          </List>  
+        :
+        <List>
+             {/* <Item extra={this.state.address}>服务器地址</Item> */}
+             <Item  thumb="../../src/assets/icon/user.png"  extra={this.state.UserCode}> 用户名 </Item>
+             <Item  thumb="../../src/assets/icon/pwd.png"   extra={this.state.Pwd}>密码</Item>
+            <Item>
               <div align="center">
-              <Button type="primary" onClick={this.logout} style={{width:'30%'}}>退出登录</Button><WhiteSpace />
+              <Button size="small" type="primary" onClick={this.logout} style={{width:'30%'}}>退出登录</Button><WhiteSpace />
               </div>
-            </List.Item>
+            </Item>
           </List>
-        </div>  }
+       }
       </div>
     )
   }
