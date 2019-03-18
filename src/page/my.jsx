@@ -168,7 +168,7 @@ export default class My extends React.Component {
              <Item  thumb="../../src/assets/icon/pwd.png"   extra={this.state.Pwd}>密码</Item>
             <Item>
               <div align="center">
-              <Button size="small" type="primary" onClick={this.logout} style={{width:'30%'}}>退出登录</Button><WhiteSpace />
+              <Button size="small" type="primary" onClick={this.logout} style={{width:'90px'}}>退出登录</Button><WhiteSpace />
               </div>
             </Item>
           </List>
