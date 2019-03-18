@@ -4,13 +4,13 @@ const localStorge = new LocalStorge();
 export default class HttpService {
     
     static getBaseUrl(){
-        var url="";
-        let userInfo=localStorge.getStorage('userInfo');
-        if(undefined!=userInfo && null!=userInfo && ''!=userInfo){
-            url=userInfo.address;
-        }else{
-            url=window.getServerUrl(); //"http://localhost:8080/";
-        }
+        var  url=window.getServerUrl();
+        // let userInfo=localStorge.getStorage('userInfo');
+        // if(undefined!=userInfo && null!=userInfo && ''!=userInfo){
+        //     url=userInfo.address;
+        // }else{
+        //     url=window.getServerUrl(); //"http://localhost:8080/";
+        // }
         return url;
     }
     

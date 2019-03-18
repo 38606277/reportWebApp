@@ -32,8 +32,8 @@ export default class My extends React.Component {
       this.setState({
         isLogin: true,
         UserCode:userInfo.userCode,
-        Pwd:userInfo.pwd,
-        address:userInfo.address
+        Pwd:userInfo.pwd
+      
       });
     }
   }
@@ -51,11 +51,11 @@ export default class My extends React.Component {
   // 当用户提交表单
   onSubmit() {
     
-    if(this.state.address==null || this.state.address=='')
-    {
-      Toast.info("服务器地址不能为空");
-      return false;
-    }
+    // if(this.state.address==null || this.state.address=='')
+    // {
+    //   Toast.info("服务器地址不能为空");
+    //   return false;
+    // }
     let loginInfo = {
       UserCode: this.state.UserCode,
       Pwd: this.state.Pwd,// "KfTaJa3vfLE=",
@@ -66,24 +66,27 @@ export default class My extends React.Component {
     checkResult.states = true;
     // 验证通过
     if (checkResult.status) {
-      HttpService.post('/reportServer/user/encodePwd',loginInfo.Pwd).then((response) => {
-        loginInfo.Pwd = response.encodePwd;
-        HttpService.post('/reportServer/user/Reactlogin',JSON.stringify(loginInfo)).then((response) => {
-          let datas=response.data;
-          datas.address=this.state.address;
-          localStorge.setStorage('userInfo',datas);
-          this.setState({isLogin:true});
-          //window.location.href = "#/Main";
-        }, (errMsg) => {
-          Toast.fail(errMsg);
-        });
-      }, (errMsg) => {
-        Toast.fail(errMsg);
+      HttpService.post('/reportServer/user/encodePwd',loginInfo.Pwd)
+      .then(response => {
+          loginInfo.Pwd = response.encodePwd;
+          HttpService.post('/reportServer/user/Reactlogin',JSON.stringify(loginInfo)).then(response => {
+            if(undefined!= response.data && null!= response.data){
+              let datas=response.data;
+              localStorge.setStorage('userInfo',datas);
+              this.setState({isLogin:true});
+            }else{
+              Toast.fail("登录失败，请检查用户名与密码");
+            }
+          }).catch((error) => {
+            Toast.fail("登录失败，请检查用户名与密码");
+          });
+      }).catch((error) => {
+        Toast.fail("登录失败，请检查用户名与密码");
       });
     }
     // 验证不通过
     else {
-      Toast.fail(errMsg);
+      Toast.fail("登录失败，请检查用户名与密码");
     }
   }
   //设置当前页面加载的对象，如果是null，则加载首次数据与div
@@ -128,14 +131,14 @@ export default class My extends React.Component {
         {this.state.isLogin==false?<div >
           <List >
             <List.Item>
-            <InputItem
+            {/* <InputItem
                 type="text"
                 name="address"
                 placeholder="服务器地址"
                 clear
                 onKeyUp={e => this.onInputKeyUp(e)}
                 onChange={(v) => this.onInputChange('address', v)}
-              ></InputItem>
+              ></InputItem> */}
               <InputItem
                 type="text"
                 name="username"
@@ -162,14 +165,14 @@ export default class My extends React.Component {
         :      
         <div>
         <List >
-            <List.Item>
+            {/* <List.Item>
             服务器地址:&nbsp;{this.state.address}
-            </List.Item>
+            </List.Item> */}
             <List.Item>
-            用&nbsp;&nbsp;&nbsp;户&nbsp;&nbsp;&nbsp;&nbsp;名:&nbsp;{this.state.UserCode}
+            用&nbsp;&nbsp;户&nbsp;&nbsp;名:&nbsp;{this.state.UserCode}
             </List.Item> 
             <List.Item>
-            密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码:&nbsp;{this.state.Pwd}
+            密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码:&nbsp;{this.state.Pwd}
             </List.Item>
             <List.Item>
               <div align="center">
