@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { List, WhiteSpace, WingBlank, Checkbox,SwipeAction, NavBar, Icon, InputItem, Toast, Button } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
+import  HttpService  from '../util/HttpService.jsx';
 import UserService from '../service/user-service.jsx';
 import LocalStorge  from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
@@ -65,9 +66,9 @@ export default class My extends React.Component {
     checkResult.states = true;
     // 验证通过
     if (checkResult.status) {
-      userService.encodePwd(loginInfo.Pwd).then((response) => {
+      HttpService.post('/reportServer/user/encodePwd',loginInfo.Pwd).then((response) => {
         loginInfo.Pwd = response.encodePwd;
-        userService.login(loginInfo).then((response) => {
+        HttpService.post('/reportServer/user/Reactlogin',JSON.stringify(loginInfo)).then((response) => {
           let datas=response.data;
           datas.address=this.state.address;
           localStorge.setStorage('userInfo',datas);

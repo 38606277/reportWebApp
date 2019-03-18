@@ -121,12 +121,12 @@ export default class QueryResult extends React.Component {
     let page = {};
     page.startIndex = this.state.startIndex;
     page.perPage = this.state.perPage;
-    HttpService.post('reportServer/query/getQueryParam/' + this.state.qry_id, null)
+    HttpService.post('/reportServer/query/getQueryParam/' + this.state.qry_id, null)
     .then(res => {
       if (res.resultCode == "1000") {
         this.setState({ outParam: res.data.out,isLoading:true });
         let aParam = [{ "in": this.state.inParam }, page];
-        HttpService.post('reportServer/query/execQuery/'+this.state.class_id+'/' + this.state.qry_id, JSON.stringify(aParam))
+        HttpService.post('/reportServer/query/execQuery/'+this.state.class_id+'/' + this.state.qry_id, JSON.stringify(aParam))
           .then(res => {
             if (res.resultCode == "1000") {
               this.setState({ data: res.data.list });
@@ -154,7 +154,7 @@ export default class QueryResult extends React.Component {
       page.startIndex = this.state.startIndex;
       page.perPage = this.state.perPage;
       let aParam = [{ "in": this.state.inParam }, page];
-      HttpService.post('reportServer/query/execQuery/'+this.state.class_id+'/' + this.state.qry_id, JSON.stringify(aParam))
+      HttpService.post('/reportServer/query/execQuery/'+this.state.class_id+'/' + this.state.qry_id, JSON.stringify(aParam))
         .then(res => {
           if (res.resultCode == "1000") {
             var moment_list = this.state.data;

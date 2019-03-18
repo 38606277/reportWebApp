@@ -85,7 +85,7 @@ export default class QueryInParam extends React.Component {
   }
   getAllQueryClass() {
     let param = {};
-    HttpService.post('reportServer/query/getQueryParamByFuncID/' + this.state.qry_id, null)
+    HttpService.post('/reportServer/query/getQueryParamByFuncID/' + this.state.qry_id, null)
       .then(res => {
         if (res.resultCode == "1000") {
           this.setState({ data: res.data.in });
@@ -105,7 +105,7 @@ export default class QueryInParam extends React.Component {
     let aParam = []
     aParam.push({ "in": this.state.inParam })
     // window.location.href = "#/ExecQuery";
-    HttpService.post('reportServer/query/execQuery/2/' + this.state.qry_id, JSON.stringify(aParam))
+    HttpService.post('/reportServer/query/execQuery/2/' + this.state.qry_id, JSON.stringify(aParam))
       .then(res => {
         if (res.resultCode == "1000")
           this.setState({ data: res.data })

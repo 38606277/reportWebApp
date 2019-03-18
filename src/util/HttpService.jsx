@@ -4,15 +4,19 @@ const localStorge = new LocalStorge();
 export default class HttpService {
     
     static getBaseUrl(){
-
-        var url=window.getServerUrl();//"http://localhost:8080/";
+        var url="";
+        let userInfo=localStorge.getStorage('userInfo');
+        if(undefined!=userInfo && null!=userInfo && ''!=userInfo){
+            url=userInfo.address;
+        }else{
+            url=window.getServerUrl(); //"http://localhost:8080/";
+        }
         return url;
     }
     
-    //
     static post(url,param){
         if((undefined==localStorge.getStorage('userInfo') && url!='/reportServer/user/encodePwd' && url!='/reportServer/user/Reactlogin') || (''==localStorge.getStorage('userInfo')  && url!='/reportServer/user/encodePwd' && url!='/reportServer/user/Reactlogin')){
-            window.location.href='#login';
+            window.location.href='#/Main';
             return  new Promise((resolve, reject) => {});
         }else{
             const fullUrl = HttpService.getBaseUrl() + url;

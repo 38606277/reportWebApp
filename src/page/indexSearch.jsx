@@ -66,7 +66,7 @@ class IndexSearch extends React.Component{
         }
         localStorge.setStorage('searchList', searchList);
         let param = {};
-        HttpService.post('reportServer/nlp/getResult/' + value, null)
+        HttpService.post('/reportServer/nlp/getResult/' + value, null)
           .then(res => {
             if (res.resultCode == "1000") {
               console.log(res.data);

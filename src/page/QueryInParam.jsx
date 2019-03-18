@@ -43,7 +43,7 @@ export default class QueryInParam extends React.Component {
   }
   getQueryParam() {
     let param = {};
-    HttpService.post('reportServer/query/getQueryParam/' + this.state.qry_id, null)
+    HttpService.post('/reportServer/query/getQueryParam/' + this.state.qry_id, null)
       .then(res => {
         if (res.resultCode == "1000") {
           let inColumns=res.data.in;

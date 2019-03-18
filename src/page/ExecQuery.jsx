@@ -65,7 +65,7 @@ export default class ExecQuery extends React.Component {
   }
   getAllQueryClass() {
     let param = {};
-    HttpService.post('reportServer/query/getQueryParamByFuncID/' + this.state.qry_id, null)
+    HttpService.post('/reportServer/query/getQueryParamByFuncID/' + this.state.qry_id, null)
       .then(res => {
         if (res.resultCode == "1000")
           this.setState({ data: res.data.in })

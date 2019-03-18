@@ -65,7 +65,7 @@ export default class QueryClassList extends React.Component {
   }
   getAllQueryClass() {
     let param = {};
-    HttpService.post('reportServer/query/getAllQueryClass', null)
+    HttpService.post('/reportServer/query/getAllQueryClass', null)
       .then(res => {
         if (res.resultCode == "1000"){
           this.setState({ data: res.data ,isLoading:false})

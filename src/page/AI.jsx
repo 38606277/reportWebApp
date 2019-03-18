@@ -20,7 +20,7 @@ export default class AI extends React.Component {
 
   getQueryResult(value) {
     let param = {};
-    HttpService.post('reportServer/nlp/getResult/' + value, null)
+    HttpService.post('/reportServer/nlp/getResult/' + value, null)
       .then(res => {
         if (res.resultCode == "1000") {
           console.log(res.data);

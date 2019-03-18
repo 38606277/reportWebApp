@@ -60,7 +60,7 @@ export default class QueryList extends React.Component {
   }
   getAllQueryClass() {
     let param = {};
-    HttpService.post('reportServer/query/getQueryByClassID/'+this.state.class_id, null)
+    HttpService.post('/reportServer/query/getQueryByClassID/'+this.state.class_id, null)
       .then(res => {
         if (res.resultCode == "1000")
           this.setState({ data: res.data })
