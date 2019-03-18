@@ -5,6 +5,7 @@ import QueryClassList from './QueryClassList.jsx';
 import AI from './AI.jsx';
 import Chat from './Chat.jsx';
 import Home from './home.jsx';
+import My from './My.jsx';
 
 
 const data = [
@@ -192,9 +193,11 @@ export default class TabBarExample extends React.Component {
           <Chat/>
         </div>
       )
-    }else 
+    }else if(pageText=='My')
     {
-      return (<div></div>)
+      return (<div>
+        <My/>
+      </div>)
     }
   }
 
@@ -215,13 +218,13 @@ export default class TabBarExample extends React.Component {
             icon={<div style={{
               width: '22px',
               height: '22px',
-              background: 'url(./../src/assets/sifuoDUQdAFKAVcFGROC.svg) center center /  21px 21px no-repeat' }}
+              background: 'url(./../src/assets/index.png) center center /  21px 21px no-repeat' }}
             />
             }
             selectedIcon={<div style={{
               width: '22px',
               height: '22px',
-              background: 'url(./../src/assets/iSrlOTqrKddqbOmlvUfq.svg) center center /  21px 21px no-repeat' }}
+              background: 'url(./../src/assets/index_on.png) center center /  21px 21px no-repeat' }}
             />
             }
             selected={this.state.selectedTab === 'blueTab'}
@@ -241,14 +244,14 @@ export default class TabBarExample extends React.Component {
               <div style={{
                 width: '22px',
                 height: '22px',
-                background: 'url(./../src/assets/BTSsmHkPsQSPTktcXyTV.svg) center center /  21px 21px no-repeat' }}
+                background: 'url(./../src/assets/index.png) center center /  21px 21px no-repeat' }}
               />
             }
             selectedIcon={
               <div style={{
                 width: '22px',
                 height: '22px',
-                background: 'url(./../src/assets/ekLecvKBnRazVLXbWOnE.svg) center center /  21px 21px no-repeat' }}
+                background: 'url(./../src/assets/index_on.png) center center /  21px 21px no-repeat' }}
               />
             }
             title="数据查询"
@@ -319,8 +322,8 @@ export default class TabBarExample extends React.Component {
             {this.renderContent('Chat')}
           </TabBar.Item>
           <TabBar.Item
-            icon={{ uri: './../src/assets/asJMfBrNqpMMlVpeInPQ.svg' }}
-            selectedIcon={{ uri: './../src/assets/gjpzzcrPMkhfEqgbYvmN.svg' }}
+            icon={{ uri: './../src/assets/my.png' }}
+            selectedIcon={{ uri: './../src/assets/my_on.png' }}
             title="我的"
             key="my"
             selected={this.state.selectedTab === 'yellowTab'}
