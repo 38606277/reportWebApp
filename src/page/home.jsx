@@ -92,22 +92,17 @@ export default class Home extends React.Component {
     }
     return (
       <div>
-        {/* <CommonSearch onSearch={() => { this.onSearch() }} /> */}
-        <div>
-          <WingBlank></WingBlank>
-          {/* <SearchBar placeholder="说出你要查询什么..." onSubmit={(value) => this.getQueryResult(value)} ref={ref => this.autoFocusInst = ref} /> */}
-          <CommonSearch onSearch={() => { this.onSearch() }}  toAI={()=>this.toAI()}/>
-          <WhiteSpace />
-        </div>
+         <CommonSearch onSearch={() => { this.onSearch() }}  toAI={()=>this.toAI()}/>
         {/* <Grid data={data1} columnNum={3} itemStyle={{ height: '150px', background: 'rgba(0,0,0,.05)' }} /> */}
         <div >
-          <Grid data={data} columnNum={4} hasLine={false} activeStyle={true} square={true} onClick={(e,index) => this.onChangeClick(e,index)} />
+          <Grid data={data} columnNum={4} hasLine={false} activeStyle={true} square={true} 
+          onClick={(e,index) => this.onChangeClick(e,index)} />
         </div>
         <WhiteSpace size="lg" />
         <Card full>
           <Card.Header
             title="我的任务"
-            thumb="https://gw.alipayobjects.com/zos/rmsportal/MRhHctKOineMbKAZslML.jpg"
+            thumb="../../src/assets/icon/renwu.png"
             extra={<span><Icon type='right' /></span>}
           />
           <Card.Body>
