@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon, Toast, Button } from 'antd-mobile';
+import { List, WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon, InputItem, Toast, Button } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import UserService from '../service/UserService.jsx';
@@ -103,37 +103,37 @@ export default class My extends React.Component {
           <span style={{ color: 'white' }}>我的设置</span>
         </NavBar>
         <div style={{ height: '130px', backgroundColor: 'rgb(79,188,242)' }}></div>
-        <list >
-
-          <Item
-            arrow="horizontal"
-            multipleLine
-            onClick={() => { }}
-          >
-          <img src='./../src/assets/index_on.png' height="30" width="30" />服务器地址
-            </Item>
-          <Item
-            arrow="horizontal"
-            thumb="https://zos.alipayobjects.com/rmsportal/dNuvNrtqUztHCwM.png"
-            multipleLine
-            onClick={() => { }}
-          >
-            用户名
-            </Item>
-          <Item
-            arrow="horizontal"
-            thumb="https://zos.alipayobjects.com/rmsportal/dNuvNrtqUztHCwM.png"
-            multipleLine
-            onClick={() => { }}
-          >
-            密码
-            </Item>
-
-          <Item>
-            <Button type="primary"  onClick={() => this.execQuery()} >登录</Button><WhiteSpace />
-            {/* <Button type="primary" size="large" inline onClick={this.onSubmit}>Submit</Button> */}
-          </Item>
-        </list>
+       
+          <List >
+            <List.Item>
+            <InputItem
+                type="text"
+                name="address"
+                placeholder="服务器地址"
+                clear
+              ></InputItem>
+              <InputItem
+                type="text"
+                name="username"
+                placeholder="输入用户名"
+                clear
+                onKeyUp={e => this.onInputKeyUp(e)}
+                onChange={(v) => this.onInputChange('UserCode', v)}
+              ></InputItem>
+            </List.Item>
+            <List.Item>
+              <InputItem
+                type="password"
+                name="password"
+                placeholder="******"
+                onKeyUp={e => this.onInputKeyUp(e)}
+                onChange={v => this.onInputChange("Pwd", v)}
+              ></InputItem>
+            </List.Item>
+            <List.Item>
+              <Button type="primary" onClick={() => { this.onSubmit() }} >退出登录</Button><WhiteSpace />
+            </List.Item>
+          </List>
       </div>
     )
   }
