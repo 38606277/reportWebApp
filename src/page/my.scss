@@ -1,13 +1,38 @@
 .head{
-    width: 8rem;
-    height: 8rem;
-    border-radius: 4rem;
-    -moz-border-radius: 4rem;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 3.2rem;
+    -moz-border-radius: 3.2rem;
     margin: 0 auto;
     background:#fff url(../../src/assets/head.png) no-repeat center center;
-    background-size: 3.5rem 4rem;
-    -o-background-size: 3.5rem 4.1rem;
-    -webkit-background-size: 3.5rem 4.1rem;
-    // margin-top: 0.8rem;
-    // margin-bottom: 0.8rem;
+    background-size: 3.0rem 3.5rem;
+    -o-background-size: 3.0rem 3.5rem;
+    -webkit-background-size: 3.0rem 3.5rem;
+    margin-top: 0.8rem;
+    margin-bottom: 0.8rem;
 }
+
+.gerenzhonhx{width: 100%;height:6rem;position: relative;}
+.gerenzhonhx h1{    margin: 0;}
+.grzx_toub_beij{width: 100%;height: 6rem;}
+
+.grzx_toub_beij img{width:100%;height: 6rem;}
+.grzx_toux_fus{position: absolute; top:0;left: 0;z-index: 1; width: 100%;height: 6rem; text-align:center; }
+.grzx_toux_fus .of{display: inline-block; padding-top: 0.6rem;text-align: center;}
+.grzx_toux_fus .of img{width: 4rem; height: 4rem;  border-radius: 3.2rem; border-radius:50%; overflow: hidden; display: inline-block;
+    background-size: 3.0rem 3.5rem;
+    -o-background-size: 3.0rem 3.5rem;
+    -webkit-background-size: 3.0rem 3.5rem;}
+// .grzx_toux_fus .of{
+//     width: 4rem;
+//     height: 4rem;
+//     border-radius: 3.2rem;
+//     -moz-border-radius: 3.2rem;
+//     margin: 0 auto;
+//     background: url(../../src/assets/nh.jpg) no-repeat center center;
+//     background-size: 2.0rem 2.5rem;
+//     -o-background-size: 2.0rem 2.5rem;
+//     -webkit-background-size: 2.0rem 2.5rem;
+//     margin-top: 0.8rem;
+//     margin-bottom: 0.8rem;
+//     }
