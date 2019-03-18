@@ -7,18 +7,16 @@ import LocalStorge  from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
 const userService = new UserService();
 const Item = List.Item;
-const CheckboxItem = Checkbox.CheckboxItem;
-const AgreeItem = Checkbox.AgreeItem;
 const Brief = Item.Brief;
 import './my.scss';
 
 export default class My extends React.Component {
   constructor(props) {
     super(props);
-    const renderResultParam = null;
     this.state = {
       UserCode: '',
       Pwd: '',
+      address:'',
       class_id: this.props.class_id,
       data: [],
       imgHeight: 176,
@@ -32,7 +30,9 @@ export default class My extends React.Component {
     if(undefined!=userInfo && null!=userInfo && ''!=userInfo){
       this.setState({
         isLogin: true,
-        UserCode:userInfo.userCode
+        UserCode:userInfo.userCode,
+        Pwd:userInfo.pwd,
+        address:userInfo.address
       });
     }
   }
@@ -49,6 +49,12 @@ export default class My extends React.Component {
   }
   // 当用户提交表单
   onSubmit() {
+    
+    if(this.state.address==null || this.state.address=='')
+    {
+      Toast.info("服务器地址不能为空");
+      return false;
+    }
     let loginInfo = {
       UserCode: this.state.UserCode,
       Pwd: this.state.Pwd,// "KfTaJa3vfLE=",
@@ -62,7 +68,9 @@ export default class My extends React.Component {
       userService.encodePwd(loginInfo.Pwd).then((response) => {
         loginInfo.Pwd = response.encodePwd;
         userService.login(loginInfo).then((response) => {
-          localStorge.setStorage('userInfo', response.data);
+          let datas=response.data;
+          datas.address=this.state.address;
+          localStorge.setStorage('userInfo',datas);
           this.setState({isLogin:true});
           //window.location.href = "#/Main";
         }, (errMsg) => {
@@ -89,7 +97,7 @@ export default class My extends React.Component {
   }
   logout=()=>{
     localStorge.removeStorage('userInfo');
-    this.setState({isLogin:false});
+    this.setState({isLogin:false,address:null});
     //window.location.href="#/Login";
   }
  
@@ -124,6 +132,8 @@ export default class My extends React.Component {
                 name="address"
                 placeholder="服务器地址"
                 clear
+                onKeyUp={e => this.onInputKeyUp(e)}
+                onChange={(v) => this.onInputChange('address', v)}
               ></InputItem>
               <InputItem
                 type="text"
@@ -152,13 +162,18 @@ export default class My extends React.Component {
         <div>
         <List >
             <List.Item>
-            {"服务器地址"}
+            服务器地址:{this.state.address}
             </List.Item>
             <List.Item>
               用户名:{this.state.UserCode}
+            </List.Item> 
+            <List.Item>
+              密码:{this.state.Pwd}
             </List.Item>
             <List.Item>
-              <Button type="primary" onClick={this.logout} >退出登录</Button><WhiteSpace />
+              <div align="center">
+              <Button type="primary" onClick={this.logout} style={{width:'30%'}}>退出登录</Button><WhiteSpace />
+              </div>
             </List.Item>
           </List>
         </div>  }
