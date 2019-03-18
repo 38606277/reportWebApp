@@ -121,9 +121,9 @@ export default class My extends React.Component {
         >
           <span style={{ color: 'white' }}>我的设置</span>
         </NavBar>
-        
-        <div className='head' style={{ background:'url(../../src/assets/head.png) no-repeat center center'}}></div>
-        
+        <div style={{background:'url(../../src/assets/sandnab.jpg)'}}>
+          <div  className='head' ></div>
+        </div>
         {this.state.isLogin==false?<div >
           <List >
             <List.Item>
@@ -162,13 +162,13 @@ export default class My extends React.Component {
         <div>
         <List >
             <List.Item>
-            服务器地址:{this.state.address}
+            服务器地址:&nbsp;{this.state.address}
             </List.Item>
             <List.Item>
-              用户名:{this.state.UserCode}
+            用&nbsp;&nbsp;&nbsp;户&nbsp;&nbsp;&nbsp;&nbsp;名:&nbsp;{this.state.UserCode}
             </List.Item> 
             <List.Item>
-              密码:{this.state.Pwd}
+            密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码:&nbsp;{this.state.Pwd}
             </List.Item>
             <List.Item>
               <div align="center">
