@@ -42,8 +42,6 @@ export default class Home extends React.Component {
     var myChart = echarts.init(document.getElementById('main'));
     // 绘制图表
     myChart.setOption({
-      title: { text: '收入情况' },
-      tooltip: {},
       xAxis: {
         data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
       },
@@ -114,8 +112,12 @@ export default class Home extends React.Component {
         </Card>
 
         <WhiteSpace size="lg" />
-        <Card full>
-
+        <Card full >
+        <Card.Header style={{fontSize:'14px'}}
+            title="我的任务"
+            thumb="https://gw.alipayobjects.com/zos/rmsportal/MRhHctKOineMbKAZslML.jpg"
+            extra={<span><Icon type='right' /></span>}
+          />
           <Card.Body>
             <div id="main" style={{ width: 300, height: 240 }}></div>
           </Card.Body>
