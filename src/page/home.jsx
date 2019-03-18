@@ -68,6 +68,9 @@ export default class Home extends React.Component {
       paramClass: null
     });
   }
+  toAI(){
+    this.props.selectedTab('ChatTab');
+  }
   onClick = ((el, index) => {
     alert(el);
   })
@@ -85,14 +88,15 @@ export default class Home extends React.Component {
   //界面渲染
   render() {
     if (this.state.paramClass == null) {
-      this.renderResult = (<CommonSearch onSearch={() => { this.onSearch() }} />)
+      this.renderResult = (<CommonSearch onSearch={() => { this.onSearch() }} toAI={()=>this.toAI()}/>)
     }
     return (
       <div>
         {/* <CommonSearch onSearch={() => { this.onSearch() }} /> */}
         <div>
           <WingBlank></WingBlank>
-          <SearchBar placeholder="说出你要查询什么..." onSubmit={(value) => this.getQueryResult(value)} ref={ref => this.autoFocusInst = ref} />
+          {/* <SearchBar placeholder="说出你要查询什么..." onSubmit={(value) => this.getQueryResult(value)} ref={ref => this.autoFocusInst = ref} /> */}
+          <CommonSearch onSearch={() => { this.onSearch() }}  toAI={()=>this.toAI()}/>
           <WhiteSpace />
         </div>
         {/* <Grid data={data1} columnNum={3} itemStyle={{ height: '150px', background: 'rgba(0,0,0,.05)' }} /> */}
