@@ -259,14 +259,14 @@ export default class TabBarExample extends React.Component {
               <div style={{
                 width: '22px',
                 height: '22px',
-                background: 'url(./../src/assets/index.png) center center /  21px 21px no-repeat' }}
+                background: 'url(./../src/assets/jifen.png) center center /  21px 21px no-repeat' }}
               />
             }
             selectedIcon={
               <div style={{
                 width: '22px',
                 height: '22px',
-                background: 'url(./../src/assets/index_on.png) center center /  21px 21px no-repeat' }}
+                background: 'url(./../src/assets/jifen_on.png) center center /  21px 21px no-repeat' }}
               />
             }
             title="数据查询"
