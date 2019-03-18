@@ -102,7 +102,9 @@ export default class My extends React.Component {
       <div>
         <NavBar
           mode="light"
-          icon={<Icon type="left" />}
+          icon={<div style={{
+            width: '22px',
+            height: '22px', background: 'url(../../src/assets/Home.png) center center /  21px 21px no-repeat'}}></div>}
           onLeftClick={() => this.goback()}
           style={{ backgroundColor: 'rgb(79,188,242)', color: 'rgb(255,255,255)' }}
           // rightContent={[
