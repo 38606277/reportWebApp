@@ -54,17 +54,18 @@ export default class LocalStorage {
             let exp=1000*60*5*60;//1000*60*5*60
             let dataObj = JSON.parse(data);
             let t=new Date().getTime() - dataObj.time;
-            if (t>exp) {
-                window.localStorage.removeItem(name);
-                let lasturl = window.location.href.split('#')[1] || '';
-                window.localStorage.setItem('lasurl', lasturl);
-                alert('登录信息已过期，请重新登录！');
-                return '';
-            }else{
-                //console.log("data="+dataObj.data);
-                //console.log(JSON.parse(dataObj.data));
-                return dataObj.data;
-            }
+            return dataObj.data;
+            // if (t>exp) {
+            //     window.localStorage.removeItem(name);
+            //     let lasturl = window.location.href.split('#')[1] || '';
+            //     window.localStorage.setItem('lasurl', lasturl);
+            //     alert('登录信息已过期，请重新登录！');
+            //     return '';
+            // }else{
+            //     //console.log("data="+dataObj.data);
+            //     //console.log(JSON.parse(dataObj.data));
+            //     return dataObj.data;
+            // }
         } else {
             if(null!=data && 'null'!=data && ''!=data){
                 return data;

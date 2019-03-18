@@ -32,7 +32,8 @@ export default class Home extends React.Component {
     super(props);
     const renderResult = null;
     this.state = {
-      paramClass: null
+      paramClass: null,
+      selectedTab:this.props.selectedTab,
     }
   }
 
@@ -70,6 +71,17 @@ export default class Home extends React.Component {
   onClick = ((el, index) => {
     alert(el);
   })
+  onChangeClick(e,index){
+    if(index==0){
+      this.props.selectedTab("redTab");
+    }else if(index==1){
+      this.props.selectedTab('greenTab');
+    }else if(index==2){
+      this.props.selectedTab('yellowTab');
+    }else if(index==3){
+      this.props.selectedTab('ChatTab');
+    }
+  }
   //界面渲染
   render() {
     if (this.state.paramClass == null) {
@@ -85,7 +97,7 @@ export default class Home extends React.Component {
         </div>
         {/* <Grid data={data1} columnNum={3} itemStyle={{ height: '150px', background: 'rgba(0,0,0,.05)' }} /> */}
         <div >
-          <Grid data={data} columnNum={4} hasLine={false} activeStyle={true} square={true} onClick={() => this.onClick()} />
+          <Grid data={data} columnNum={4} hasLine={false} activeStyle={true} square={true} onClick={(e,index) => this.onChangeClick(e,index)} />
         </div>
         <WhiteSpace size="lg" />
         <Card full>

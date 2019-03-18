@@ -2,6 +2,9 @@ import { TabBar, ListView } from 'antd-mobile';
 import ReactDOM   from 'react-dom';
 import React        from 'react';
 import QueryClassList from './QueryClassList.jsx';
+import LocalStorge  from '../util/LogcalStorge.jsx';
+const localStorge = new LocalStorge();
+
 import AI from './AI.jsx';
 import Chat from './Chat.jsx';
 import Home from './home.jsx';
@@ -171,7 +174,15 @@ export default class TabBarExample extends React.Component {
       hidden: false,
     };
   }
-
+  componentDidMount() {
+    let userInfo=localStorge.getStorage('userInfo');
+    if(undefined==userInfo || null==userInfo || ''==userInfo){
+      this.setState({
+        selectedTab: "yellowTab"
+      });
+     // window.location.href="#/Login";
+    }
+  }
   renderContent(pageText) {
     if(pageText=='query')
     {
@@ -200,7 +211,11 @@ export default class TabBarExample extends React.Component {
       </div>)
     }
   }
-
+  onChildChanged=(selectedTab)=>{
+    this.setState({
+      selectedTab: selectedTab
+    });
+  }
   render() {
     return (
       <div style={{ position: 'fixed', height: '100%', width: '100%', top: 0 }}>
@@ -236,7 +251,7 @@ export default class TabBarExample extends React.Component {
             }}
             data-seed="logId"
           >
-          <Home/>
+          <Home selectedTab={this.onChildChanged}></Home>
             {/* <ListViewExample /> */}
           </TabBar.Item>
           <TabBar.Item

@@ -1,37 +1,75 @@
 import React from 'react';
-import { List, WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon, InputItem, Toast, Button } from 'antd-mobile';
-import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
-import UserService from '../service/UserService.jsx';
-import HttpService from '../util/HttpService.jsx';
-import QueryInParam from './QueryInParam.jsx';
+import { List, WhiteSpace, WingBlank, Checkbox,SwipeAction, NavBar, Icon, InputItem, Toast, Button } from 'antd-mobile';
+import 'antd-mobile/dist/antd-mobile.css';
+import UserService from '../service/user-service.jsx';
+import LocalStorge  from '../util/LogcalStorge.jsx';
+const localStorge = new LocalStorge();
 const userService = new UserService();
 const Item = List.Item;
 const CheckboxItem = Checkbox.CheckboxItem;
 const AgreeItem = Checkbox.AgreeItem;
 const Brief = Item.Brief;
+import './my.scss';
 
 export default class My extends React.Component {
   constructor(props) {
     super(props);
     const renderResultParam = null;
     this.state = {
+      UserCode: '',
+      Pwd: '',
       class_id: this.props.class_id,
       data: [],
       imgHeight: 176,
       driver: "aaaa",
-      paramClass: null
+      paramClass: null,
+      isLogin:false
     }
   }
+  componentDidMount() {
 
-
-
-
-  onReset() {
-    this.props.form.resetFields();
   }
-  onOpenChange() {
-
+  // 当用户名发生改变
+  onInputChange(name, value) {
+    this.setState({
+      [name]: value
+    });
+  }
+  onInputKeyUp(e) {
+    if (e.keyCode === 13) {
+      this.onSubmit();
+    }
+  }
+  // 当用户提交表单
+  onSubmit() {
+    let loginInfo = {
+      UserCode: this.state.UserCode,
+      Pwd: this.state.Pwd,// "KfTaJa3vfLE=",
+      import: "",
+      isAdmin: ""
+    },
+    checkResult = userService.checkLoginInfo(loginInfo);
+    checkResult.states = true;
+    // 验证通过
+    if (checkResult.status) {
+      userService.encodePwd(loginInfo.Pwd).then((response) => {
+        loginInfo.Pwd = response.encodePwd;
+        userService.login(loginInfo).then((response) => {
+          localStorge.setStorage('userInfo', response.data);
+          this.setState({isLogin:true});
+          //window.location.href = "#/Main";
+        }, (errMsg) => {
+          Toast.fail(errMsg);
+        });
+      }, (errMsg) => {
+        Toast.fail(errMsg);
+      });
+    }
+    // 验证不通过
+    else {
+      Toast.fail(errMsg);
+    }
   }
   //设置当前页面加载的对象，如果是null，则加载首次数据与div
   onChildChanged = () => {
@@ -40,13 +78,15 @@ export default class My extends React.Component {
     });
   }
   onClassClick(qry_id) {
-    //window.location.href = "#/QueryInParam/"+qry_id;
     this.setState({ paramClass: qry_id });
-    this.renderResultParam = <QueryInParam class_id={this.state.class_id} qry_id={qry_id} callbackParent={this.onChildChanged} />;
+    //this.renderResultParam = <QueryInParam class_id={this.state.class_id} qry_id={qry_id} callbackParent={this.onChildChanged} />;
   }
-
-  componentDidMount() {
+  logout=()=>{
+    localStorge.removeStorage('userInfo');
+    this.setState({isLogin:false});
+    //window.location.href="#/Login";
   }
+ 
   //设置上一窗口的数据进行显示，返回上一级
   goback() {
     this.props.callbackParent();
@@ -60,7 +100,7 @@ export default class My extends React.Component {
             icon={<Icon type="left" />}
             onLeftClick={() => this.goback()}
             rightContent={[
-              <Icon key="1" type="ellipsis" onClick={this.loadData} />
+              <Icon key="1" type="ellipsis" onClick={this.logout} />
             ]}
           >
             我的设置
@@ -102,8 +142,10 @@ export default class My extends React.Component {
         >
           <span style={{ color: 'white' }}>我的设置</span>
         </NavBar>
-        <div style={{ height: '130px', backgroundColor: 'rgb(79,188,242)' }}></div>
-       
+        
+        <div className='head' style={{ background:'url(../../src/assets/head.png) no-repeat center center'}}></div>
+        
+        {this.state.isLogin==false?<div >
           <List >
             <List.Item>
             <InputItem
@@ -131,9 +173,24 @@ export default class My extends React.Component {
               ></InputItem>
             </List.Item>
             <List.Item>
-              <Button type="primary" onClick={() => { this.onSubmit() }} >退出登录</Button><WhiteSpace />
+              <Button type="primary" onClick={() => { this.onSubmit() }} >登录</Button><WhiteSpace />
             </List.Item>
           </List>
+        </div>    
+        :      
+        <div>
+        <List >
+            <List.Item>
+            {"服务器地址"}
+            </List.Item>
+            <List.Item>
+              用户名:{this.state.UserCode}
+            </List.Item>
+            <List.Item>
+              <Button type="primary" onClick={this.logout} >退出登录</Button><WhiteSpace />
+            </List.Item>
+          </List>
+        </div>  }
       </div>
     )
   }
