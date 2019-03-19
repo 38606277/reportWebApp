@@ -5,6 +5,7 @@ import QueryClassList from './QueryClassList.jsx';
 import LocalStorge  from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
 
+import WxTabBar from '../components/TabBar';
 import AI from './AI.jsx';
 import Chat from './Chat.jsx';
 import Home from './home.jsx';
@@ -219,7 +220,7 @@ export default class TabBarExample extends React.Component {
   render() {
     return (
       <div style={{ position: 'fixed', height: '100%', width: '100%', top: 0 }}>
-        <TabBar
+        {/* <TabBar
           unselectedTintColor="#949494"
           tintColor="#33A3F4"
           barTintColor="white"
@@ -243,7 +244,6 @@ export default class TabBarExample extends React.Component {
             />
             }
             selected={this.state.selectedTab === 'blueTab'}
-            // badge={1}
             onPress={() => {
               this.setState({
                 selectedTab: 'blueTab',
@@ -252,7 +252,6 @@ export default class TabBarExample extends React.Component {
             data-seed="logId"
           >
           <Home selectedTab={this.onChildChanged}></Home>
-            {/* <ListViewExample /> */}
           </TabBar.Item>
           <TabBar.Item
             icon={
@@ -271,7 +270,6 @@ export default class TabBarExample extends React.Component {
             }
             title="数据查询"
             key="Koubei"
-            // badge={'new'}
             selected={this.state.selectedTab === 'redTab'}
             onPress={() => {
               this.setState({
@@ -350,7 +348,9 @@ export default class TabBarExample extends React.Component {
           >
             {this.renderContent('My')}
           </TabBar.Item>
-        </TabBar>
+        </TabBar> */}
+        <Home selectedTab={this.onChildChanged}></Home>
+        <WxTabBar {...this.props} />
       </div>
     );
   }

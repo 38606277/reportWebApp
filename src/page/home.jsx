@@ -57,37 +57,28 @@ export default class Home extends React.Component {
 
   // 当用户点击查询文本框时显示真正的查询文本框
   onSearch() {
-    this.setState({ paramClass: "search" });
-    window.location.href = "#/IndexSearch/Main";
-    // this.renderResult=<IndexSearch callbackParent={this.onChildChanged}/>;
+    window.location.href = "#/IndexSearch/Home";
   }
-  onChildChanged = () => {
-    this.setState({
-      paramClass: null
-    });
-  }
+  
   toAI(){
-    this.props.selectedTab('ChatTab');
+    window.location.href = "#/Chat";
   }
   onClick = ((el, index) => {
     alert(el);
   })
   onChangeClick(e,index){
     if(index==0){
-      this.props.selectedTab("redTab");
+      window.location.href = "#/Query";
     }else if(index==1){
-      this.props.selectedTab('greenTab');
+      window.location.href = "#/AI";
     }else if(index==2){
-      this.props.selectedTab('yellowTab');
+      window.location.href = "#/Chat";
     }else if(index==3){
-      this.props.selectedTab('ChatTab');
+      window.location.href = "#/My";
     }
   }
   //界面渲染
   render() {
-    if (this.state.paramClass == null) {
-      this.renderResult = (<CommonSearch onSearch={() => { this.onSearch() }} toAI={()=>this.toAI()}/>)
-    }
     return (
       <div>
         <div className="headerBar">
@@ -123,7 +114,6 @@ export default class Home extends React.Component {
             <div id="main" style={{ width: 300, height: 240 }}></div>
           </Card.Body>
         </Card>
-
       </div>
     )
   }

@@ -5,6 +5,7 @@ import 'antd-mobile/dist/antd-mobile.css';
 import  HttpService  from '../util/HttpService.jsx';
 import UserService from '../service/user-service.jsx';
 import LocalStorge  from '../util/LogcalStorge.jsx';
+
 const localStorge = new LocalStorge();
 const userService = new UserService();
 const Item = List.Item;
@@ -20,9 +21,6 @@ export default class My extends React.Component {
       address:'',
       class_id: this.props.class_id,
       data: [],
-      imgHeight: 176,
-      driver: "aaaa",
-      paramClass: null,
       isLogin:false
     }
   }
@@ -33,7 +31,6 @@ export default class My extends React.Component {
         isLogin: true,
         UserCode:userInfo.userCode,
         Pwd:userInfo.pwd
-      
       });
     }
   }
@@ -50,12 +47,6 @@ export default class My extends React.Component {
   }
   // 当用户提交表单
   onSubmit() {
-    
-    // if(this.state.address==null || this.state.address=='')
-    // {
-    //   Toast.info("服务器地址不能为空");
-    //   return false;
-    // }
     let loginInfo = {
       UserCode: this.state.UserCode,
       Pwd: this.state.Pwd,// "KfTaJa3vfLE=",
@@ -89,25 +80,16 @@ export default class My extends React.Component {
       Toast.fail("登录失败，请检查用户名与密码");
     }
   }
-  //设置当前页面加载的对象，如果是null，则加载首次数据与div
-  onChildChanged = () => {
-    this.setState({
-      paramClass: null
-    });
-  }
-  onClassClick(qry_id) {
-    this.setState({ paramClass: qry_id });
-    //this.renderResultParam = <QueryInParam class_id={this.state.class_id} qry_id={qry_id} callbackParent={this.onChildChanged} />;
-  }
+  
   logout=()=>{
     localStorge.removeStorage('userInfo');
     this.setState({isLogin:false,address:null});
-    //window.location.href="#/Login";
+    //window.location.href="#/Home";
   }
  
   //设置上一窗口的数据进行显示，返回上一级
   goback() {
-    this.props.callbackParent("blueTab");
+    window.location.href="#/Home";
   }
   render() {
     return (
@@ -139,14 +121,6 @@ export default class My extends React.Component {
         {this.state.isLogin==false?
           <List >
             <Item>
-            {/* <InputItem
-                type="text"
-                name="address"
-                placeholder="服务器地址"
-                clear
-                onKeyUp={e => this.onInputKeyUp(e)}
-                onChange={(v) => this.onInputChange('address', v)}
-              ></InputItem> */}
               <InputItem
                 type="text"
                 name="username"
@@ -171,7 +145,6 @@ export default class My extends React.Component {
           </List>  
         :
         <List>
-             {/* <Item extra={this.state.address}>服务器地址</Item> */}
              <Item  thumb="../../src/assets/icon/user.png"  extra={this.state.UserCode}> 用户名 </Item>
              <Item  thumb="../../src/assets/icon/pwd.png"   extra={this.state.Pwd}>密码</Item>
             <Item>

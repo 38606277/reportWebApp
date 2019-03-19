@@ -76,11 +76,6 @@ export default class AI extends React.Component {
               {val.VENDOR_NAME}
             </List.Item>
           ))} */}
-          <list renderHeader={() => 'aa缴费'}
-            renderFooter={() => (<div style={{ padding: 30, textAlign: 'center' }}>
-              {this.state.isLoading ? 'Loading...' : 'Loaded'}
-            </div>)}
-          >
             {this.state.data.map(val => (
               <Item
                 arrow="down"
@@ -101,7 +96,6 @@ export default class AI extends React.Component {
                 )}
               </Item>
             ))}
-          </list>
         </List>
       </div>
     );

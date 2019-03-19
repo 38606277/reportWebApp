@@ -4,8 +4,6 @@ import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import UserService from '../service/UserService.jsx';
 import HttpService from '../util/HttpService.jsx';
-import QueryResult from './QueryResult.jsx';
-
 const userService = new UserService();
 const Item = List.Item;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -15,10 +13,9 @@ const Brief = Item.Brief;
 export default class QueryInParam extends React.Component {
   constructor(props) {
     super(props);
-    const renderQueryResult=null;
     this.state = {
-      qry_id: this.props.qry_id,
-      class_id:this.props.class_id,
+      qry_id: this.props.match.params.qry_id,
+      class_id:this.props.match.params.class_id,
       data: [],      inParam: {},
       displayInParam:{},      imgHeight: 176,
       driver: "aaaa",      paramClass:null,
@@ -111,14 +108,7 @@ export default class QueryInParam extends React.Component {
         }
     });
   }
-    //设置当前页面加载的对象，如果是null，则加载首次数据与div
-  onChildChanged=()=>{
-    let clearparm={};
-    for (let key of Object.keys(this.state.inParam)) {
-      clearparm[key]=null;
-    }
-    this.setState({ paramClass: null, inParam:clearparm });
-  }
+  
   execQuery() {
     let paramStr = "";
     for (let key of Object.keys(this.state.inParam)) {
@@ -126,7 +116,7 @@ export default class QueryInParam extends React.Component {
     }
     paramStr = paramStr.substring(1, paramStr.length);
     this.setState({paramClass:this.state.qry_id});
-    this.renderQueryResult=<QueryResult qry_id={this.state.qry_id} class_id={this.state.class_id} inParam={paramStr} callbackParent={this.onChildChanged}/>;
+    window.location.href = "#/QueryResult/"+this.state.class_id+"/"+this.state.qry_id+"/"+paramStr;
   }
   onValueChange(fieldName, value) {
     const {inParam}=this.state;
@@ -222,11 +212,11 @@ onSelectChangeDic = (selectedRowKeys) => {
 }
 //设置上一窗口的数据进行显示，返回上一级
   goback(){
-    this.props.callbackParent();
+    window.location.href = "#/QueryList/"+this.state.class_id;
+    //this.props.callbackParent();
   }
   
   onDictChange=(v,name)=>{
-    //console.log(v,name);
     const {selectedRowKeys}=this.state;
     let newarr=[];
     let v1=0;
@@ -313,63 +303,53 @@ onSelectChangeDic = (selectedRowKeys) => {
       }
     }
     );
-    if(this.state.data.length>0 && this.state.paramClass==null){
-      this.renderQueryResult=(
-          <div>
-              <NavBar
-                mode="light"
-                icon={<Icon type="left" />}
-                onLeftClick={() => this.goback()}
-                // rightContent={[
-                //   <Icon key="1" type="ellipsis" onClick={this.loadData} />
-                // ]}
-              >
-                输入查询条件
-              </NavBar>
-
-              <List>
-                {html}
-                <Item>
-                  <Button type="primary" onClick={() => this.execQuery()} >执行查询</Button><WhiteSpace />
-                  {/* <Button type="primary" size="large" inline onClick={this.onSubmit}>Submit</Button> */}
-                </Item>
-              </List>
-
-              {/* <WhiteSpace size="lg" />
-              <WingBlank><Link to='/UserPayList'>缴费记录</Link></WingBlank> */}
-              <WingBlank>
-                  <Modal popup={true} 
-                    title="字典查询" 
-                    visible={this.state.visible}
-                    maskClosable={false}
-                    closable={true}
-                    afterClose={this.handleOk} 
-                    onClose={this.handleOk}
-                    style={{paddingTop:'10px'}}
-                    >
-                     <List>
-                        {this.state.dictionaryList.map(i => (
-                          <CheckboxItem  key={i.value_code} onChange={() => this.onDictChange(i.value_code,i.value_name)}>
-                            {i.value_name}
-                          </CheckboxItem>
-                        ))}
-                      </List>
-                      {/* <InputItem
-                          style={{ width: 10, marginBottom: '10px' }}
-                          placeholder="请输入..." enterButton="查询"
-                          onSearch={value => this.onDictionarySearch(value)}
-                      /> */}
-                      <Pagination current={this.state.pageNumd}
-                          total={this.state.totald/this.state.perPaged}
-                          onChange={(pageNumd) => this.onPageNumdChange(pageNumd)} />
-                  </Modal>
-                  </WingBlank>
-            </div>);
-             
-    }
+    
     return (
       
-      <div>{this.renderQueryResult}</div>
+      <div>
+        <NavBar
+            mode="light"
+            icon={<Icon type="left" />}
+            onLeftClick={() => this.goback()}
+            // rightContent={[
+            //   <Icon key="1" type="ellipsis" onClick={this.loadData} />
+            // ]}
+          >
+            输入查询条件
+          </NavBar>
+
+          <List style={{ textAlign: 'center',marginBottom:"50px" }}>
+            {html}
+            <Item>
+              <Button type="primary" onClick={() => this.execQuery()} >执行查询</Button><WhiteSpace />
+              {/* <Button type="primary" size="large" inline onClick={this.onSubmit}>Submit</Button> */}
+            </Item>
+          </List>
+          <WhiteSpace size="lg" />
+          <WingBlank>
+              <Modal popup={true} 
+                title="字典查询" 
+                visible={this.state.visible}
+                maskClosable={false}
+                closable={true}
+                afterClose={this.handleOk} 
+                onClose={this.handleOk}
+                style={{paddingTop:'10px'}}
+                >
+                <List>
+                    {this.state.dictionaryList.map(i => (
+                      <CheckboxItem  key={i.value_code} onChange={() => this.onDictChange(i.value_code,i.value_name)}>
+                        {i.value_name}
+                      </CheckboxItem>
+                    ))}
+                  </List>
+                  
+                  <Pagination current={this.state.pageNumd}
+                      total={this.state.totald/this.state.perPaged}
+                      onChange={(pageNumd) => this.onPageNumdChange(pageNumd)} />
+              </Modal>
+              </WingBlank>
+      </div>
     )
   }
 }
