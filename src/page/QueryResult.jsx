@@ -3,6 +3,7 @@ import { List, Toast, WhiteSpace, WingBlank, Checkbox, ActivityIndicator,Action,
 import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import ReactDOM from 'react-dom';
+import WxTabBar from '../components/TabBar';
 
 import './QueryResult.scss';
 
@@ -45,9 +46,9 @@ export default class QueryResult extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      qry_id: this.props.qry_id,
-      class_id: this.props.class_id,
-      inStrParam: this.props.inParam,
+      qry_id: this.props.match.params.qry_id,
+      class_id:this.props.match.params.class_id,
+      inStrParam: this.props.match.params.inParam,
       data: [],
       inParam: {},
       imgHeight: 176,
@@ -182,7 +183,9 @@ export default class QueryResult extends React.Component {
   }
   //设置上一窗口的数据进行显示，返回上一级
   goback(){
-    this.props.callbackParent();
+    window.location.href = "#/QueryInParam/"+this.state.class_id+"/"+this.state.qry_id;
+
+    //this.props.callbackParent();
   }
   render() {
     return (
@@ -210,7 +213,7 @@ export default class QueryResult extends React.Component {
             refreshing={this.state.refreshing}
             onRefresh={()=>this.onRefreshs()}
         >
-        <list renderHeader={() => 'aa缴费'}
+        <list
          renderFooter={() => (<div style={{ padding: 30, textAlign: 'center' }}>
          {this.state.isLoading ? 'Loading...' : 'Loaded'}
        </div>)}
@@ -249,6 +252,7 @@ export default class QueryResult extends React.Component {
         </PullToRefresh>
         {this.state.data.length==0?<div>{this.state.total==0?<div className='tips'>---暂无数据---</div>:''}</div>:''}
         {this.state.data.length==this.state.total?<div>{this.state.total>0?<div className='tips'>---没有数据了---</div>:''}</div>:''}
+        <WxTabBar {...this.props}/>
       </div >
     )
   }

@@ -5,6 +5,8 @@ import 'antd-mobile/dist/antd-mobile.css';
 import  HttpService  from '../util/HttpService.jsx';
 import UserService from '../service/user-service.jsx';
 import LocalStorge  from '../util/LogcalStorge.jsx';
+import WxTabBar from '../components/TabBar';
+
 const localStorge = new LocalStorge();
 const userService = new UserService();
 const Item = List.Item;
@@ -102,12 +104,13 @@ export default class My extends React.Component {
   logout=()=>{
     localStorge.removeStorage('userInfo');
     this.setState({isLogin:false,address:null});
-    //window.location.href="#/Login";
+    //window.location.href="#/Home";
   }
  
   //设置上一窗口的数据进行显示，返回上一级
   goback() {
-    this.props.callbackParent("blueTab");
+    window.location.href="#/Home";
+    //this.props.callbackParent("blueTab");
   }
   render() {
     return (
@@ -139,14 +142,6 @@ export default class My extends React.Component {
         {this.state.isLogin==false?
           <List >
             <Item>
-            {/* <InputItem
-                type="text"
-                name="address"
-                placeholder="服务器地址"
-                clear
-                onKeyUp={e => this.onInputKeyUp(e)}
-                onChange={(v) => this.onInputChange('address', v)}
-              ></InputItem> */}
               <InputItem
                 type="text"
                 name="username"
@@ -171,7 +166,6 @@ export default class My extends React.Component {
           </List>  
         :
         <List>
-             {/* <Item extra={this.state.address}>服务器地址</Item> */}
              <Item  thumb="../../src/assets/icon/user.png"  extra={this.state.UserCode}> 用户名 </Item>
              <Item  thumb="../../src/assets/icon/pwd.png"   extra={this.state.Pwd}>密码</Item>
             <Item>
@@ -181,6 +175,7 @@ export default class My extends React.Component {
             </Item>
           </List>
        }
+       <WxTabBar {...this.props} />
       </div>
     )
   }

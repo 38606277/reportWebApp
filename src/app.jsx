@@ -66,6 +66,17 @@ const IndexSearch = Loadable({
     loading: loading,
     delay:3000
 });
+const My = Loadable({
+    loader: () => import('./page/my.jsx'),
+    loading: loading,
+    delay:3000
+});
+const Home = Loadable({
+    loader: () => import('./page/home.jsx'),
+    loading: loading,
+    delay:3000
+});
+
 
 // function loadPage(url){
 //    return Loadable({
@@ -89,15 +100,17 @@ class App extends React.Component {
         return (
                 <Router>
                     <Switch>
-                        <Route exact path="/" component={Login} />
+                        <Route exact path="/" component={Home} />
                         <Route path="/ListUser" component={ListUser} />
                         <Route path="/Main" component={Main} />
+                        <Route path="/Home" component={Home} />
                         <Route path="/AI" component={AI} />
                         <Route path="/Chat" component={Chat} />
-                        <Route path="/QueryClassList" component={QueryClassList} />
+                        <Route path="/My" component={My} />
+                        <Route path="/Query" component={QueryClassList} />
                         <Route path="/QueryList/:class_id" component={QueryList} />
-                        <Route path="/QueryInParam/:qry_id" component={QueryInParam} />
-                        <Route path="/QueryResult/:qry_id/:inParam" component={QueryResult} />
+                        <Route path="/QueryInParam/:class_id/:qry_id" component={QueryInParam} />
+                        <Route path="/QueryResult/:class_id/:qry_id/:inParam" component={QueryResult} />
                         <Route path="/Login" component={Login} />
                         <Route path="/AddUser" component={Loadable({
                                                                     loader: () => import('./page/AddUser.jsx'),

@@ -4,7 +4,8 @@ import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import UserService from '../service/UserService.jsx';
 import HttpService from '../util/HttpService.jsx';
-import QueryInParam from './QueryInParam.jsx';
+import WxTabBar from '../components/TabBar';
+
 const userService = new UserService();
 const Item = List.Item;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -16,7 +17,7 @@ export default class QueryList extends React.Component {
     super(props);
     const renderResultParam=null;
     this.state = {
-      class_id:this.props.class_id,
+      class_id:this.props.match.params.class_id,
       data: [],
       imgHeight: 176,
       driver: "aaaa",
@@ -50,9 +51,9 @@ export default class QueryList extends React.Component {
     });
   }
   onClassClick(qry_id) {
-    //window.location.href = "#/QueryInParam/"+qry_id;
-    this.setState({paramClass:qry_id});
-    this.renderResultParam=<QueryInParam class_id={this.state.class_id} qry_id={qry_id} callbackParent={this.onChildChanged}/>;
+    window.location.href = "#/QueryInParam/"+this.state.class_id+"/"+qry_id;
+    // this.setState({paramClass:qry_id});
+    // this.renderResultParam=<QueryInParam class_id={this.state.class_id} qry_id={qry_id} callbackParent={this.onChildChanged}/>;
   }
 
   componentDidMount() {
@@ -72,13 +73,13 @@ export default class QueryList extends React.Component {
   }
 //设置上一窗口的数据进行显示，返回上一级
   goback(){
-    this.props.callbackParent();
+    window.location.href = "#/Query";
+    //this.props.callbackParent();
   }
   render() {
-    if(this.state.data.length>0 && this.state.paramClass==null){
-      this.renderResultParam=(
-            <div>
-            <NavBar
+    return (
+      <div>
+        <NavBar
               mode="light"
               icon={<Icon type="left" />}
               onLeftClick={() => this.goback()}
@@ -89,7 +90,7 @@ export default class QueryList extends React.Component {
               选择一个查询
             </NavBar>
 
-            <list renderHeader={() => 'aa缴费'}>
+            <List style={{ textAlign: 'center',marginBottom:"50px" }}>
               {this.state.data.map(val => (
                 <Item
                   arrow="horizontal"
@@ -101,15 +102,11 @@ export default class QueryList extends React.Component {
                   {val.qry_name}
                 </Item>
               ))}
-            </list>
+            </List>
 
-            <WhiteSpace size="lg" />
-            <WingBlank><Link to='/UserPayList'>缴费记录</Link></WingBlank>
-
-          </div>);
-    }
-    return (
-      <div>{this.renderResultParam}</div>
+            
+            <WxTabBar {...this.props}/>
+      </div>
     )
   }
 }

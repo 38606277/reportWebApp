@@ -4,6 +4,7 @@ import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import { Brief } from 'antd-mobile/lib/list/ListItem';
 import HttpService from '../util/HttpService.jsx';
+import WxTabBar from '../components/TabBar';
 
 import './AI.css';
 
@@ -103,6 +104,7 @@ export default class AI extends React.Component {
             ))}
           </list>
         </List>
+        <WxTabBar {...this.props} />
       </div>
     );
   }
