@@ -4,7 +4,6 @@ import 'antd-mobile/dist/antd-mobile.css';
 import User from '../service/user-service.jsx'
 import LocalStorge from '../util/LogcalStorge.jsx';
 import CommonSearch from './commonSearch.jsx';
-import WxTabBar from '../components/TabBar';
 
 // 引入 ECharts 主模块
 import echarts from 'echarts/lib/echarts';
@@ -122,7 +121,6 @@ export default class Home extends React.Component {
             <div id="main" style={{ width: 300, height: 240 }}></div>
           </Card.Body>
         </Card>
-        <WxTabBar {...this.props}/>
       </div>
     )
   }

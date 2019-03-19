@@ -77,7 +77,11 @@ const Home = Loadable({
     delay:3000
 });
 
-
+const Layout = Loadable({
+    loader: () => import('./page/Layout.jsx'),
+    loading: loading,
+    delay:3000
+});
 // function loadPage(url){
 //    return Loadable({
 //     loader:()=>import(url),
@@ -96,9 +100,8 @@ class App extends React.Component {
     //  }
 
     render() {
-
-        return (
-                <Router>
+        let LayoutRouter = (
+                <Layout>
                     <Switch>
                         <Route exact path="/" component={Home} />
                         <Route path="/ListUser" component={ListUser} />
@@ -119,14 +122,18 @@ class App extends React.Component {
                         <Route path="/UserPayList" component={UserPayList} />
                         <Route path="/UserBill" component={UserBill} />
                         <Route path="/IndexSearch/:path" component={IndexSearch} />
-
-                        {/* <Route component={Error}/> */}
+                    </Switch>
+                </Layout>
+            );
+        return (
+                <Router>
+                    <Switch>
+                        <Route path="/" render={props=>LayoutRouter} />
                     </Switch>
                 </Router>
         )
     }
 }
-
 
 ReactDOM.render(
     <App />,

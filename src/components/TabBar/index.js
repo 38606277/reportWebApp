@@ -8,10 +8,10 @@ import {menuData} from '../../common/menu';
 import 'antd-mobile/lib/tab-bar/style/index.css';
 import 'antd-mobile/lib/badge/style/index.css';
 import Styles from './index.less';
- 
+const pathName=window.location.href.split('#')[1] || '';
 class WxTabBar extends PureComponent {
   state = {
-    selectedTab: 'Home',
+    selectedTab:pathName=="/"?"Home":pathName.substring(1),
     hidden: false
   }
  
@@ -23,7 +23,8 @@ class WxTabBar extends PureComponent {
  
   // 监听 props 的变化
   componentWillReceiveProps(nextProps){
-    let pathName = nextProps.location.pathname;
+    let pathName=window.location.href.split('#')[1] || '';
+    //let pathName = nextProps.location.pathname;
     if(pathName === '/Home' || pathName === '/'){
         this.setState({
             hidden:false,
@@ -32,7 +33,7 @@ class WxTabBar extends PureComponent {
     }else if(pathName === '/Query'){
         this.setState({
             hidden:false,
-            selectedTab:"Query"
+            selectedTab:"Query" //pathName.substring(1)
         });
     }else if(pathName === '/AI'){
         this.setState({

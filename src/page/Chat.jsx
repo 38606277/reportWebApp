@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { List, ListView,PullToRefresh,WhiteSpace, WingBlank, Checkbox, SwipeAction,  NavBar, Icon } from 'antd-mobile';
 import { Link, Redirect } from 'react-router-dom';
-import WxTabBar from '../components/TabBar';
-
 import 'antd-mobile/dist/antd-mobile.css';
 import './Chat.css';
 // function ticking(){
@@ -152,7 +150,7 @@ export default class Chat extends React.Component {
                </div>
           // </div>
         ))}
-         <div id="scrolld" style={{paddingBottom:'40px'}}> </div>
+         <div id="scrolld" > </div>
       </PullToRefresh>
           {megArray.map((elem,index) => (
               <div>
@@ -185,7 +183,6 @@ export default class Chat extends React.Component {
             }
         </div>
         {/* <div id="scrolld"> </div> */}
-        <WxTabBar {...this.props} />
       </div>
     )
   }

@@ -5,7 +5,6 @@ import 'antd-mobile/dist/antd-mobile.css';
 import  HttpService  from '../util/HttpService.jsx';
 import UserService from '../service/user-service.jsx';
 import LocalStorge  from '../util/LogcalStorge.jsx';
-import WxTabBar from '../components/TabBar';
 
 const localStorge = new LocalStorge();
 const userService = new UserService();
@@ -22,9 +21,6 @@ export default class My extends React.Component {
       address:'',
       class_id: this.props.class_id,
       data: [],
-      imgHeight: 176,
-      driver: "aaaa",
-      paramClass: null,
       isLogin:false
     }
   }
@@ -35,7 +31,6 @@ export default class My extends React.Component {
         isLogin: true,
         UserCode:userInfo.userCode,
         Pwd:userInfo.pwd
-      
       });
     }
   }
@@ -52,12 +47,6 @@ export default class My extends React.Component {
   }
   // 当用户提交表单
   onSubmit() {
-    
-    // if(this.state.address==null || this.state.address=='')
-    // {
-    //   Toast.info("服务器地址不能为空");
-    //   return false;
-    // }
     let loginInfo = {
       UserCode: this.state.UserCode,
       Pwd: this.state.Pwd,// "KfTaJa3vfLE=",
@@ -91,16 +80,7 @@ export default class My extends React.Component {
       Toast.fail("登录失败，请检查用户名与密码");
     }
   }
-  //设置当前页面加载的对象，如果是null，则加载首次数据与div
-  onChildChanged = () => {
-    this.setState({
-      paramClass: null
-    });
-  }
-  onClassClick(qry_id) {
-    this.setState({ paramClass: qry_id });
-    //this.renderResultParam = <QueryInParam class_id={this.state.class_id} qry_id={qry_id} callbackParent={this.onChildChanged} />;
-  }
+  
   logout=()=>{
     localStorge.removeStorage('userInfo');
     this.setState({isLogin:false,address:null});
@@ -110,7 +90,6 @@ export default class My extends React.Component {
   //设置上一窗口的数据进行显示，返回上一级
   goback() {
     window.location.href="#/Home";
-    //this.props.callbackParent("blueTab");
   }
   render() {
     return (
@@ -175,7 +154,6 @@ export default class My extends React.Component {
             </Item>
           </List>
        }
-       <WxTabBar {...this.props} />
       </div>
     )
   }

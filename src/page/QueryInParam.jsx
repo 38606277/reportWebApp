@@ -4,9 +4,6 @@ import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import UserService from '../service/UserService.jsx';
 import HttpService from '../util/HttpService.jsx';
-import WxTabBar from '../components/TabBar';
-
-
 const userService = new UserService();
 const Item = List.Item;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -16,7 +13,6 @@ const Brief = Item.Brief;
 export default class QueryInParam extends React.Component {
   constructor(props) {
     super(props);
-    const renderQueryResult=null;
     this.state = {
       qry_id: this.props.match.params.qry_id,
       class_id:this.props.match.params.class_id,
@@ -112,14 +108,7 @@ export default class QueryInParam extends React.Component {
         }
     });
   }
-    //设置当前页面加载的对象，如果是null，则加载首次数据与div
-  onChildChanged=()=>{
-    let clearparm={};
-    for (let key of Object.keys(this.state.inParam)) {
-      clearparm[key]=null;
-    }
-    this.setState({ paramClass: null, inParam:clearparm });
-  }
+  
   execQuery() {
     let paramStr = "";
     for (let key of Object.keys(this.state.inParam)) {
@@ -128,8 +117,6 @@ export default class QueryInParam extends React.Component {
     paramStr = paramStr.substring(1, paramStr.length);
     this.setState({paramClass:this.state.qry_id});
     window.location.href = "#/QueryResult/"+this.state.class_id+"/"+this.state.qry_id+"/"+paramStr;
-
-    // this.renderQueryResult=<QueryResult qry_id={this.state.qry_id} class_id={this.state.class_id} inParam={paramStr} callbackParent={this.onChildChanged}/>;
   }
   onValueChange(fieldName, value) {
     const {inParam}=this.state;
@@ -230,7 +217,6 @@ onSelectChangeDic = (selectedRowKeys) => {
   }
   
   onDictChange=(v,name)=>{
-    //console.log(v,name);
     const {selectedRowKeys}=this.state;
     let newarr=[];
     let v1=0;
@@ -340,9 +326,6 @@ onSelectChangeDic = (selectedRowKeys) => {
             </Item>
           </List>
           <WhiteSpace size="lg" />
-          <WxTabBar {...this.props}/>
-          {/* <WhiteSpace size="lg" />
-          <WingBlank><Link to='/UserPayList'>缴费记录</Link></WingBlank> */}
           <WingBlank>
               <Modal popup={true} 
                 title="字典查询" 
@@ -360,17 +343,12 @@ onSelectChangeDic = (selectedRowKeys) => {
                       </CheckboxItem>
                     ))}
                   </List>
-                  {/* <InputItem
-                      style={{ width: 10, marginBottom: '10px' }}
-                      placeholder="请输入..." enterButton="查询"
-                      onSearch={value => this.onDictionarySearch(value)}
-                  /> */}
+                  
                   <Pagination current={this.state.pageNumd}
                       total={this.state.totald/this.state.perPaged}
                       onChange={(pageNumd) => this.onPageNumdChange(pageNumd)} />
               </Modal>
               </WingBlank>
-              
       </div>
     )
   }
