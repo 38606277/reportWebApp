@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon ,Toast} from 'antd-mobile';
+import { List,  Grid ,WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon ,Toast} from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import UserService from '../service/UserService.jsx';
@@ -10,6 +10,7 @@ const Item = List.Item;
 const CheckboxItem = Checkbox.CheckboxItem;
 const AgreeItem = Checkbox.AgreeItem;
 const Brief = Item.Brief;
+const url=window.getServerUrl();
 
 export default class QueryList extends React.Component {
   constructor(props) {
@@ -22,8 +23,8 @@ export default class QueryList extends React.Component {
     }
   }
   
-  onClassClick(qry_id) {
-    window.location.href = "#/QueryInParam/"+this.state.class_id+"/"+qry_id;
+  onClassClick=(item)=> {
+    window.location.href = "#/QueryInParam/"+this.state.class_id+"/"+item.qry_id;
   }
 
   componentDidMount() {
@@ -47,6 +48,16 @@ export default class QueryList extends React.Component {
     //this.props.callbackParent();
   }
   render() {
+    const datas=[];
+    if (null != this.state.data) {
+      this.state.data.map((item, index) => {
+          let urls='./../src/assets/icon/default.png';
+          if(item.qry_file!=null && item.qry_file!=''){
+            urls=url+"/report/"+item.qry_file
+          }
+          datas.push({icon:urls,text:item.qry_name,qry_id:item.qry_id})
+      });
+    }
     return (
       <div>
         <NavBar
@@ -59,8 +70,9 @@ export default class QueryList extends React.Component {
             >
               选择一个查询
             </NavBar>
+            <Grid data={datas}  onClick={this.onClassClick} />
 
-            <List style={{ textAlign: 'center'}}>
+            {/* <List style={{ textAlign: 'center'}}>
               {this.state.data.map(val => (
                 <Item
                   arrow="horizontal"
@@ -72,7 +84,7 @@ export default class QueryList extends React.Component {
                   {val.qry_name}
                 </Item>
               ))}
-            </List>
+            </List> */}
 
       </div>
     )
