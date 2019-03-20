@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon,Toast } from 'antd-mobile';
+import { List, Grid ,WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon,Toast } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import UserService from '../service/UserService.jsx';
@@ -7,6 +7,7 @@ import HttpService from '../util/HttpService.jsx';
 const userService = new UserService();
 const Item = List.Item;
 const Brief = Item.Brief;
+const url=window.getServerUrl();
 
 export default class QueryClassList extends React.Component {
   constructor(props) {
@@ -16,8 +17,8 @@ export default class QueryClassList extends React.Component {
       isLoading:true
     }
   }
-  onClassClick(item) {
-      window.location.href = "#/QueryList/"+item;
+  onClassClick=(item)=> {
+      window.location.href = "#/QueryList/"+item.class_id;
   }
 
   componentDidMount() {
@@ -38,6 +39,21 @@ export default class QueryClassList extends React.Component {
       });
   }
   render() {
+    const datas=[];
+    if (null != this.state.data) {
+      this.state.data.map((item, index) => {
+          let urls='./../src/assets/icon/default.png';
+          if(item.img_file!=null && item.img_file!=''){
+            urls=url+"/report/"+item.img_file
+          }
+          datas.push({icon:urls,text:item.class_name,class_id:item.class_id})
+      });
+    }
+    // const data = Array.from(new Array(9)).map((_val, i) => ({
+    //   icon: 'https://gw.alipayobjects.com/zos/rmsportal/nywPmnTAvTmLusPxHPSu.png',
+    //   text: `name${i}`,
+    // }));
+
     return (
       <div>
 
@@ -49,8 +65,8 @@ export default class QueryClassList extends React.Component {
         >
           选择一个查询类别
         </NavBar>
-
-        <List style={{ textAlign: 'center'}}>
+        <Grid data={datas}  onClick={this.onClassClick} />
+        {/* <List style={{ textAlign: 'center'}}>
           {this.state.data.map(val => (
             <Item
               arrow="horizontal"
@@ -62,7 +78,7 @@ export default class QueryClassList extends React.Component {
               {val.class_name}
             </Item>
           ))}
-        </List>
+        </List> */}
       </div>
     )
   }
