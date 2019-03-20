@@ -1,9 +1,10 @@
 import React from 'react';
-import { List, WhiteSpace, WingBlank, SearchBar, Checkbox, Button, NavBar, Icon, InputItem, Grid, Card } from 'antd-mobile';
+import { List, WhiteSpace, WingBlank, SearchBar, Carousel,Checkbox, Button, NavBar, Icon, InputItem, Grid, Card } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import User from '../service/user-service.jsx'
 import LocalStorge from '../util/LogcalStorge.jsx';
 import CommonSearch from './commonSearch.jsx';
+import QueryClassList from './QueryClassList.jsx';
 
 // 引入 ECharts 主模块
 import echarts from 'echarts/lib/echarts';
@@ -34,10 +35,17 @@ export default class Home extends React.Component {
     this.state = {
       paramClass: null,
       selectedTab:this.props.selectedTab,
+      data: ['1', '2', '3'],
+      imgHeight: 176,
     }
   }
 
   componentDidMount() {
+    setTimeout(() => {
+      this.setState({
+        data: ['AiyWuByWklrrUDlFignR', 'TekJlZRVCjLFexlOCuWn', 'IJOtIlfsYdTyaDTRVrLI'],
+      });
+    }, 100);
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('main'));
     // 绘制图表
@@ -85,28 +93,42 @@ export default class Home extends React.Component {
          <CommonSearch onSearch={() => { this.onSearch() }}  toAI={()=>this.toAI()}/>
          </div>
         {/* <Grid data={data1} columnNum={3} itemStyle={{ height: '150px', background: 'rgba(0,0,0,.05)' }} /> */}
-        <div style={{marginTop:'20px'}}>
+        {/* <div style={{marginTop:'20px'}}>
           <Grid data={data} columnNum={4} hasLine={false} activeStyle={true} square={true} 
           onClick={(e,index) => this.onChangeClick(e,index)} />
-        </div>
-        <WhiteSpace size="lg" />
-        <Card full>
-          <Card.Header
-            title="我的任务"
-            thumb="../../src/assets/icon/renwu.png"
-            extra={<span><Icon type='right' /></span>}
-          />
-          <Card.Body>
-            <div>查询供应商信息</div>
-            <div>This is content of `Card`</div>
-            <div>This is content of `Card`</div>
-          </Card.Body>
-        </Card>
+        </div> */}
 
+        <Carousel style={{marginTop:'20px'}}
+          autoplay={false}
+          infinite
+          beforeChange={(from, to) => console.log(`slide from ${from} to ${to}`)}
+          afterChange={index => console.log('slide to', index)}
+        >
+          {this.state.data.map(val => (
+            <a
+              key={val}
+              href="http://www.alipay.com"
+              style={{ display: 'inline-block', width: '100%', height: this.state.imgHeight }}
+            >
+              <img
+                src={`https://zos.alipayobjects.com/rmsportal/${val}.png`}
+                alt=""
+                style={{ width: '100%', verticalAlign: 'top' }}
+                onLoad={() => {
+                  // fire window resize event to change height
+                  window.dispatchEvent(new Event('resize'));
+                  this.setState({ imgHeight: 'auto' });
+                }}
+              />
+            </a>
+          ))}
+        </Carousel>
         <WhiteSpace size="lg" />
+        <QueryClassList/>
+        
         <Card full >
         <Card.Header style={{fontSize:'14px'}}
-            title="我的任务"
+            title="收入情况"
             thumb="https://gw.alipayobjects.com/zos/rmsportal/MRhHctKOineMbKAZslML.jpg"
             extra={<span><Icon type='right' /></span>}
           />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, Grid ,WhiteSpace, WingBlank, Checkbox, SwipeAction, NavBar, Icon,Toast } from 'antd-mobile';
+import { List, Grid ,WhiteSpace, WingBlank, Checkbox, Card, SwipeAction, NavBar, Icon,Toast } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import UserService from '../service/UserService.jsx';
@@ -57,15 +57,24 @@ export default class QueryClassList extends React.Component {
     return (
       <div>
 
-        <NavBar
+        {/* <NavBar
           mode="light"
           icon={<Icon type="left" />}
           onLeftClick={() => window.location.href = "#/Home"}
           
         >
           选择一个查询类别
-        </NavBar>
-        <Grid data={datas}  onClick={this.onClassClick} />
+        </NavBar> */}
+        <Card full>
+        <Card.Header style={{fontSize:'14px'}}
+            title="数据查询"
+            extra={<span><Icon type='right' /></span>}
+          />
+          <Card.Body style={{padding:'0px'}}>
+          <Grid data={datas}  onClick={this.onClassClick} />
+          </Card.Body>
+        </Card>
+       
         {/* <List style={{ textAlign: 'center'}}>
           {this.state.data.map(val => (
             <Item
