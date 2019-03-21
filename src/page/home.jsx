@@ -50,6 +50,7 @@ export default class Home extends React.Component {
     var myChart = echarts.init(document.getElementById('main'));
     // 绘制图表
     myChart.setOption({
+      
       xAxis: {
         data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
       },
@@ -104,24 +105,23 @@ export default class Home extends React.Component {
           beforeChange={(from, to) => console.log(`slide from ${from} to ${to}`)}
           afterChange={index => console.log('slide to', index)}
         >
-          {this.state.data.map(val => (
             <a
-              key={val}
               href="http://www.alipay.com"
               style={{ display: 'inline-block', width: '100%', height: this.state.imgHeight }}
             >
               <img
-                src={`https://zos.alipayobjects.com/rmsportal/${val}.png`}
+                src={require("../assets/banner.png")} 
                 alt=""
-                style={{ width: '100%', verticalAlign: 'top' }}
+                style={{ width: '100%', verticalAlign: 'top',height:'150px' }}
                 onLoad={() => {
                   // fire window resize event to change height
                   window.dispatchEvent(new Event('resize'));
-                  this.setState({ imgHeight: 'auto' });
+                  this.setState({ imgHeight: '20px' });
                 }}
               />
             </a>
-          ))}
+           
+
         </Carousel>
         <WhiteSpace size="lg" />
         <QueryClassList/>
@@ -129,7 +129,7 @@ export default class Home extends React.Component {
         <Card full >
         <Card.Header style={{fontSize:'14px'}}
             title="收入情况"
-            thumb="https://gw.alipayobjects.com/zos/rmsportal/MRhHctKOineMbKAZslML.jpg"
+           
             extra={<span><Icon type='right' /></span>}
           />
           <Card.Body>
