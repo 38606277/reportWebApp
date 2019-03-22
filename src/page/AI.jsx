@@ -11,7 +11,19 @@ import './AI.css';
 
 const Item = List.Item;
 
-
+Array.prototype.indexOf = function(val) {
+  for (var i = 0; i < this.length; i++) {
+  if (this[i] == val) return i;
+  }
+  return -1;
+};
+  
+Array.prototype.remove = function(val) {
+  var index = this.indexOf(val);
+  if (index > -1) {
+  this.splice(index, 1);
+  }
+};
 export default class AI extends React.Component {
   constructor(props) {
     super(props);
@@ -60,12 +72,21 @@ export default class AI extends React.Component {
   getQueryResult(value) {
     let searchList = localStorge.getStorage('searchList');
     if (undefined == searchList || searchList == '' || searchList == null) {
-      searchList = [value];
+        searchList = [value];
     } else if (searchList.length == 10) {
-      searchList.pop();
-      searchList.unshift(value);
+        var index = searchList.indexOf(value);
+        if(index>0){
+          searchList.remove(value);
+        }else{
+          searchList.pop();
+        }     
+        searchList.unshift(value);
     } else {
-      searchList.unshift(value);
+        var index = searchList.indexOf(value);
+        if(index>0){
+          searchList.remove(value);
+        }
+        searchList.unshift(value);
     }
     localStorge.setStorage('searchList', searchList);
     let param = {};
