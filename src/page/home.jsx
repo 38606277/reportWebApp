@@ -36,7 +36,7 @@ export default class Home extends React.Component {
       paramClass: null,
       selectedTab:this.props.selectedTab,
       data: ['1', '2', '3'],
-      imgHeight: 176,
+      imgHeight: 196,
     }
   }
 
@@ -66,7 +66,7 @@ export default class Home extends React.Component {
 
   // 当用户点击查询文本框时显示真正的查询文本框
   onSearch() {
-    window.location.href = "#/IndexSearch/Home";
+    window.location.href = "#/AI";
   }
   
   toAI(){
@@ -110,9 +110,9 @@ export default class Home extends React.Component {
               style={{ display: 'inline-block', width: '100%', height: this.state.imgHeight }}
             >
               <img
-                src={require("../assets/banner.png")} 
+                src={require("../assets/banner4.png")} 
                 alt=""
-                style={{ width: '100%', verticalAlign: 'top',height:'150px' }}
+                style={{ width: '100%', verticalAlign: 'top',height:'176px' }}
                 onLoad={() => {
                   // fire window resize event to change height
                   window.dispatchEvent(new Event('resize'));

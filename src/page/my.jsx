@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { List, WhiteSpace, WingBlank, Checkbox,SwipeAction, NavBar, Icon, InputItem, Toast, Button } from 'antd-mobile';
+import { List, WhiteSpace, WingBlank, Checkbox, SwipeAction,Switch, NavBar, Icon, InputItem, Toast, Button } from 'antd-mobile';
 import 'antd-mobile/dist/antd-mobile.css';
-import  HttpService  from '../util/HttpService.jsx';
+import HttpService from '../util/HttpService.jsx';
 import UserService from '../service/user-service.jsx';
-import LocalStorge  from '../util/LogcalStorge.jsx';
+import LocalStorge from '../util/LogcalStorge.jsx';
 
 const localStorge = new LocalStorge();
 const userService = new UserService();
@@ -18,19 +18,19 @@ export default class My extends React.Component {
     this.state = {
       UserCode: '',
       Pwd: '',
-      address:'',
+      address: '',
       class_id: this.props.class_id,
       data: [],
-      isLogin:false
+      isLogin: false
     }
   }
   componentDidMount() {
-    let userInfo=localStorge.getStorage('userInfo');
-    if(undefined!=userInfo && null!=userInfo && ''!=userInfo){
+    let userInfo = localStorge.getStorage('userInfo');
+    if (undefined != userInfo && null != userInfo && '' != userInfo) {
       this.setState({
         isLogin: true,
-        UserCode:userInfo.userCode,
-        Pwd:userInfo.pwd
+        UserCode: userInfo.userCode,
+        Pwd: userInfo.pwd
       });
     }
   }
@@ -53,43 +53,43 @@ export default class My extends React.Component {
       import: "",
       isAdmin: ""
     },
-    checkResult = userService.checkLoginInfo(loginInfo);
+      checkResult = userService.checkLoginInfo(loginInfo);
     checkResult.states = true;
     // 验证通过
     if (checkResult.status) {
-      HttpService.post('/reportServer/user/encodePwd',loginInfo.Pwd)
-      .then(response => {
+      HttpService.post('/reportServer/user/encodePwd', loginInfo.Pwd)
+        .then(response => {
           loginInfo.Pwd = response.encodePwd;
-          HttpService.post('/reportServer/user/Reactlogin',JSON.stringify(loginInfo)).then(response => {
-            if(undefined!= response.data && null!= response.data){
-              let datas=response.data;
-              localStorge.setStorage('userInfo',datas);
-              this.setState({isLogin:true});
-            }else{
+          HttpService.post('/reportServer/user/Reactlogin', JSON.stringify(loginInfo)).then(response => {
+            if (undefined != response.data && null != response.data) {
+              let datas = response.data;
+              localStorge.setStorage('userInfo', datas);
+              this.setState({ isLogin: true });
+            } else {
               Toast.fail("登录失败，请检查用户名与密码");
             }
           }).catch((error) => {
             Toast.fail("登录失败，请检查用户名与密码");
           });
-      }).catch((error) => {
-        Toast.fail("登录失败，请检查用户名与密码");
-      });
+        }).catch((error) => {
+          Toast.fail("登录失败，请检查用户名与密码");
+        });
     }
     // 验证不通过
     else {
       Toast.fail("登录失败，请检查用户名与密码");
     }
   }
-  
-  logout=()=>{
+
+  logout = () => {
     localStorge.removeStorage('userInfo');
-    this.setState({isLogin:false,address:null});
+    this.setState({ isLogin: false, address: null });
     //window.location.href="#/Home";
   }
- 
+
   //设置上一窗口的数据进行显示，返回上一级
   goback() {
-    window.location.href="#/Home";
+    window.location.href = "#/Home";
   }
   render() {
     return (
@@ -98,12 +98,13 @@ export default class My extends React.Component {
           mode="light"
           icon={<div style={{
             width: '22px',
-            height: '22px', background: 'url(../../src/assets/Home.png) no-repeat center center /  21px 21px '}}></div>}
+            height: '22px', background: 'url(../../src/assets/Home.png) no-repeat center center /  21px 21px '
+          }}></div>}
           onLeftClick={() => this.goback()}
           style={{ backgroundColor: 'rgb(79,188,242)', color: 'rgb(255,255,255)' }}
-          // rightContent={[
-          //   <Icon key="1" type="cross-circle" onClick={this.logout} />
-          // ]}
+        // rightContent={[
+        //   <Icon key="1" type="cross-circle" onClick={this.logout} />
+        // ]}
         >
           <span style={{ color: 'white' }}>我的设置</span>
         </NavBar>
@@ -111,15 +112,15 @@ export default class My extends React.Component {
           <div  className='head' ></div>
         </div> */}
         <div className="gerenzhonhx">
-          <div className="grzx_toub_beij"><img src="../../src/assets/sandnab.jpg"/></div>
+          <div className="grzx_toub_beij"><img src="../../src/assets/sandnab.jpg" /></div>
           <div className="grzx_toux_fus">
             <div className="of">
-              <img src="../../src/assets/nh.jpg"/>
-            </div>
+              <img src="../../src/assets/开心猫.jpg"/>
+            </div> 
          </div>
         </div>
-        {this.state.isLogin==false?
-          <List >
+        {this.state.isLogin == false ?
+          <List renderHeader={() => '我的登录信息'}>
             <Item>
               <InputItem
                 type="text"
@@ -140,20 +141,28 @@ export default class My extends React.Component {
               ></InputItem>
             </Item>
             <Item>
-              <Button type="primary" onClick={() => { this.onSubmit() }} >登录</Button><WhiteSpace />
-            </Item>
-          </List>  
-        :
-        <List>
-             <Item  thumb="../../src/assets/icon/user.png"  extra={this.state.UserCode}> 用户名 </Item>
-             <Item  thumb="../../src/assets/icon/pwd.png"   extra={this.state.Pwd}>密码</Item>
-            <Item>
               <div align="center">
-              <Button size="small" type="primary" onClick={this.logout} style={{width:'90px'}}>退出登录</Button><WhiteSpace />
+                <Button type="primary" style={{ height: '35px', lineHeight: '35px', width: '140px', fontSize: '14px' }} onClick={() => { this.onSubmit() }} >登录</Button><WhiteSpace />
               </div>
             </Item>
           </List>
-       }
+          :
+          <List renderHeader={() => '登录信息'} >
+            <Item thumb="../../src/assets/icon/user.png" extra={this.state.UserCode}><span style={{ fontSize: '14px' }}> 用户名 </span></Item>
+            <Item thumb="../../src/assets/icon/pwd.png" extra={this.state.Pwd}><span style={{ fontSize: '14px' }}> 密码 </span></Item>
+            <Item>
+              <div align="center">
+                <Button type="primary" onClick={this.logout} style={{ height: '35px', lineHeight: '35px', width: '140px', fontSize: '14px' }}>退出登录</Button><WhiteSpace />
+              </div>
+            </Item>
+          </List>
+        }
+
+        <List renderHeader={() => '设置'} >
+          <Item extra={<Switch checked='1'/>}> 通知</Item>
+          <Item extra={<Switch checked='1'/>}> 自动登录</Item>
+
+        </List>
       </div>
     )
   }

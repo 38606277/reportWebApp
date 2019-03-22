@@ -67,7 +67,7 @@ const IndexSearch = Loadable({
     delay:3000
 });
 const My = Loadable({
-    loader: () => import('./page/my.jsx'),
+    loader: () => import('./page/My.jsx'),
     loading: loading,
     delay:3000
 });
@@ -121,7 +121,7 @@ class App extends React.Component {
                                                                 })} />
                         <Route path="/UserPayList" component={UserPayList} />
                         <Route path="/UserBill" component={UserBill} />
-                        <Route path="/IndexSearch/:path" component={IndexSearch} />
+                        <Route path="/IndexSearch" component={IndexSearch} />
                     </Switch>
                 </Layout>
             );
