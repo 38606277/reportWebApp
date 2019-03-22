@@ -75,7 +75,7 @@ export default class AI extends React.Component {
         searchList = [value];
     } else if (searchList.length == 10) {
         var index = searchList.indexOf(value);
-        if(index>0){
+        if(index>-1){
           searchList.remove(value);
         }else{
           searchList.pop();
@@ -83,7 +83,7 @@ export default class AI extends React.Component {
         searchList.unshift(value);
     } else {
         var index = searchList.indexOf(value);
-        if(index>0){
+        if(index>-1){
           searchList.remove(value);
         }
         searchList.unshift(value);
