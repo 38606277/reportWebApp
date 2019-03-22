@@ -16,44 +16,46 @@ export default class AI extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [],
       localStorgeSearchList: [],
+      value: '',
+      data: [],
+      out: []
     };
   }
 
 
   componentDidMount() {
-    this.autoFocusInst.focus();
-    let searchList = localStorge.getStorage('searchList');
-    if (undefined == searchList || searchList == '' || searchList == null) {
-      searchList = []
-    }
-    this.setState({
-      localStorgeSearchList: searchList
-    });
+      this.autoFocusInst.focus();
+      let searchList = localStorge.getStorage('searchList');
+      if (undefined == searchList || searchList == '' || searchList == null) {
+          searchList = []
+      }
+      this.setState({
+          localStorgeSearchList: searchList
+      });
   }
   clearLocalStorge() {
-    localStorge.removeStorage('searchList');
-    this.setState({
-      localStorgeSearchList: []
-    });
+      localStorge.removeStorage('searchList');
+      this.setState({
+          localStorgeSearchList: []
+      });
   }
   //设置上一窗口的数据进行显示，返回上一级
   goback() {
-    window.location.href = "#/" + this.state.path;
-    // this.props.callbackParent();
+      window.location.href = "#/Home";
+      // this.props.callbackParent();
   }
   searchfouce() {
-    const searchList = localStorge.getStorage('searchList');
-    if (undefined != searchList && searchList != '' && searchList != null && searchList.length > 0) {
-      this.setState({
-        localStorgeSearchList: searchList
-      });
-    } else {
-      this.setState({
-        localStorgeSearchList: []
-      });
-    }
+      const searchList = localStorge.getStorage('searchList');
+      if (undefined != searchList && searchList != '' && searchList != null && searchList.length > 0) {
+          this.setState({
+              localStorgeSearchList: searchList
+          });
+      } else {
+          this.setState({
+              localStorgeSearchList: []
+          });
+      }
   }
   getQueryResult(value) {
     let searchList = localStorge.getStorage('searchList');
@@ -93,25 +95,21 @@ export default class AI extends React.Component {
 
 
 
-  getQueryResult(value) {
-    let param = {};
-    HttpService.post('/reportServer/nlp/getResult/' + value, null)
-      .then(res => {
-        if (res.resultCode == "1000") {
-          console.log(res.data);
-          this.setState({ data: res.data.list, out: res.data.out })
-        } else {
-          Toast.fail(res.message);
-        }
-      })
-      .catch((error) => {
-        Toast.fail(error);
-      });
-
-
-
-
-  }
+  // getQueryResult(value) {
+  //   let param = {};
+  //   HttpService.post('/reportServer/nlp/getResult/' + value, null)
+  //     .then(res => {
+  //       if (res.resultCode == "1000") {
+  //         console.log(res.data);
+  //         this.setState({ data: res.data.list, out: res.data.out })
+  //       } else {
+  //         Toast.fail(res.message);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       Toast.fail(error);
+  //     });
+  // }
 
   render() {
     return (
