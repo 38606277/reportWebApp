@@ -112,10 +112,10 @@ export default class My extends React.Component {
           <div  className='head' ></div>
         </div> */}
         <div className="gerenzhonhx">
-          <div className="grzx_toub_beij"><img src="../../src/assets/sandnab.jpg" /></div>
+          <div className="grzx_toub_beij"><img src={require("../assets/sandnab.jpg")} /></div>
           <div className="grzx_toux_fus">
             <div className="of">
-              <img src="../../src/assets/开心猫.jpg"/>
+              <img src={require("../assets/开心猫.jpg")}/>
             </div> 
          </div>
         </div>
@@ -148,8 +148,8 @@ export default class My extends React.Component {
           </List>
           :
           <List renderHeader={() => '登录信息'} >
-            <Item thumb="../../src/assets/icon/user.png" extra={this.state.UserCode}><span style={{ fontSize: '14px' }}> 用户名 </span></Item>
-            <Item thumb="../../src/assets/icon/pwd.png" extra={this.state.Pwd}><span style={{ fontSize: '14px' }}> 密码 </span></Item>
+            <Item thumb={require("../assets/icon/user.png")} extra={this.state.UserCode}><span style={{ fontSize: '14px' }}> 用户名 </span></Item>
+            <Item thumb={require("../assets/icon/pwd.png")}  extra={this.state.Pwd}><span style={{ fontSize: '14px' }}> 密码 </span></Item>
             <Item>
               <div align="center">
                 <Button type="primary" onClick={this.logout} style={{ height: '35px', lineHeight: '35px', width: '140px', fontSize: '14px' }}>退出登录</Button><WhiteSpace />
@@ -161,6 +161,10 @@ export default class My extends React.Component {
         <List renderHeader={() => '设置'} >
           <Item extra={<Switch checked='1'/>}> 通知</Item>
           <Item extra={<Switch checked='1'/>}> 自动登录</Item>
+
+        </List>
+        <List >
+          <Item extra={'智能报表1.0'}>关于</Item>
 
         </List>
       </div>
