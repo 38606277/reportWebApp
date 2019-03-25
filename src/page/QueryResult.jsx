@@ -19,6 +19,7 @@ export default class QueryResult extends React.Component {
       inStrParam: this.props.match.params.inParam,
       data: [],
       height: document.documentElement.clientHeight,
+      refreshing: false,
       inParam: {},
       imgHeight: 176,
       animating: true,
@@ -102,7 +103,7 @@ export default class QueryResult extends React.Component {
       });
   }
   onRefreshs(){
-    if(this.state.data.length==this.state.total){
+    if(this.state.data.length!=this.state.total){
       let startIndex=this.state.startIndex;
       this.setState({ refreshing: true, startIndex:startIndex+1},function(){
         this.pageexecQuery();
