@@ -134,7 +134,7 @@ export default class Chat extends React.Component {
             damping={60}
             ref={el => this.ptr = el}
             style={{
-              // height: this.state.height,
+              height: this.state.height,
               overflow: 'auto',
             }}
             indicator={this.state.down ? {} : { deactivate: '上拉可以刷新' }}
@@ -150,7 +150,7 @@ export default class Chat extends React.Component {
                </div>
           // </div>
         ))}
-         <div id="scrolld" > </div>
+        
       </PullToRefresh>
           {megArray.map((elem,index) => (
               <div>
@@ -168,6 +168,7 @@ export default class Chat extends React.Component {
             )
            )}
         </ul>
+        <div id="scrolld" > </div>
         {this.state.saying==true?<div className="saying">
           <img src={require("../assets/saying.gif")}/>
         </div>:''}
