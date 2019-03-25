@@ -1,6 +1,6 @@
 import React from 'react';
 import { List, Toast, WhiteSpace, WingBlank, Checkbox, ActivityIndicator,Action, NavBar, Icon, PullToRefresh,InputItem, Button, Picker, DatePicker } from 'antd-mobile';
-import 'antd-mobile/dist/antd-mobile.css';
+// import 'antd-mobile/dist/antd-mobile.css';
 import { Link } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import './QueryResult.scss';
@@ -18,6 +18,7 @@ export default class QueryResult extends React.Component {
       class_id:this.props.match.params.class_id,
       inStrParam: this.props.match.params.inParam,
       data: [],
+      height: document.documentElement.clientHeight,
       inParam: {},
       imgHeight: 176,
       animating: true,
@@ -131,7 +132,7 @@ export default class QueryResult extends React.Component {
             damping={60}
             ref={el => this.ptr = el}
             style={{
-              // height: this.state.height,
+              height: this.state.height,
               overflow: 'auto',
             }}
             indicator={this.state.down ? {} : { deactivate: '上拉可以刷新' }}
