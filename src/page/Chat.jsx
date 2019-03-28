@@ -15,7 +15,7 @@ import './Chat.css';
 //查看历史信息使用下列加载 开始
 function genData(dataArr) {
   // const dataArr = [];
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 10; i++) {
     dataArr.push(i);
   }
   return dataArr;
@@ -80,20 +80,24 @@ export default class Chat extends React.Component {
       }
     }
     componentDidMount() {
-        const hei = this.state.height - ReactDOM.findDOMNode(this.ptr).offsetTop;
-        setTimeout(() => this.setState({
-          height: hei,
-          data: genData(this.state.data),
-        }), 0);
+        const hei = this.state.height - ReactDOM.findDOMNode(this.lv).offsetTop;
+        setTimeout(() => {
+          this.setState({
+            height: hei,
+            data: genData(this.state.data),
+            height: hei,
+            refreshing: false
+          });
+        }, 1500);
     }
   
-    onRefreshs(){
+    onRefreshs = () => {
         this.setState({ refreshing: true });
         setTimeout(() => {
           this.setState({ refreshing: false,
             data: genData(this.state.data), 
           });
-        }, 1000);
+        }, 600);
     }
   
     onInputKeyUp(e){
@@ -129,10 +133,10 @@ export default class Chat extends React.Component {
             <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
             <span style={{float: "right"}} id="root"></span>
         </div> */}
-        <ul className="contentes" ref="msgList">
+        <ul className="contentes">
         <PullToRefresh
             damping={60}
-            ref={el => this.ptr = el}
+            ref={el => this.lv = el}
             style={{
               height: this.state.height,
               overflow: 'auto',
@@ -140,13 +144,13 @@ export default class Chat extends React.Component {
             indicator={this.state.down ? {} : { deactivate: '上拉可以刷新' }}
             direction={this.state.down ? 'down' : 'up'}
             refreshing={this.state.refreshing}
-            onRefresh={()=>this.onRefreshs()}
+            onRefresh={this.onRefreshs}
         >
         {this.state.data.map((elem,index) => (
           // <div key={index} style={{ textAlign: 'center', padding: 20 }}>
               <div style={{background:'#f5f5f9' }}>
                    <li ><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{elem} </span></li>
-                   <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left"}}>35 ¥ {elem} </span></li>
+                   <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left",background:'#f1ebeb00'}}>35 ¥ {elem} </span></li>
                </div>
           // </div>
         ))}
@@ -154,8 +158,8 @@ export default class Chat extends React.Component {
       </PullToRefresh>
           {megArray.map((elem,index) => (
               <div>
-                  <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{elem} </span></li>
-                  <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left"}}>{respon[index]} </span></li>
+                  <li><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}} >{elem} </span></li>
+                  <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left",background:'#f1ebeb00'}}>{respon[index]} </span></li>
               </div>
             // <div className="container" key={index}>
             //   <div className="message">
