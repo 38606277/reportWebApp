@@ -11,6 +11,7 @@ const userService = new UserService();
 const Item = List.Item;
 const Brief = Item.Brief;
 import './my.scss';
+const url=window.getServerUrl();
 
 export default class My extends React.Component {
   constructor(props) {
@@ -21,16 +22,22 @@ export default class My extends React.Component {
       address: '',
       class_id: this.props.class_id,
       data: [],
-      isLogin: false
+      isLogin: false,
+      icon:''
     }
   }
   componentDidMount() {
     let userInfo = localStorge.getStorage('userInfo');
     if (undefined != userInfo && null != userInfo && '' != userInfo) {
+      let urls='./../src/assets/icon/default.png';
+          if(userInfo.icon!=null && userInfo.icon!=''){
+            urls=url+"/report/"+userInfo.icon
+          }
       this.setState({
         isLogin: true,
         UserCode: userInfo.userCode,
-        Pwd: userInfo.pwd
+        Pwd: userInfo.pwd,
+        icon:urls
       });
     }
   }
@@ -115,7 +122,7 @@ export default class My extends React.Component {
           <div className="grzx_toub_beij"><img src={require("../assets/sandnab.jpg")} /></div>
           <div className="grzx_toux_fus">
             <div className="of">
-              <img src={require("../assets/开心猫.jpg")}/>
+              <img src={this.state.icon}/>
             </div> 
          </div>
         </div>
@@ -150,6 +157,7 @@ export default class My extends React.Component {
           <List renderHeader={() => '登录信息'} >
             <Item thumb={require("../assets/icon/user.png")} extra={this.state.UserCode}><span style={{ fontSize: '14px' }}> 用户名 </span></Item>
             <Item thumb={require("../assets/icon/pwd.png")}  extra={this.state.Pwd}><span style={{ fontSize: '14px' }}> 密码 </span></Item>
+            <Item thumb={require("../assets/icon/pwd.png")}  extra={<Link to="UploadInfo" >修改图像</Link>}><span style={{ fontSize: '14px' }}> 图像 </span></Item>
             <Item>
               <div align="center">
                 <Button type="primary" onClick={this.logout} style={{ height: '35px', lineHeight: '35px', width: '140px', fontSize: '14px' }}>退出登录</Button><WhiteSpace />
