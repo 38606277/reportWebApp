@@ -1,5 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Widget, addResponseMessage, addLinkSnippet, addUserMessage } from 'react-chat-widget';
+import 'react-chat-widget/lib/styles.css';
+import logo from './../assets/icon/chart_on.png';
 import { List, ListView,PullToRefresh,WhiteSpace, WingBlank, Checkbox, SwipeAction,  NavBar, Icon } from 'antd-mobile';
 import { Link, Redirect } from 'react-router-dom';
 import 'antd-mobile/dist/antd-mobile.css';
@@ -38,22 +41,28 @@ export default class Chat extends React.Component {
     }
     // setInterval(ticking, 1000);
   }
+  handleNewUserMessage = (newMessage) => {
+    console.log(`New message incoming! ${newMessage}`);
+    // Now send the message throught the backend API
+    addResponseMessage("response");
+  }
+
   handleData(e) {
     this.setState({
       meg: e.target.value
     })
   }
-  sendMessage() {
+  sendMessage = (newMessage) =>{
     
       var message = this.state.meg
-      if (message === '') {
+      if (newMessage === '') {
         alert('不能发送空白消息哦')
       } else {
-        this.setState({
-          megArray: [...this.state.megArray, message]
-        })
+        // this.setState({
+        //   megArray: [...this.state.megArray, message]
+        // })
         var that = this
-        var func = fetch('http://www.tuling123.com/openapi/api?key=f0d11b6cae4647b2bd810a6a3df2136f&info=' + message, {
+        var func = fetch('http://www.tuling123.com/openapi/api?key=f0d11b6cae4647b2bd810a6a3df2136f&info=' + newMessage, {
           method: 'POST',
           type: 'cors'
         }).then(function(response) {
@@ -61,34 +70,38 @@ export default class Chat extends React.Component {
           //return "hello";//response.json()
       }).then(function(detail) {
           if(detail.code===100000){
-            return (that.setState({respon: [...that.state.respon, detail.text]}, () => {
-              // var el = ReactDOM.findDOMNode(that.refs.msgList);
-              // el.scrollTop=el.scrollHeight;
-              let anchorElement = document.getElementById("scrolld");
-              anchorElement.scrollIntoView();
-            }))
+            return addResponseMessage(detail.text);
+            // (that.setState({respon: [...that.state.respon, detail.text]}, () => {
+            //   // var el = ReactDOM.findDOMNode(that.refs.msgList);
+            //   // el.scrollTop=el.scrollHeight;
+            //   let anchorElement = document.getElementById("scrolld");
+            //   anchorElement.scrollIntoView();
+            // }))
           }else{
-            return (that.setState({respon: [...that.state.respon, "不知道你说什么,好像服务器发生错误"]}, () => {
-              // var el = ReactDOM.findDOMNode(that.refs.msgList);
-              // el.scrollTop=el.scrollHeight;
-              let anchorElement = document.getElementById("scrolld");
-              anchorElement.scrollIntoView();
-            }))
+            
+            // (that.setState({respon: [...that.state.respon, "不知道你说什么,好像服务器发生错误"]}, () => {
+            //   // var el = ReactDOM.findDOMNode(that.refs.msgList);
+            //   // el.scrollTop=el.scrollHeight;
+            //   let anchorElement = document.getElementById("scrolld");
+            //   anchorElement.scrollIntoView();
+            // }))
           }
         })
-        this.state.meg = ''
       }
     }
+   
     componentDidMount() {
-        const hei = this.state.height - ReactDOM.findDOMNode(this.lv).offsetTop;
-        setTimeout(() => {
-          this.setState({
-            height: hei,
-            data: genData(this.state.data),
-            height: hei,
-            refreshing: false
-          });
-        }, 1500);
+     let btn= document.getElementById("btn");
+     btn.click();
+        // const hei = this.state.height - ReactDOM.findDOMNode(this.lv).offsetTop;
+        // setTimeout(() => {
+        //   this.setState({
+        //     height: hei,
+        //     data: genData(this.state.data),
+        //     height: hei,
+        //     refreshing: false
+        //   });
+        // }, 1500);
     }
   
     onRefreshs = () => {
@@ -120,7 +133,11 @@ export default class Chat extends React.Component {
            //document.getElementsByClassName('.saying').show();
            this.setState({saying:true});
     }
-
+    getCustomLauncher(handleToggle){
+      console.log(handleToggle);
+      //handleToggle.click();
+     // document.getElementById("btn").onclick();
+    }
   render() {
     var meg = this.state.meg
     var megArray = this.state.megArray
@@ -128,12 +145,23 @@ export default class Chat extends React.Component {
     
     return (
       <div className="content">
-      
+      <Widget
+              handleNewUserMessage={this.sendMessage}
+              profileAvatar={logo}
+              ShowCloseButton={false}
+              title="智能机器人"
+              subtitle={null}
+              badge="1"
+              // launcher={handleToggle => this.getCustomLauncher(handleToggle)}
+              launcher={handleToggle => (
+                <input id="btn" onClick={handleToggle} type="button"></input>
+              )}
+            />
        {/* <div className="header">
             <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
             <span style={{float: "right"}} id="root"></span>
         </div> */}
-        <ul className="contentes">
+        {/* <ul className="contentes">
         <PullToRefresh
             damping={60}
             ref={el => this.lv = el}
@@ -186,7 +214,7 @@ export default class Chat extends React.Component {
             </div>
             : <div className="wenwen_text" id="wenwen" onClick={()=>this._touch_start(event)}>  按住 说话  </div>
             }
-        </div>
+        </div> */}
         {/* <div id="scrolld"> </div> */}
       </div>
     )
