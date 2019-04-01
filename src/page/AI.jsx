@@ -180,7 +180,6 @@ export default class AI extends React.Component {
               {this.state.out.map((item) => {
                 // if (item.out_id.toUpperCase() == val.out_id) {
                 return <div>
-                  {}
                   <Brief>{item.out_name}:{val[item.out_id.toUpperCase()]}</Brief>
                 </div>
                 // }
