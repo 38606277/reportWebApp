@@ -71,7 +71,7 @@ export default class My extends React.Component {
             if (undefined != response.data && null != response.data) {
               let datas = response.data;
               localStorge.setStorage('userInfo', datas);
-              this.setState({ isLogin: true });
+              this.setState({ isLogin: true, icon:datas.icon==undefined?'./../src/assets/icon/default.png':url+"/report/"+datas.icon});
             } else {
               Toast.fail("登录失败，请检查用户名与密码");
             }

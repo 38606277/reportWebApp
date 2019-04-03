@@ -14,7 +14,7 @@ import LocalStorge from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
 
 const Item = List.Item;
-
+const url=window.getServerUrl();
 export default class Chat extends React.Component {
   constructor(props) {
     super(props);
@@ -25,7 +25,8 @@ export default class Chat extends React.Component {
       userId:'',
       to_userId:'0',
       pageNumd: 1, 
-      perPaged: 1000
+      perPaged: 1000,
+      userIcon:''
     }
   }
 
@@ -38,36 +39,28 @@ export default class Chat extends React.Component {
     let user_id=null;
     if (undefined != userInfo && null != userInfo && '' != userInfo) {
       user_id=userInfo.id;
-      this.setState({ userId:userInfo.id});
+      this.setState({ userId:userInfo.id,userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon});
     }else{
       window.location.href="/My";
     }
-    if(this.state.isWrite){
-      let mInfo={'from_userId':user_id,'to_userId':this.state.to_userId,
-                pageNumd:this.state.pageNumd,perPaged:this.state.perPaged}
-      HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
-      .then(res => {
-        if (res.resultCode = "1000") {
-          this.setState({
-            isWrite:false
-          })
-        console.log(res);
-        let list=res.data;
-        for(var i=0;i<list.length;i++){
-            if(user_id==list[i].from_userId){
-              addUserMessage(list[i].post_message);
+    let mInfo={'from_userId':user_id,'to_userId':this.state.to_userId,
+              pageNumd:this.state.pageNumd,perPaged:this.state.perPaged}
+    HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
+    .then(res => {
+      let list=res.data;
+      for(var i=0;i<list.length;i++){
+          if(user_id==list[i].from_userId){
+            addUserMessage(list[i].post_message);
+          }else{
+            if(list[i].message_type=='json'){
+              let ress=JSON.parse(list[i].post_message);
+              renderCustomComponent(this.FormD, {data: ress.data.list, out: ress.data.out }); 
             }else{
-              if(list[i].message_type=='json'){
-                let ress=JSON.parse(list[i].post_message);
-                renderCustomComponent(this.FormD, {data: ress.data.list, out: ress.data.out }); 
-              }else{
-                addResponseMessage(list[i].post_message);
-              }
+              addResponseMessage(list[i].post_message);
             }
-        }
-        }
-      })
-    }
+          }
+      }
+    })
   }
 
   //组件即将销毁
@@ -132,7 +125,7 @@ export default class Chat extends React.Component {
            HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
             .then(res => {
               if (res.resultCode != "1000") {
-                console.log(res);
+               // console.log(res);
               }
             })
             return renderCustomComponent(this.FormD, {data: res.data.list, out: res.data.out }); 
@@ -166,7 +159,7 @@ export default class Chat extends React.Component {
           HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
             .then(res => {
               if (res.resultCode != "1000") {
-                console.log(res);
+               // console.log(res);
               }
             })
           return addResponseMessage(detail.text);
@@ -207,7 +200,7 @@ export default class Chat extends React.Component {
           handleNewUserMessage={newMessage=>this.sendMessage(newMessage)}
           senderPlaceHolder="输入想要做什么"
           profileAvatar={ai}
-          titleAvatar={my}
+          titleAvatar={this.state.userIcon==''?my:url+"/report/"+this.state.userIcon}
           ShowCloseButton="false"
           title="智能机器人"
           subtitle=""
