@@ -200,7 +200,7 @@ export default class Chat extends React.Component {
           handleNewUserMessage={newMessage=>this.sendMessage(newMessage)}
           senderPlaceHolder="输入想要做什么"
           profileAvatar={ai}
-          titleAvatar={this.state.userIcon==''?my:url+"/report/"+this.state.userIcon}
+          titleAvatar={this.state.userIcon==''?my:this.state.userIcon}
           ShowCloseButton="false"
           title="智能机器人"
           subtitle=""
