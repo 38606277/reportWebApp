@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Widget, addResponseMessage, Launcher,toggleWidget,isWidgetOpened,addLinkSnippet, addUserMessage, renderCustomComponent } from 'react-chat-widget';
+import { Widget, addResponseMessage,toggleWidget,addLinkSnippet, addUserMessage, renderCustomComponent } from 'react-chat-widget';
 import 'react-chat-widget/lib/styles.css';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
@@ -25,7 +25,7 @@ export default class Chat extends React.Component {
       userId:'',
       to_userId:'0',
       pageNumd: 1, 
-      perPaged: 10
+      perPaged: 1000
     }
   }
 
@@ -41,14 +41,32 @@ export default class Chat extends React.Component {
     }else{
       window.location.href="/My";
     }
-    let mInfo={'from_userId':user_id,'to_userId':this.state.to_userId,
-              pageNumd:this.state.pageNumd,perPaged:this.state.perPaged}
-    HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
-    .then(res => {
-      if (res.resultCode = "1000") {
-       console.log(res);
-      }
-    })
+    if(this.state.isWrite){
+      let mInfo={'from_userId':user_id,'to_userId':this.state.to_userId,
+                pageNumd:this.state.pageNumd,perPaged:this.state.perPaged}
+      HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
+      .then(res => {
+        if (res.resultCode = "1000") {
+          this.setState({
+            isWrite:false
+          })
+        console.log(res);
+        let list=res.data;
+        for(var i=0;i<list.length;i++){
+            if(user_id==list[i].from_userId){
+              addUserMessage(list[i].post_message);
+            }else{
+              if(list[i].message_type=='json'){
+                let ress=JSON.parse(list[i].post_message);
+                renderCustomComponent(this.FormD, {data: ress.data.list, out: ress.data.out }); 
+              }else{
+                addResponseMessage(list[i].post_message);
+              }
+            }
+        }
+        }
+      })
+    }
   }
 
   //组件即将销毁
@@ -107,7 +125,7 @@ export default class Chat extends React.Component {
             let responseInfo={'from_userId':this.state.to_userId,
                   'to_userId':this.state.userId,
                   'post_message':res,
-                  'message_type':'0',
+                  'message_type':'json',
                   'message_state':'0'
                 }
            HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
