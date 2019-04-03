@@ -7,7 +7,7 @@ const webpackConfigDev = {
     mode:'development',
 
     devServer:{
-        port: 8086,
+        port: 8087,
         host: '0.0.0.0',
         disableHostCheck: true
     }
