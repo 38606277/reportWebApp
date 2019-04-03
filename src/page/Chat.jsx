@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Widget, addResponseMessage, toggleWidget,isWidgetOpened,toggleChat,addLinkSnippet, addUserMessage, renderCustomComponent } from 'react-chat-widget';
+import { Widget, addResponseMessage, toggleWidget,isWidgetOpened,addLinkSnippet, addUserMessage, renderCustomComponent } from 'react-chat-widget';
 import 'react-chat-widget/lib/styles.css';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
@@ -30,12 +30,21 @@ export default class Chat extends React.Component {
       out:[],
       userId:'',
       to_userId:'0',
-      pageNumd: 1, perPaged: 10
+      pageNumd: 1, perPaged: 10,
+      isClick:false
     }
   }
-  
- 
+
+ // 组件加载完成
   componentDidMount() {
+    console.log("组件加载完成");
+    var context= document.querySelector("button.rcw-close-button");
+    console.log(context);
+    if(null!=context){
+       var  oldId = context.getAttribute("id");
+        console.log(oldId);
+      }
+
     let userInfo = localStorge.getStorage('userInfo');
     let user_id=null;
     if (undefined != userInfo && null != userInfo && '' != userInfo) {
@@ -53,6 +62,24 @@ export default class Chat extends React.Component {
       }
     })
   }
+
+//   // 组件即将销毁
+  componentWillUnmount() {
+    var context= document.querySelector("button.rcw-close-button");
+    console.log(context);
+    if(null!=context){
+
+    
+       var  oldId = context.getAttribute("id");
+        console.log(oldId);
+      }
+   // var d= document.querySelector("button.rcw-close-button").setAttribute("id","ctbn");
+   // var ddd= document.querySelector("div.rcw-conversation-container").remove();
+   // console.log(d);
+    //  document.getElementById("btn").click();
+      console.log('组件即将销毁');
+  }
+
   FormD = ({ data, out }) => {
     return <Card style={{backgroundColor:'#f4f7f9'}}>
       <List>
@@ -167,36 +194,29 @@ export default class Chat extends React.Component {
     event.preventDefault();
     this.setState({ saying: true });
   }
-  getCustomLauncher(handleToggle) {
-    console.log(handleToggle);
-    console.log(isWidgetOpened);
-    console.log(toggleWidget);
-    isWidgetOpened();
-    //toggleWidget();
-    //Widget.toggleConversation(toggleChat());
-    //handleToggle.click();
-    // document.getElementById("btn").onclick();
-  }
+ 
   render() {
     return (
-      <div className="content">
+      <div className="content" id="cons">
+      <div id="ccon">
         <Widget
           handleNewUserMessage={newMessage=>this.sendMessage(newMessage)}
           senderPlaceHolder="输入想要做什么"
           profileAvatar={ai}
           titleAvatar={my}
           badge={1}
-          ShowCloseButton={false}
+          ShowCloseButton="false"
           title="智能机器人"
           subtitle=""
           badge="1"
-          toggleWidget={true}
-         /// launcher={handleToggle =>this.getCustomLauncher(handleToggle)}
-          // launcher={handleToggle => (
-          //   <input id="btn" onClick={handleToggle} type="button"></input>
-          // )}
+          fullScreenMode={false}
+          toggleWidget
+          //launcher={this.toggleWidget}
+          launcher={handleToggle => (
+             <input id="btn" onClick={handleToggle} type="button"></input>
+          )}
         />
-        
+        </div>
       </div>
     )
   }
