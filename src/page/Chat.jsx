@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Widget, addResponseMessage, toggleWidget,isWidgetOpened,addLinkSnippet, addUserMessage, renderCustomComponent } from 'react-chat-widget';
+import { Widget, addResponseMessage, Launcher,toggleWidget,isWidgetOpened,addLinkSnippet, addUserMessage, renderCustomComponent } from 'react-chat-widget';
 import 'react-chat-widget/lib/styles.css';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
@@ -19,32 +19,20 @@ export default class Chat extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      meg: '',
-      respon: [],
-      megArray: [],
       isWrite: true,
       saying: false,
-      refreshing: false,
-      down: true,
-      data: [],
-      out:[],
+      isClick: true,
       userId:'',
       to_userId:'0',
-      pageNumd: 1, perPaged: 10,
-      isClick:false
+      pageNumd: 1, 
+      perPaged: 10
     }
   }
 
  // 组件加载完成
   componentDidMount() {
-    console.log("组件加载完成");
-    var context= document.querySelector("button.rcw-close-button");
-    console.log(context);
-    if(null!=context){
-       var  oldId = context.getAttribute("id");
-        console.log(oldId);
-      }
-
+    //调用组件内部方法打开窗口，再次调用是关闭；在组件销毁时调用一次关闭，可以保证每次打开都是开启状态
+    toggleWidget();
     let userInfo = localStorge.getStorage('userInfo');
     let user_id=null;
     if (undefined != userInfo && null != userInfo && '' != userInfo) {
@@ -57,27 +45,16 @@ export default class Chat extends React.Component {
               pageNumd:this.state.pageNumd,perPaged:this.state.perPaged}
     HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
     .then(res => {
-      if (res.resultCode != "1000") {
-       
+      if (res.resultCode = "1000") {
+       console.log(res);
       }
     })
   }
 
-//   // 组件即将销毁
+  //组件即将销毁
   componentWillUnmount() {
-    var context= document.querySelector("button.rcw-close-button");
-    console.log(context);
-    if(null!=context){
-
-    
-       var  oldId = context.getAttribute("id");
-        console.log(oldId);
-      }
-   // var d= document.querySelector("button.rcw-close-button").setAttribute("id","ctbn");
-   // var ddd= document.querySelector("div.rcw-conversation-container").remove();
-   // console.log(d);
-    //  document.getElementById("btn").click();
-      console.log('组件即将销毁');
+    //调用组件内部方法打开窗口，再次调用是关闭；在组件销毁时调用一次关闭，可以保证每次打开都是开启状态
+    toggleWidget();
   }
 
   FormD = ({ data, out }) => {
@@ -194,7 +171,15 @@ export default class Chat extends React.Component {
     event.preventDefault();
     this.setState({ saying: true });
   }
- 
+  // getCustomLauncher=()=> {
+  //   //不知道什么原因，这个方法会被调用2次， toggleWidget()只能调用一次
+  //   if(!this.state.isClick){
+  //    // console.log("已经调用一次，不能在调用了")
+  //   }else{
+  //     this.setState({isClick:false});
+  //       toggleWidget();
+  //   }
+  // }
   render() {
     return (
       <div className="content" id="cons">
@@ -204,17 +189,15 @@ export default class Chat extends React.Component {
           senderPlaceHolder="输入想要做什么"
           profileAvatar={ai}
           titleAvatar={my}
-          badge={1}
           ShowCloseButton="false"
           title="智能机器人"
           subtitle=""
           badge="1"
           fullScreenMode={false}
-          toggleWidget
-          //launcher={this.toggleWidget}
-          launcher={handleToggle => (
-             <input id="btn" onClick={handleToggle} type="button"></input>
-          )}
+          //launcher = {this.getCustomLauncher}
+          // launcher={handleToggle => (
+          //    <input id="btn" onClick={handleToggle} type="button"></input>
+          // )}
         />
         </div>
       </div>
