@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Widget, addResponseMessage,toggleWidget,addLinkSnippet, addUserMessage, renderCustomComponent } from 'react-chat-widget';
+import { Widget, addResponseMessage,toggleWidget,dropMessages,addLinkSnippet, addUserMessage, renderCustomComponent } from 'react-chat-widget';
 import 'react-chat-widget/lib/styles.css';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
@@ -33,6 +33,7 @@ export default class Chat extends React.Component {
   componentDidMount() {
     //调用组件内部方法打开窗口，再次调用是关闭；在组件销毁时调用一次关闭，可以保证每次打开都是开启状态
     toggleWidget();
+    dropMessages();
     let userInfo = localStorge.getStorage('userInfo');
     let user_id=null;
     if (undefined != userInfo && null != userInfo && '' != userInfo) {
