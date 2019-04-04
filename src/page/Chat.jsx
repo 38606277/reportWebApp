@@ -197,9 +197,9 @@ export default class Chat extends React.Component {
                // console.log(res);
               }
             })
-            renderCustomComponent(that.FormFile, {data: "改为文件名", file:"http://localhost:8080/report/upload/PRC02 利润表.xlsx" }); 
+          //  renderCustomComponent(that.FormFile, {data: "改为文件名", file:"http://localhost:8080/report/upload/PRC02 利润表.xlsx" }); 
 
-         // return addResponseMessage(detail.text);
+          return addResponseMessage(detail.text);
         } else {
         }
       })
