@@ -5,8 +5,9 @@ import 'react-chat-widget/lib/styles.css';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
 import my from './../assets/icon/chart.png';
+import down from './../assets/icon/down.png';
 import "babel-polyfill";
-import { List, ListView, PullToRefresh, WhiteSpace, WingBlank, Toast,Brief, Checkbox, Card, SwipeAction, InputItem, NavBar, Icon } from 'antd-mobile';
+import { List, ListView, PullToRefresh, WhiteSpace, WingBlank, Toast, Checkbox, Card, SwipeAction, InputItem, NavBar, Icon } from 'antd-mobile';
 import { Link, Redirect } from 'react-router-dom';
 import 'antd-mobile/dist/antd-mobile.css';
 import './Chat.css';
@@ -14,6 +15,7 @@ import LocalStorge from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
 
 const Item = List.Item;
+const Brief = Item.Brief;
 const url=window.getServerUrl();
 export default class Chat extends React.Component {
   constructor(props) {
@@ -26,7 +28,8 @@ export default class Chat extends React.Component {
       to_userId:'0',
       pageNumd: 1, 
       perPaged: 1000,
-      userIcon:''
+      userIcon:'',
+      fileIcon:'./../src/assets/icon/down.png'
     }
   }
 
@@ -53,10 +56,15 @@ export default class Chat extends React.Component {
             addUserMessage(list[i].post_message);
           }else{
             if(list[i].message_type=='json'){
-              let ress=JSON.parse(list[i].post_message);
-              renderCustomComponent(this.FormD, {data: ress.data.list, out: ress.data.out }); 
+                let ress=JSON.parse(list[i].post_message);
+                renderCustomComponent(this.FormD, {data: ress.data.list, out: ress.data.out }); 
+            }else if(list[i].message_type=="file"){
+                let ress=JSON.parse(list[i].post_message);
+                renderCustomComponent(this.FormFile, {data: "改为文件名", file:"http://localhost:8080/report/upload/20190404/093729/FL_edqibyQgGF4dYX00O.jpg" }); 
+            }else if(list[i].message_type=="text"){
+                addResponseMessage(list[i].post_message);
             }else{
-              addResponseMessage(list[i].post_message);
+                addResponseMessage(list[i].post_message);
             }
           }
       }
@@ -89,7 +97,26 @@ export default class Chat extends React.Component {
       </List>
     </Card>
   }
-
+  FormFile = ({ data, file }) => {
+    let fileIcon=this.state.fileIcon;
+    var fileExtension = file.substring(file.lastIndexOf('.') + 1);
+    fileExtension=fileExtension.toUpperCase();
+    if(fileExtension=='DOC' || fileExtension=='DOCX'){
+      fileIcon="./../src/assets/icon/word.png";
+    }else  if(fileExtension=='XLS' || fileExtension=='XLSX'){
+      fileIcon="./../src/assets/icon/excel.png";
+    }else  if(fileExtension=='PPT' || fileExtension=='PPTX'){
+      fileIcon="./../src/assets/icon/ppt.png";
+    }
+    return <div  style={{backgroundColor:'#f4f7f9',maxWidth:'370px'}}>
+            <List>
+              <Item align="top" thumb={fileIcon} multipleLine>
+                <a href={file} target="_black" style={{marginRight:'5px'}}>{data}</a>
+                <Brief><a href={file} target="_black" style={{marginRight:'5px'}}>点击下载</a></Brief>
+              </Item>
+            </List>
+          </div>
+  }
   handleModalDataChange(event) {
     this.setState({ test: event.target.value })
   }
@@ -114,21 +141,29 @@ export default class Chat extends React.Component {
       await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
         .then(res => {
           if (res.resultCode == "1000") {
-            // this.setState({ data: res.data.list, out: res.data.out })
-            //数据保存到数据库
-            let responseInfo={'from_userId':this.state.to_userId,
-                  'to_userId':this.state.userId,
-                  'post_message':res,
-                  'message_type':'json',
-                  'message_state':'0'
-                }
-           HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
-            .then(res => {
-              if (res.resultCode != "1000") {
-               // console.log(res);
+            if(undefined== res.filetype){
+              res.filetype="json";
+            }
+             //数据保存到数据库
+             let responseInfo={'from_userId':this.state.to_userId,
+             'to_userId':this.state.userid,
+             'post_message':res,
+             'message_type':res.filetype,
+             'message_state':'0'
+             }
+              HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
+                  .then(res => {
+                  if (res.resultCode != "1000") {
+                  // console.log(res);
+                  }
+              })
+              if(res.filetype=="json"){
+                  return renderCustomComponent(this.FormD, {data: res.data.list, out: res.data.out }); 
+              }else if(res.filetype=="file"){
+                  return renderCustomComponent(this.FormFile, {data: "改为文件名称", file:"http://localhost:8080/report/upload/PRC02 利润表.xlsx" }); 
+              }else if(res.filetype=="text"){
+                  return addResponseMessage(res.data);
               }
-            })
-            return renderCustomComponent(this.FormD, {data: res.data.list, out: res.data.out }); 
           } else {
 
           }
@@ -162,7 +197,9 @@ export default class Chat extends React.Component {
                // console.log(res);
               }
             })
-          return addResponseMessage(detail.text);
+            renderCustomComponent(that.FormFile, {data: "改为文件名", file:"http://localhost:8080/report/upload/PRC02 利润表.xlsx" }); 
+
+         // return addResponseMessage(detail.text);
         } else {
         }
       })
