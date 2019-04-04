@@ -93,7 +93,9 @@ export default class My extends React.Component {
     this.setState({ isLogin: false, address: null });
     //window.location.href="#/Home";
   }
-
+  updateImg(){
+    window.location.href = "#/UploadInfo";
+  }
   //设置上一窗口的数据进行显示，返回上一级
   goback() {
     window.location.href = "#/Home";
@@ -122,7 +124,9 @@ export default class My extends React.Component {
           <div className="grzx_toub_beij"><img src={require("../assets/sandnab.jpg")} /></div>
           <div className="grzx_toux_fus">
             <div className="of">
-              <img src={this.state.icon}/>
+             {this.state.UserCode==''?<img src={this.state.icon}/>:
+              <img src={this.state.icon} onClick={()=>this.updateImg()}/>
+              }
             </div> 
          </div>
         </div>
@@ -157,7 +161,7 @@ export default class My extends React.Component {
           <List renderHeader={() => '登录信息'} >
             <Item thumb={require("../assets/icon/user.png")} extra={this.state.UserCode}><span style={{ fontSize: '14px' }}> 用户名 </span></Item>
             <Item thumb={require("../assets/icon/pwd.png")}  extra={this.state.Pwd}><span style={{ fontSize: '14px' }}> 密码 </span></Item>
-            <Item thumb={require("../assets/icon/pwd.png")}  extra={<Link to="UploadInfo" >修改图像</Link>}><span style={{ fontSize: '14px' }}> 图像 </span></Item>
+            {/* <Item thumb={require("../assets/icon/pwd.png")}  extra={<Link to="UploadInfo" >修改图像</Link>}><span style={{ fontSize: '14px' }}> 图像 </span></Item> */}
             <Item>
               <div align="center">
                 <Button type="primary" onClick={this.logout} style={{ height: '35px', lineHeight: '35px', width: '140px', fontSize: '14px' }}>退出登录</Button><WhiteSpace />
