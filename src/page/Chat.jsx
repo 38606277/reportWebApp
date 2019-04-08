@@ -60,7 +60,7 @@ export default class Chat extends React.Component {
                 renderCustomComponent(this.FormD, {data: ress.data.list, out: ress.data.out }); 
             }else if(list[i].message_type=="file"){
                 let ress=JSON.parse(list[i].post_message);
-                renderCustomComponent(this.FormFile, {data:  ress.data.fileName, file:url+'report/'+ ress.data.filePath }); 
+                renderCustomComponent(this.FormFile, {data:  ress.data.fileName, file:ress.data.filePath }); 
             }else if(list[i].message_type=="text"){
                 addResponseMessage(list[i].post_message);
             }else{
@@ -112,7 +112,7 @@ export default class Chat extends React.Component {
             <List>
               <Item align="top" thumb={fileIcon} multipleLine>
                 <a href={file} target="_black" style={{marginRight:'5px'}}>{data}</a>
-                <Brief><a href={file} target="_black" style={{marginRight:'5px'}}>点击下载</a></Brief>
+                <Brief><a onClick={()=>this.domnFile(file)} href="javascript:void(0);" target="_black" style={{marginRight:'5px'}}>点击下载</a></Brief>
               </Item>
             </List>
           </div>
@@ -165,7 +165,7 @@ export default class Chat extends React.Component {
               if(res.data.filetype=="json"){
                   return renderCustomComponent(this.FormD, {data: res.data.list, out: res.data.out }); 
               }else if(res.data.filetype=="file"){
-                  return renderCustomComponent(this.FormFile, {data:res.data.fileName, file:url+'report/'+res.data.filePath }); 
+                  return renderCustomComponent(this.FormFile, {data:res.data.fileName, file:res.data.filePath });//url+'report/'+res.data.filePath 
               }else if(res.data.filetype=="text"){
                   return addResponseMessage(res.data);
               }
@@ -211,7 +211,28 @@ export default class Chat extends React.Component {
 
     }
   }
-
+  async domnFile(filepath){
+   await fetch(url+'reportServer/uploadFile/downloadFile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'credentials': JSON.stringify(localStorge.getStorage('userInfo') || '')
+        },
+        body:filepath
+      }).then(function (response) {
+        if (response.ok) {
+          response.blob().then((blob) => {
+            const a = window.document.createElement('a');
+            const downUrl = window.URL.createObjectURL(blob);// 获取 blob 本地文件连接 (blob 为纯二进制对象，不能够直接保存到磁盘上)
+             a.href = downUrl;
+             a.download = filepath.substr(filepath.lastIndexOf("/")+1);
+             a.click();
+            window.URL.revokeObjectURL(downUrl);
+          });
+        }
+      });
+        
+  }
 
   changeSpeack() {
     let isw = this.state.isWrite;
