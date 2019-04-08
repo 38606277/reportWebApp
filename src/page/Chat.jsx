@@ -60,7 +60,7 @@ export default class Chat extends React.Component {
                 renderCustomComponent(this.FormD, {data: ress.data.list, out: ress.data.out }); 
             }else if(list[i].message_type=="file"){
                 let ress=JSON.parse(list[i].post_message);
-                renderCustomComponent(this.FormFile, {data: "改为文件名", file:"http://localhost:8080/report/upload/20190404/093729/FL_edqibyQgGF4dYX00O.jpg" }); 
+                renderCustomComponent(this.FormFile, {data:  ress.data.fileName, file:url+'report/'+ ress.data.filePath }); 
             }else if(list[i].message_type=="text"){
                 addResponseMessage(list[i].post_message);
             }else{
@@ -137,18 +137,23 @@ export default class Chat extends React.Component {
       }
     })
     if(ist){
-      //首先进行函数查询
-      await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
-        .then(res => {
+      let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
+      await HttpService.post('/reportServer/query/execqueryToExcel/2/87', JSON.stringify(qryParam))
+      .then(res=>{
+
+      // })
+      // //首先进行函数查询
+      // await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
+      //   .then(res => {
           if (res.resultCode == "1000") {
-            if(undefined== res.filetype){
-              res.filetype="json";
+            if(undefined== res.data.filetype){
+              res.data.filetype="json";
             }
              //数据保存到数据库
              let responseInfo={'from_userId':this.state.to_userId,
-             'to_userId':this.state.userid,
+             'to_userId':this.state.userId,
              'post_message':res,
-             'message_type':res.filetype,
+             'message_type':res.data.filetype,
              'message_state':'0'
              }
               HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
@@ -157,11 +162,11 @@ export default class Chat extends React.Component {
                   // console.log(res);
                   }
               })
-              if(res.filetype=="json"){
+              if(res.data.filetype=="json"){
                   return renderCustomComponent(this.FormD, {data: res.data.list, out: res.data.out }); 
-              }else if(res.filetype=="file"){
-                  return renderCustomComponent(this.FormFile, {data: "改为文件名称", file:"http://localhost:8080/report/upload/PRC02 利润表.xlsx" }); 
-              }else if(res.filetype=="text"){
+              }else if(res.data.filetype=="file"){
+                  return renderCustomComponent(this.FormFile, {data:res.data.fileName, file:url+'report/'+res.data.filePath }); 
+              }else if(res.data.filetype=="text"){
                   return addResponseMessage(res.data);
               }
           } else {
