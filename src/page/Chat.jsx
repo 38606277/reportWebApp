@@ -220,14 +220,19 @@ export default class Chat extends React.Component {
         },
         body:filepath
       }).then(function (response) {
+        //console.log()
         if (response.ok) {
           response.blob().then((blob) => {
+            if(blob.size>0){
             const a = window.document.createElement('a');
             const downUrl = window.URL.createObjectURL(blob);// 获取 blob 本地文件连接 (blob 为纯二进制对象，不能够直接保存到磁盘上)
              a.href = downUrl;
              a.download = filepath.substr(filepath.lastIndexOf("/")+1);
              a.click();
             window.URL.revokeObjectURL(downUrl);
+          }else{
+            Toast.fail("文件已丢失，请重新导出下载！");
+          }
           });
         }
       });
