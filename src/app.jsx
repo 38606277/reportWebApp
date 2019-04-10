@@ -87,7 +87,11 @@ const UploadInfo = Loadable({
     loading: loading,
     delay:3000
 });
-
+const Demo = Loadable({
+    loader: () => import('./page/ai/demo.jsx'),
+    loading: loading,
+    delay:3000
+});
 // function loadPage(url){
 //    return Loadable({
 //     loader:()=>import(url),
@@ -129,6 +133,7 @@ class App extends React.Component {
                         <Route path="/UserBill" component={UserBill} />
                         <Route path="/IndexSearch" component={IndexSearch} />
                         <Route path="/UploadInfo" component={UploadInfo} />
+                        <Route path="/Demo" component={Demo} />
                     </Switch>
                 </Layout>
             );
