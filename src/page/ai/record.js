@@ -4,8 +4,8 @@ window.URL = window.URL || window.webkitURL;
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 var HZRecorder = function (stream, config) {
     config = config || {};
-    config.sampleBits = config.sampleBits || 8;      //采样数位 8, 16
-    config.sampleRate = config.sampleRate || (44100 / 6);   //采样率(1/6 44100)
+    config.sampleBits = 16;      //采样数位 8, 16
+    config.sampleRate = 16000;   //采样率(1/6 44100)
     //创建一个音频环境对象
     var audioContext = window.AudioContext || window.webkitAudioContext;    
     var context = new audioContext();    
