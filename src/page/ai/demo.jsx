@@ -1,4 +1,5 @@
 import React from "react";
+import {  WhiteSpace, Icon, InputItem, Toast, Button } from 'antd-mobile';
 import "./demo.css";
 import Script from 'react-load-script';
 import HttpService from '../../util/HttpService.jsx';
@@ -97,20 +98,48 @@ export default class Demo extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            status: null
+            status: null,
+            username:null
         }
     }
  
     componentDidMount(){
         initEvent();
     }
-    
+    onInputChange(name, value) {
+        this.setState({
+          [name]: value
+        });
+      }
+      onInputKeyUp(e) {
+        if (e.keyCode === 13) {
+          this.yuyin();
+        }
+      }
+      yuyin=()=>{
+        HttpService.post("reportServer/MyVoiceApplication/yuyin"
+        ,JSON.stringify({data:this.state.username}))
+        .then(response=>{
+            console.log(response); 
+        }).catch((error) => {
+            Toast.fail("登录失败，请检查用户名与密码");
+        });
+      }
     render() {
         return (
             <div>
                 <div class="messages"></div>
                 <Script url="../src/page/ai/jquery-3.2.1.min.js"/>
                 <Script url="../src/page/ai/record.js"/>
+                <InputItem
+                type="text"
+                name="username"
+                placeholder="输入用户名"
+                clear
+                onKeyUp={e => this.onInputKeyUp(e)}
+                onChange={(v) => this.onInputChange('username', v)}
+              ></InputItem>
+              <Button type="primary" onClick={this.yuyin}>语音合成</Button>
                 <input id="microphone" type="button" value="录音"/>
                 <audio controls autoplay></audio>
             </div>
