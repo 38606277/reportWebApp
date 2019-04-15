@@ -8,71 +8,71 @@ const localStorge = new LocalStorge();
 var recorder;        
 var msg={};
 
-var audio = document.querySelector('audio');
-function initEvent() {
-    var msgId=1;
-    var btnElem=document.getElementById("microphone");//获取ID
-    btnElem.addEventListener("touchstart", function(event) {
-        //event.preventDefault();//阻止浏览器默认行为
-        HZRecorder.get(function (rec) {
-            recorder = rec;
-            recorder.start();
-        });
-    });
+//var audio = document.querySelector('audio');
+    // function initEvent() {
+    //     var msgId=1;
+    //     var btnElem=document.getElementById("microphone");//获取ID
+    //     btnElem.addEventListener("touchstart", function(event) {
+    //         //event.preventDefault();//阻止浏览器默认行为
+    //         HZRecorder.get(function (rec) {
+    //             recorder = rec;
+    //             recorder.start();
+    //         });
+    //     });
 
-    btnElem.addEventListener("touchend", function(event) {
-        //event.preventDefault();
-        HZRecorder.get(function (rec) {
-            recorder = rec;
-            recorder.stop();
-        })
-       
-        //发送音频片段
-        var data=recorder.getBlob();
-        if(data.duration==0){
-              alert("请先录音");
-             return;
-        }
-       
-       if(data.duration!==0){
-        //导出wav文件
-        //  downloadRecord(data.blob);
-        msg[msgId]=data;
-        recorder.clear();
-        var dur=data.duration/10;
-        var str="<div class='warper'><div id="+msgId+" class='voiceItem' >"+dur+"s</div></div>"
-        $(".messages").append(str);
-        msgId++;
-        let formData = new FormData();
-        formData.append("file", data.blob);
-        HttpService.post("reportServer/MyVoiceApplication/uploadai",formData).then(response=>{
-            console.log(response); 
-        });
-        // recorder.upload(window.getServerUrl()+"reportServer/MyVoiceApplication/uploadai", function (state, e) {
-        //     switch (state) {                        
-        //         case 'uploading':                            
-        //     //var percentComplete = Math.round(e.loaded * 100 / e.total) + '%';
-        //             break;                        
-        //         case 'ok':                            
-        //             //alert(e.target.responseText);
-        //             console.log("成功");                            
-        //             break;                        
-        //         case 'error':
-        //             alert("上传失败");                            
-        //             break;                        
-        //         case 'cancel':
-        //             alert("上传被取消");                            
-        //             break;
-        //     }
-        // });
-        $(".voiceItem").click(function(){
-                var id=$(this)[0].id;
-                var data=msg[id];
-                playRecord(data.blob);
-         });
-        }
-     });
-};
+    //     btnElem.addEventListener("touchend", function(event) {
+    //         //event.preventDefault();
+    //         HZRecorder.get(function (rec) {
+    //             recorder = rec;
+    //             recorder.stop();
+    //         })
+        
+    //         //发送音频片段
+    //         var data=recorder.getBlob();
+    //         if(data.duration==0){
+    //             alert("请先录音");
+    //             return;
+    //         }
+        
+    //     if(data.duration!==0){
+    //         //导出wav文件
+    //         //  downloadRecord(data.blob);
+    //         msg[msgId]=data;
+    //         recorder.clear();
+    //         var dur=data.duration/10;
+    //         var str="<div class='warper'><div id="+msgId+" class='voiceItem' >"+dur+"s</div></div>"
+    //         $(".messages").append(str);
+    //         msgId++;
+    //         let formData = new FormData();
+    //         formData.append("file", data.blob);
+    //         HttpService.post("reportServer/MyVoiceApplication/uploadai",formData).then(response=>{
+    //             console.log(response); 
+    //         });
+    //         // recorder.upload(window.getServerUrl()+"reportServer/MyVoiceApplication/uploadai", function (state, e) {
+    //         //     switch (state) {                        
+    //         //         case 'uploading':                            
+    //         //     //var percentComplete = Math.round(e.loaded * 100 / e.total) + '%';
+    //         //             break;                        
+    //         //         case 'ok':                            
+    //         //             //alert(e.target.responseText);
+    //         //             console.log("成功");                            
+    //         //             break;                        
+    //         //         case 'error':
+    //         //             alert("上传失败");                            
+    //         //             break;                        
+    //         //         case 'cancel':
+    //         //             alert("上传被取消");                            
+    //         //             break;
+    //         //     }
+    //         // });
+    //         $(".voiceItem").click(function(){
+    //                 var id=$(this)[0].id;
+    //                 var data=msg[id];
+    //                 playRecord(data.blob);
+    //         });
+    //         }
+    //     });
+    // };
 
 function playRecord(blob){  
     var audio = document.querySelector('audio');
@@ -110,7 +110,66 @@ export default class Demo extends React.Component {
     }
  
     componentDidMount(){
-        initEvent();
+       // initEvent();
+       var msg={};
+       var thates = this;
+       var msgId=1;
+        var btnElem=document.getElementById("microphone");//获取ID
+        btnElem.addEventListener("touchstart", function(event) {
+            //event.preventDefault();//阻止浏览器默认行为
+            HZRecorder.get(function (rec) {
+                recorder = rec;
+                recorder.start();
+            });
+        });
+
+        btnElem.addEventListener("touchend", function(event) {
+            //event.preventDefault();
+            HZRecorder.get(function (rec) {
+                recorder = rec;
+                recorder.stop();
+            })
+            //发送音频片段
+            var data=recorder.getBlob();
+            if(data.duration==0){
+                alert("请先录音");
+                return;
+            }
+        if(data.duration!==0){
+            //导出wav文件
+            //  downloadRecord(data.blob);
+            msg[msgId]=data;
+            recorder.clear();
+            var dur=data.duration/10;
+            var str="<div class='warper'><div id="+msgId+" class='voiceItem' >"+dur+"s</div></div>"
+            $(".messages").append(str);
+            msgId++;
+            let formData = new FormData();
+            formData.append("file", data.blob);
+            HttpService.post("reportServer/MyVoiceApplication/uploadai",formData).then(response=>{
+                if(response.resultCode=="1000"){
+                    fetch('http://www.tuling123.com/openapi/api?key=f0d11b6cae4647b2bd810a6a3df2136f&info=' + response.data.content, {
+                        method: 'POST',
+                        type: 'cors'
+                    }).then(function (response) {
+                        return response.json();
+                    }).then(function (detail) {
+                        if (detail.code === 100000) {
+                            thates.setState({ username :detail.text},function(){
+                                thates.yuyin();
+                            }); 
+                        }
+                    });
+                }
+            });
+        
+            $(".voiceItem").click(function(){
+                    var id=$(this)[0].id;
+                    var data=msg[id];
+                    playRecord(data.blob);
+            });
+            }
+        });
     }
     onInputChange(name, value) {
         this.setState({
