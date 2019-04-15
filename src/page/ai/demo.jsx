@@ -104,8 +104,8 @@ export default class Demo extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            status: null,
-            username:null
+            question: "",
+            answer:""
         }
     }
  
@@ -148,6 +148,7 @@ export default class Demo extends React.Component {
             formData.append("file", data.blob);
             HttpService.post("reportServer/MyVoiceApplication/uploadai",formData).then(response=>{
                 if(response.resultCode=="1000"){
+                    thates.setState({question:response.data.content});
                     fetch('http://www.tuling123.com/openapi/api?key=f0d11b6cae4647b2bd810a6a3df2136f&info=' + response.data.content, {
                         method: 'POST',
                         type: 'cors'
@@ -155,7 +156,7 @@ export default class Demo extends React.Component {
                         return response.json();
                     }).then(function (detail) {
                         if (detail.code === 100000) {
-                            thates.setState({ username :detail.text},function(){
+                            thates.setState({ answer :detail.text},function(){
                                 thates.yuyin();
                             }); 
                         }
@@ -182,14 +183,14 @@ export default class Demo extends React.Component {
         }
       }
    yuyin(){
-       if(null!=this.state.username && ""!=this.state.username){
+       if(null!=this.state.answer && ""!=this.state.answer){
         fetch(window.getServerUrl()+'reportServer/MyVoiceApplication/yuyin', {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json',
                 'credentials': JSON.stringify(localStorge.getStorage('userInfo') || '')
                 },
-                body:this.state.username
+                body:this.state.answer
         }).then(function (resyy) {
             if (resyy.ok) {
               let msgId=1;
@@ -218,9 +219,10 @@ export default class Demo extends React.Component {
                 <div class="messages"></div>
                 <Script url="../src/page/ai/jquery-3.2.1.min.js"/>
                 <Script url="../src/page/ai/record.js"/>
-                <InputItem  type="text"  name="username"  placeholder="输入用户名"  clear
+                <InputItem  type="text"  name="answer"  placeholder="输入用户名"  clear
                     onKeyUp={e => this.onInputKeyUp(e)} 
-                    onChange={(v) => this.onInputChange('username', v)}
+                    onChange={(v) => this.onInputChange('answer', v)}
+                    value={'问:'+this.state.question +' 回答:'+ this.state.answer}
                     // extra={<Button type="primary" onClick={()=>this.yuyin()}  size="small" >语音合成</Button>}
                 ></InputItem>
 
