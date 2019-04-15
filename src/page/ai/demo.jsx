@@ -3,6 +3,8 @@ import {  WhiteSpace, Icon, InputItem, Toast, Button } from 'antd-mobile';
 import "./demo.css";
 import Script from 'react-load-script';
 import HttpService from '../../util/HttpService.jsx';
+import LocalStorge from '../../util/LogcalStorge.jsx';
+const localStorge = new LocalStorge();
 var recorder;        
 var msg={};
 
@@ -28,7 +30,7 @@ function initEvent() {
         //发送音频片段
         var data=recorder.getBlob();
         if(data.duration==0){
-              showError("请先录音");
+              alert("请先录音");
              return;
         }
        
@@ -74,13 +76,17 @@ function initEvent() {
 
 function playRecord(blob){  
     var audio = document.querySelector('audio');
-    if(!recorder){
-        showError("请先录音");
-        return;
-    }
-    recorder.play(audio,blob);  
-};  
- 
+    playaudio(audio,blob); 
+    // if(!recorder){
+    //     showError("请先录音");
+    //     return;
+    // }
+    //recorder.play(audio,blob);  
+}
+function playaudio(audio,blob) {
+    audio.autoplay=true;
+    audio.src = window.URL.createObjectURL(blob);  
+}; 
 function downloadRecord(record){
     var save_link = window.document.createElement('a');
       save_link.href = window.URL.createObjectURL(record);
@@ -116,15 +122,37 @@ export default class Demo extends React.Component {
           this.yuyin();
         }
       }
-      yuyin=()=>{
-        HttpService.post("reportServer/MyVoiceApplication/yuyin"
-        ,JSON.stringify({data:this.state.username}))
-        .then(response=>{
-            console.log(response); 
-        }).catch((error) => {
-            Toast.fail("登录失败，请检查用户名与密码");
+   yuyin(){
+       if(null!=this.state.username && ""!=this.state.username){
+        fetch(window.getServerUrl()+'reportServer/MyVoiceApplication/yuyin', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                'credentials': JSON.stringify(localStorge.getStorage('userInfo') || '')
+                },
+                body:this.state.username
+        }).then(function (resyy) {
+            if (resyy.ok) {
+              let msgId=1;
+              resyy.blob().then((blob) => {
+                let size=blob.size;
+                let time=size*8/16/2/8000;
+                    time=time.toFixed(1);
+                    var audio = document.querySelector('audio');
+                    audio.src = window.URL.createObjectURL(blob);
+                    msg[1]=blob;
+                    var dur=time;
+                    var str="<div class='warper'><div id="+1+" class='voiceItem' >"+dur+"s</div></div>"
+                    $(".messages").append(str);
+                    msgId++;
+                    $(".voiceItem").click(function(){
+                        playRecord(blob);
+                    });
+                })
+            } 
         });
-      }
+        }
+    }
     render() {
         return (
             <div>
@@ -139,7 +167,7 @@ export default class Demo extends React.Component {
                 onKeyUp={e => this.onInputKeyUp(e)}
                 onChange={(v) => this.onInputChange('username', v)}
               ></InputItem>
-              <Button type="primary" onClick={this.yuyin}>语音合成</Button>
+              <Button type="primary" onClick={()=>this.yuyin()}>语音合成</Button>
                 <input id="microphone" type="button" value="录音"/>
                 <audio controls autoplay></audio>
             </div>
