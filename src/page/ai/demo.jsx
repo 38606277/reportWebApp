@@ -142,10 +142,10 @@ export default class Demo extends React.Component {
                     audio.src = window.URL.createObjectURL(blob);
                     msg[1]=blob;
                     var dur=time;
-                    var str="<div class='warper'><div id="+1+" class='voiceItem' >"+dur+"s</div></div>"
+                    var str="<div class='warper'><div id="+1+" class='voiceItemlet' >"+dur+"s</div></div>"
                     $(".messages").append(str);
                     msgId++;
-                    $(".voiceItem").click(function(){
+                    $(".voiceItemlet").click(function(){
                         playRecord(blob);
                     });
                 })
@@ -159,17 +159,17 @@ export default class Demo extends React.Component {
                 <div class="messages"></div>
                 <Script url="../src/page/ai/jquery-3.2.1.min.js"/>
                 <Script url="../src/page/ai/record.js"/>
-                <InputItem
-                type="text"
-                name="username"
-                placeholder="输入用户名"
-                clear
-                onKeyUp={e => this.onInputKeyUp(e)}
-                onChange={(v) => this.onInputChange('username', v)}
-              ></InputItem>
-              <Button type="primary" onClick={()=>this.yuyin()}>语音合成</Button>
-                <input id="microphone" type="button" value="录音"/>
+                <InputItem  type="text"  name="username"  placeholder="输入用户名"  clear
+                    onKeyUp={e => this.onInputKeyUp(e)} 
+                    onChange={(v) => this.onInputChange('username', v)}
+                    // extra={<Button type="primary" onClick={()=>this.yuyin()}  size="small" >语音合成</Button>}
+                ></InputItem>
+
                 <audio controls autoplay></audio>
+                <div style={{textAlign:'center',margin:'10px'}}>
+                    <Button type="primary" onClick={()=>this.yuyin()} inline size="small" style={{marginRight: '4px' }}>语音合成</Button>
+                    <Button type="primary" id="microphone" inline size="small">录音</Button>
+                </div>
             </div>
         );
     }

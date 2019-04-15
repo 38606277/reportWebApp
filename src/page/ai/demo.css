@@ -1,9 +1,15 @@
 .messages{
     min-height:200px;
-margin-bottom: 10px;border: 1px solid gainsboro;
+    margin-bottom: 10px;
+    border: 1px solid gainsboro;
+    max-height: 300px;
+    overflow: auto;
 }
-.warper{clear: both;margin: 10px;display: block;
-min-height: 32px;
+.warper{
+    clear: both;
+    margin: 10px;
+    display: block;
+    min-height: 32px;
 }
 .voiceItem{
     background-color:skyblue;
@@ -11,6 +17,16 @@ min-height: 32px;
     min-height: 32px;
     border-radius: 3px;
     float: right;
+    cursor: pointer;
+    line-height: 32px;
+    text-indent: 10px;
+}
+.voiceItemlet{
+    background-color:skyblue;
+    min-width: 100px;
+    min-height: 32px;
+    border-radius: 3px;
+    float: left;
     cursor: pointer;
     line-height: 32px;
     text-indent: 10px;
