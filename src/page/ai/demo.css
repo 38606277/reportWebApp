@@ -12,7 +12,7 @@
     min-height: 32px;
 }
 .voiceItem{
-    background-color:skyblue;
+    background-color:#87eb9d;
     min-width: 100px;
     min-height: 32px;
     border-radius: 3px;
@@ -22,7 +22,7 @@
     text-indent: 10px;
 }
 .voiceItemlet{
-    background-color:skyblue;
+    background-color:#ffffff;
     min-width: 100px;
     min-height: 32px;
     border-radius: 3px;
