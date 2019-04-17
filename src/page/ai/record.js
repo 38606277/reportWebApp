@@ -169,9 +169,9 @@ var HZRecorder = function (stream, config) {
 //是否支持录音HZRecorder.canRecording = (navigator.getUserMedia != null);
 //获取录音机
 HZRecorder.get = function (callback, config) {
-    if (callback) {        
-    if (navigator.getUserMedia) {
-            navigator.getUserMedia(
+    if (callback) {  
+    if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia) {
+        getUserMedia(
                 { audio: true } //只启用音频
                 , function (stream) {
                     var rec = new HZRecorder(stream, config);
@@ -216,4 +216,19 @@ Date.prototype.Format = function (fmt) { //author: meizz
     for (var k in o)
     if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;
+}
+function getUserMedia(constrains,success,error){
+    if(navigator.mediaDevices.getUserMedia){
+        //最新标准API
+        navigator.mediaDevices.getUserMedia(constrains).then(success).catch(error);
+    } else if (navigator.webkitGetUserMedia){
+        //webkit内核浏览器
+        navigator.webkitGetUserMedia(constrains).then(success).catch(error);
+    } else if (navigator.mozGetUserMedia){
+        //Firefox浏览器
+        navagator.mozGetUserMedia(constrains).then(success).catch(error);
+    } else if (navigator.getUserMedia){
+        //旧版API
+        navigator.getUserMedia(constrains).then(success).catch(error);
+    }
 }
