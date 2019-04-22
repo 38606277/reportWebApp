@@ -290,7 +290,6 @@ export default class Demo extends React.Component {
                 <div class="messages"></div>
                 <Script url="../src/page/ai/jquery-3.2.1.min.js"/>
                 <Script url="../src/page/ai/record.js"/>
-                <Script url="../src/page/ai/wcPop.js"/>
 
                 <InputItem  type="text"  name="answer"  placeholder="输入用户名"  clear
                     onKeyUp={e => this.onInputKeyUp(e)} 
