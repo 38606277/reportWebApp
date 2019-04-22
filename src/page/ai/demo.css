@@ -34,3 +34,4 @@
 audio{display: none;}
 .error{color: red;font-size: small;text-align: center;margin-top: 10px;}
 .contrs{text-align: center;}
+.saying{position:fixed;bottom:30%;left:50%;width:120px;margin-left:-60px;}
