@@ -12,47 +12,23 @@ var question;
 var answer;
 var audio = document.querySelector('audio');
 var msgId=1;
-
-var timer = "", //定时器
-		startX = 0, //开始x轴坐标
-		startY = 0, //开始y轴坐标
-        isSend = false; //记录是上滑还是下滑，下滑录音
-        
 function initEvent() {
   
     var btnElem=document.getElementById("microphone");//获取ID
     btnElem.addEventListener("touchstart", function(event) {
         event.preventDefault();//阻止浏览器默认行为
-        document.getElementById("microphone").text="松开  结束";
-		// timer = setTimeout(function() {
-		// 	//$(".issaying").show(); //开始录音时候出现动画
-        //     HZRecorder.get(function (rec) {
-        //         recorder = rec;
-        //         recorder.start();
-        //     });
-		// }, 500);
         HZRecorder.get(function (rec) {
             recorder = rec;
             recorder.start();
         });
     });
-    // btnElem.addEventListener("touchmove", function(event) {
-	// 	event.preventDefault();
-	// 	var touch = event.touches[0], //获取第一个触点
-	// 		x = Number(touch.pageX), //页面触点X坐标
-	// 		y = Number(touch.pageY); //页面触点Y坐标
-	// 	//判断滑动方向
-	// 	$(".saying").hide();
-	// });
+   
     btnElem.addEventListener("touchend", function(event) {
         event.preventDefault();
-        document.getElementById("microphone").text="按住  说话";
-		timer = "";
         HZRecorder.get(function (rec) {
             recorder = rec;
             recorder.stop();
         })
-       // $(".issaying").hide();
         //发送音频片段
         var data=recorder.getBlob();
         // if(data.duration==0){
@@ -160,7 +136,9 @@ export default class Demo extends React.Component {
         super(props)
         this.state = {
             question: "",
-            answer:""
+            answer:"",
+            saying:false,
+            btnText:"按住  说话"
         }
     }
  
@@ -270,18 +248,22 @@ export default class Demo extends React.Component {
     }
     handleStart(e){
         this.setState({
-            saying:true
+            saying:true,
+            btnText:"松开  结束"
         });
     }
     handleTouchMove(e) {
-        // this.setState({
-        //     saying:false,
-        // });
+        this.setState({
+            saying:false,
+            btnText:"按住  说话"
+        });
     }
 
     handleTouchEnd (e) {
         this.setState({
             saying:false,
+            btnText:"按住  说话"
+
         });
     }
     render() {
@@ -309,7 +291,7 @@ export default class Demo extends React.Component {
                         onTouchStart={this.handleStart.bind(this)}  //使用bind(this)改变函数作用域，不加上bind则this指向的是全局对象window而报错。
                         onTouchMove={this.handleTouchMove.bind(this)}
                         onTouchEnd={this.handleTouchEnd.bind(this)} 
-                        inline size="small">按住  说话</Button> 
+                        inline size="small">{this.state.btnText}</Button> 
                 </div>
             </div>
         );
