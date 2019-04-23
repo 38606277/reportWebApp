@@ -106,7 +106,7 @@ export default class Home extends React.Component {
           afterChange={index => console.log('slide to', index)}
         >
             <a
-              href="http://www.alipay.com"
+              href="#/Demo"
               style={{ display: 'inline-block', width: '100%', height: this.state.imgHeight }}
             >
               <img
