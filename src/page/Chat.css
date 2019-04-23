@@ -166,9 +166,7 @@
     border: 1px solid #ccc;
     box-shadow: 0 0 3px #ccc;
 }
-.rcw-sender {
-  margin-bottom: 50px !important
-}
+
 .contentes  li img.imgleft { 
     float: left; 
 }
@@ -193,6 +191,8 @@
   text-align:center;overflow:hidden;margin-left:20%;
 }
 .saying{position:fixed;bottom:30%;left:50%;width:120px;margin-left:-60px;}
+
+
 .rcw-widget-container .rcw-launcher{
   top: 0;
    /* margin: 0; */
@@ -208,4 +208,37 @@
 }
 .rcw-conversation-container > .rcw-header > .rcw-title {
   padding: 0 0 1px;
+}
+.rcw-messages-container{
+  border-bottom:1px solid #dcd6d6;
+}
+.rcw-sender {
+  margin-bottom: 50px !important;
+  background-color:#ffffff;
+  display:block;
+  height:65px;
+
+}
+.rcw-new-message{
+  background-color:#fff;
+
+}
+.rcw-send{
+  float:right;
+  height:24px;
+  width: 75px;
+  background: rgb(45, 142, 242);
+  border-radius: 12px;
+  padding: 0 5px;
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 12px;
+  color: #fff;
+  text-align: center;
+}
+.rcw-send .rcw-send-icon{
+  display: none;
+}
+.rcw-send:before {
+  content: "发送消息";
 }
