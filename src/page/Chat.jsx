@@ -9,7 +9,7 @@ import down from './../assets/icon/down.png';
 import "babel-polyfill";
 import { List, ListView, PullToRefresh, WhiteSpace, WingBlank, Toast, Checkbox, Card, SwipeAction, InputItem, NavBar, Icon } from 'antd-mobile';
 import { Link, Redirect } from 'react-router-dom';
-import 'antd-mobile/dist/antd-mobile.css';
+// import 'antd-mobile/dist/antd-mobile.css';
 import './Chat.css';
 import LocalStorge from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
@@ -29,7 +29,8 @@ export default class Chat extends React.Component {
       pageNumd: 1, 
       perPaged: 1000,
       userIcon:'',
-      fileIcon:'./../src/assets/icon/down.png'
+      fileIcon:'./../src/assets/icon/down.png',
+      questionList: [],
     }
   }
 
@@ -68,7 +69,8 @@ export default class Chat extends React.Component {
             }
           }
       }
-    })
+    });
+    this.loadQuestion();
   }
 
   //组件即将销毁
@@ -117,8 +119,90 @@ export default class Chat extends React.Component {
             </List>
           </div>
   }
+
+  QuestionList = ({ data }) => {
+    return <List renderHeader={() => '常见问题'} className="my-list">
+        {data.map(item => (
+          <Item arrow="horizontal"
+            multipleLine
+            onClick={() => this.onQuestionClick(item.ai_question_id,item.ai_question)}
+           >
+             <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
+                {item.ai_question}
+             </div>
+          </Item>
+        ))}
+      </List>
+  }
+  loadQuestion(){
+    let listParam = {};
+    listParam.pageNum  = 1;
+    listParam.perPage  = 5;
+    HttpService.post('/reportServer/questions/getQuestionsList', JSON.stringify(listParam))
+    .then(res => {
+      if (res.resultCode != "1000") {
+        this.setState({questionList:res.list});
+        renderCustomComponent(this.QuestionList, {data:res.list});
+      }
+    })
+  }
+
+  async onQuestionClick(question_id,question){
+    console.log(question_id);
+   // this.sendMessageByQuestion(question);
+    var ist=true; 
+    //先保存发送信息
+    let userInfo={'from_userId':this.state.userId,
+                  'to_userId':this.state.to_userId,
+                  'post_message':question,
+                  'message_type':'0',
+                  'message_state':'0'
+                }
+    await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
+    .then(res => {
+      if (res.resultCode != "1000") {
+        ist=false;
+      }else{
+        addUserMessage(question);
+      }
+    })
+    if(ist){
+      let listParam = {};
+          listParam.question_id  =question_id;
+          listParam.pageNum  = 1;
+          listParam.perPage  = 1;
+      HttpService.post('/reportServer/questions/getDefaultAnswerByQID/'+question_id,null)
+      .then(res=>{
+        if(null!=res && res.data.length>0){
+          addResponseMessage(res.data[0].answer);
+        }else{
+          addResponseMessage("没有符合您问题的答案，请重新选择");
+          renderCustomComponent(this.QuestionList, {data:this.state.questionList});
+        }
+      });
+    }
+  }
   handleModalDataChange(event) {
     this.setState({ test: event.target.value })
+  }
+   //发送消息
+   async sendMessageByQuestion(newMessage){ 
+    var ist=true; 
+    //先保存发送信息
+    let userInfo={'from_userId':this.state.userId,
+                  'to_userId':this.state.to_userId,
+                  'post_message':newMessage,
+                  'message_type':'0',
+                  'message_state':'0'
+                }
+    await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
+    .then(res => {
+      if (res.resultCode != "1000") {
+        ist=false;
+      }else{
+        addUserMessage(newMessage);
+      }
+    })
   }
   //发送消息
   async sendMessage(newMessage){ 
@@ -183,16 +267,16 @@ export default class Chat extends React.Component {
    
     
       var that = this
-      fetch('http://www.tuling123.com/openapi/api?key=f0d11b6cae4647b2bd810a6a3df2136f&info=' + newMessage, {
+      fetch('https://api.ownthink.com/bot?spoken=' + newMessage, {
         method: 'POST',
         type: 'cors'
       }).then(function (response) {
         return response.json();
       }).then(function (detail) {
-        if (detail.code === 100000) {
+        if (detail.message =="success") {
           let responseInfo={'from_userId':that.state.to_userId,
                   'to_userId':that.state.userId,
-                  'post_message':detail.text,
+                  'post_message':detail.data.info.text,
                   'message_type':'0',
                   'message_state':'0'
                 }
@@ -204,7 +288,7 @@ export default class Chat extends React.Component {
             })
           //  renderCustomComponent(that.FormFile, {data: "改为文件名", file:"http://localhost:8080/report/upload/PRC02 利润表.xlsx" }); 
 
-          return addResponseMessage(detail.text);
+          return addResponseMessage(detail.data.info.text);
         } else {
         }
       })

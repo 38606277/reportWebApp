@@ -242,3 +242,9 @@
 .rcw-send:before {
   content: "发送消息";
 }
+
+
+.am-list-content >div{
+  background-color:rgb(255, 255, 255) !important
+
+}
