@@ -245,6 +245,6 @@
 
 
 .am-list-content >div{
-  background-color:rgb(255, 255, 255) !important
-
+  background-color:rgb(255, 255, 255) !important;
+  color: rgb(45, 142, 242);
 }
