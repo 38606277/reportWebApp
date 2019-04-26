@@ -13,8 +13,8 @@ import { Link, Redirect } from 'react-router-dom';
 import './Chat.css';
 import LocalStorge from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
-import Script from 'react-load-script';
-import IScroll from 'iscroll';
+// import Script from 'react-load-script';
+// import IScroll from 'iscroll';
 const Item = List.Item;
 const Brief = Item.Brief;
 const url=window.getServerUrl();
@@ -506,7 +506,6 @@ export default class Chat extends React.Component {
   render() {
     return (
       <div className="content" id="cons">
-        <Script url="../src/page/ai/jquery-3.2.1.min.js"/>
         <Widget
           handleNewUserMessage={newMessage=>this.sendMessage(newMessage)}
           senderPlaceHolder="输入想要做什么"
@@ -517,10 +516,6 @@ export default class Chat extends React.Component {
           subtitle=""
           badge="1"
           fullScreenMode={false}
-          //launcher = {this.getCustomLauncher}
-          // launcher={handleToggle => (
-          //    <input id="btn" onClick={handleToggle} type="button"></input>
-          // )}
         />
       </div>
     )
