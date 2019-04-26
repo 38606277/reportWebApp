@@ -170,7 +170,7 @@ export default class Chat extends React.Component {
               self.transformScroller(0.3, 0);
           } else {
               self.setState({dragLoading: true});//设置在下拉刷新状态中
-              self.transformScroller(0.1, dragValve);
+              self.transformScroller(0.1, 0);
               console.log("加载中....");
             //  self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = JZ);
               self.fetchItems(false);//触发冲外面传进来的刷新回调函数
