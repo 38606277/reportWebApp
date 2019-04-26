@@ -13,10 +13,17 @@ import { Link, Redirect } from 'react-router-dom';
 import './Chat.css';
 import LocalStorge from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
-
+import Script from 'react-load-script';
+import IScroll from 'iscroll';
 const Item = List.Item;
 const Brief = Item.Brief;
 const url=window.getServerUrl();
+var XLJZ = '下拉加载';
+var SKJZ = '松开加载';
+var JZ = '加载中...'
+var dropDownRefreshText = XLJZ;
+var dragValve = 40; // 下拉加载阀值
+var scrollValve = 40; // 滚动加载阀值
 export default class Chat extends React.Component {
   constructor(props) {
     super(props);
@@ -24,14 +31,20 @@ export default class Chat extends React.Component {
       isWrite: true,
       saying: false,
       isClick: true,
-      userId:'',
-      to_userId:'0',
+      userId:null,
+      to_userId:0,
       pageNumd: 1, 
-      perPaged: 1000,
+      perPaged: 5,
       userIcon:'',
       fileIcon:'./../src/assets/icon/down.png',
       questionList: [],
+      translate: 0,//位移
+      dragLoading: false,//是否在下拉刷新中
+      scrollerLoading: false,//是否在加载更多中
+      openDragLoading: true,//是否开启下拉刷新
+      openScrollLoading: true,//是否开启下拉刷新
     }
+    this.page = 1;
   }
 
  // 组件加载完成
@@ -40,45 +53,193 @@ export default class Chat extends React.Component {
     toggleWidget();
     dropMessages();
     let userInfo = localStorge.getStorage('userInfo');
-    let user_id=null;
     if (undefined != userInfo && null != userInfo && '' != userInfo) {
-      user_id=userInfo.id;
-      this.setState({ userId:userInfo.id,userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon});
+      this.setState({ userId:userInfo.id,
+        userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon,
+        translate: 0,
+        openDragLoading: this.openDragLoading || true,//根据外面设置的开关改变自己的状态
+        openScrollLoading: this.openScrollLoading || true},function(){
+          this.fetchItems(true);
+          this.loadQuestion();
+        });
     }else{
       window.location.href="/My";
     }
-    let mInfo={'from_userId':user_id,'to_userId':this.state.to_userId,
-              pageNumd:this.state.pageNumd,perPaged:this.state.perPaged}
-    HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
-    .then(res => {
-      let list=res.data;
-      for(var i=0;i<list.length;i++){
-          if(user_id==list[i].from_userId){
-            addUserMessage(list[i].post_message);
-          }else{
-            if(list[i].message_type=='json'){
-                let ress=JSON.parse(list[i].post_message);
-                renderCustomComponent(this.FormD, {data: ress.data.list, out: ress.data.out }); 
-            }else if(list[i].message_type=="file"){
-                let ress=JSON.parse(list[i].post_message);
-                renderCustomComponent(this.FormFile, {data:  ress.data.fileName, file:ress.data.filePath }); 
-            }else if(list[i].message_type=="text"){
-                addResponseMessage(list[i].post_message);
-            }else{
-                addResponseMessage(list[i].post_message);
-            }
-          }
-      }
-    });
-    this.loadQuestion();
+    
   }
+  fetchItems(isTrue) {
+        let mInfo={'from_userId':this.state.userId,'to_userId':this.state.to_userId,
+              pageNumd:this.page,perPaged:5}
+        HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
+        .then(res => {
+          let list=res.data;
+          for(var i=0;i<list.length;i++){
+              if(this.state.userId==list[i].from_userId){
+                addUserMessage(list[i].post_message);
+              }else{
+                if(list[i].message_type=='json'){
+                    let ress=JSON.parse(list[i].post_message);
+                    renderCustomComponent(this.FormD, {data: ress.data.list, out: ress.data.out }); 
+                }else if(list[i].message_type=="file"){
+                    let ress=JSON.parse(list[i].post_message);
+                    renderCustomComponent(this.FormFile, {data:  ress.data.fileName, file:ress.data.filePath }); 
+                }else if(list[i].message_type=="text"){
+                    addResponseMessage(list[i].post_message);
+                }else{
+                    addResponseMessage(list[i].post_message);
+                }
+              }
+          }
+          if(isTrue){
+            this.initRefresh();//初始化下拉刷新
+            this.initScroll();//初始化滚动加载更多
+          }
+            ++this.page;
+        });
+    }
 
   //组件即将销毁
   componentWillUnmount() {
     //调用组件内部方法打开窗口，再次调用是关闭；在组件销毁时调用一次关闭，可以保证每次打开都是开启状态
     toggleWidget();
   }
+  initRefresh=()=> {
+    var self = this;//对象转存，防止闭包函数内无法访问
+    var isTouchStart = false; // 是否已经触发下拉条件
+    var isDragStart = false; // 是否已经开始下拉
+    var startX, startY;        // 下拉方向，touchstart 时的点坐标
+    var hasTouch = 'ontouchstart' in window;//判断是否是在移动端手机上
+    // 监听下拉加载，兼容电脑端
+    let pullDown = document.getElementById("messages");
+    if (self.state.openDragLoading) {
+      pullDown.addEventListener('touchstart', touchStart, false);
+      pullDown.addEventListener('touchmove', touchMove, false);
+      pullDown.addEventListener('touchend', touchEnd, false);
+      pullDown.addEventListener('mousedown', touchStart, false);
+      pullDown.addEventListener('mousemove', touchMove, false);
+      pullDown.addEventListener('mouseup', touchEnd, false);
+    }
+    function touchStart(event) {
+        if (pullDown.scrollTop <= 0) {
+            isTouchStart = true;
+            startY = hasTouch ? event.changedTouches[0].pageY : event.pageY;
+            startX = hasTouch ? event.changedTouches[0].pageX : event.pageX;
+        }
+    }
 
+    function touchMove(event) {
+        if (!isTouchStart) return;
+        var distanceY = (hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY;
+        var distanceX = (hasTouch ? event.changedTouches[0].pageX : event.pageX) - startX;
+        //如果X方向上的位移大于Y方向，则认为是左右滑动
+        if (Math.abs(distanceX) > Math.abs(distanceY))return;
+        if (distanceY > 0) {
+            self.setState({
+                translate: Math.pow((hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY, 0.85)
+            });
+        } else {
+            if (self.state.translate !== 0) {
+                self.setState({translate: 0});
+                self.transformScroller(0, self.state.translate);
+            }
+        }
+
+        if (distanceY > 0) {
+            if (!isDragStart) {
+                isDragStart = true;
+            }
+            if (self.state.translate <= dragValve) {// 下拉中，但还没到刷新阀值
+                if (dropDownRefreshText !== XLJZ){
+                   // self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
+                    console.log("下拉加载")
+                }
+            } else { // 下拉中，已经达到刷新阀值
+                if (dropDownRefreshText !== SKJZ){
+                   // self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = SKJZ);
+                    console.log("松开加载");
+                  }
+            }
+            self.transformScroller(0, self.state.translate);
+        }
+      }
+      function touchEnd(event) {
+          isDragStart = false;
+          if (!isTouchStart) return;
+          isTouchStart = false;
+          if (self.state.translate <= dragValve) {
+              self.transformScroller(0.3, 0);
+          } else {
+              self.setState({dragLoading: true});//设置在下拉刷新状态中
+              self.transformScroller(0.1, dragValve);
+              console.log("加载中....");
+            //  self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = JZ);
+              self.fetchItems(false);//触发冲外面传进来的刷新回调函数
+          }
+      }
+  }
+
+  initScroll=()=> {
+      var self = this;
+      let scroller = document.getElementById("messages");
+
+      // 监听滚动加载
+      if (this.state.openScrollLoading) {
+          scroller.addEventListener('scroll', scrolling, false);
+      }
+
+      function scrolling() {
+          if (self.state.scrollerLoading) return;
+          var scrollerscrollHeight = scroller.scrollHeight; // 容器滚动总高度
+          var scrollerHeight =scroller.getBoundingClientRect().height;// 容器滚动可见高度
+          var scrollerTop = scroller.scrollTop;//滚过的高度
+          // 达到滚动加载阀值
+          if (scrollerscrollHeight - scrollerHeight - scrollerTop <= scrollValve) {
+              self.setState({scrollerLoading: true});
+              self.fetchItems(false);
+          }
+      }
+  }
+  /**
+   * 利用 transition 和transform  改变位移
+   * @param time 时间
+   * @param translate  距离
+   */
+  transformScroller=(time, translate)=> {
+      this.setState({translate: translate});
+      let scroller = document.getElementById("messages");
+      var elStyle = scroller.style;
+      elStyle.webkitTransition = elStyle.MozTransition = elStyle.transition = 'all ' + time + 's ease-in-out';
+      elStyle.webkitTransform = elStyle.MozTransform = elStyle.transform = 'translate3d(0, ' + translate + 'px, 0)';
+  }
+  /**
+   * 下拉刷新完毕
+   */
+  dragLoadingDone=()=> {
+      this.setState({dragLoading: false});
+      this.transformScroller(0.1, 0);
+  }
+  /**
+   * 滚动加载完毕
+   */
+  scrollLoadingDone=()=> {
+      this.setState({scrollerLoading: false});
+      console.log("下拉加载");
+    //  this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
+  }
+  componentWillReceiveProps=(nextProps)=> {
+      var self = this;
+      self.fetchItems(false);//把新的数据填进列表
+      if (this.state.dragLoading) {//如果之前是下拉刷新状态，恢复
+          setTimeout(function () {
+              self.dragLoadingDone();
+          }, 1000);
+      }
+      if (this.state.scrollerLoading) {//如果之前是滚动加载状态，恢复
+          setTimeout(function () {
+              self.scrollLoadingDone();
+          }, 1000);
+      }
+  }
   FormD = ({ data, out }) => {
     return <Card style={{backgroundColor:'#f4f7f9'}}>
       <List>
@@ -87,7 +248,6 @@ export default class Chat extends React.Component {
             multipleLine
             onClick={() => this.onClassClick(val.class_id)}
           >
-             {/* {JSON.stringify(this.state.out)} */}
              {out.map((item) => {
                return <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
                 {item.out_name}:{val[item.out_id.toUpperCase()]}
@@ -148,8 +308,7 @@ export default class Chat extends React.Component {
   }
 
   async onQuestionClick(question_id,question){
-    console.log(question_id);
-   // this.sendMessageByQuestion(question);
+    // this.sendMessageByQuestion(question);
     var ist=true; 
     //先保存发送信息
     let userInfo={'from_userId':this.state.userId,
@@ -347,7 +506,7 @@ export default class Chat extends React.Component {
   render() {
     return (
       <div className="content" id="cons">
-      <div id="ccon">
+        <Script url="../src/page/ai/jquery-3.2.1.min.js"/>
         <Widget
           handleNewUserMessage={newMessage=>this.sendMessage(newMessage)}
           senderPlaceHolder="输入想要做什么"
@@ -363,7 +522,6 @@ export default class Chat extends React.Component {
           //    <input id="btn" onClick={handleToggle} type="button"></input>
           // )}
         />
-        </div>
       </div>
     )
   }

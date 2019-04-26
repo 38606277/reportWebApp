@@ -248,3 +248,23 @@
   background-color:rgb(255, 255, 255) !important;
   color: rgb(45, 142, 242);
 }
+
+#PullDown {
+  margin:0px;
+  height: 40px;
+  width: 100%;
+  text-align: center;
+  font-size: 15px;
+  background-color: white;
+  line-height: 40px;
+}
+
+#PullUp {
+  margin:0px;
+  height: 40px;
+  width: 100%;
+  text-align: center;
+  font-size: 15px;
+  background-color: white;
+  line-height: 40px;
+}
