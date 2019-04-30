@@ -104,6 +104,19 @@ const RenderContent = props => {
   }else 
   if (props.message_type=="voice") {
     return <audio src={props.post_message ? props.post_message : ''} controls />;
+  }else if(props.message_type=="question"){
+    return <List renderHeader={() => '常见问题'} className="my-list">
+        {props.data.map(item => (
+          <Item arrow="horizontal"
+            multipleLine
+            onClick={() => this.onQuestionClick(item.ai_question_id,item.ai_question)}
+           >
+             <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
+                {item.ai_question}
+             </div>
+          </Item>
+        ))}
+      </List>
   }
   else{
     return <div >{props.post_message}</div>;

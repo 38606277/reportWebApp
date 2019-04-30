@@ -66,7 +66,7 @@ export default class ChatNew extends React.Component {
         openDragLoading:true,//根据外面设置的开关改变自己的状态
         openScrollLoading:true},function(){
           this.fetchItems(true);
-          //this.loadQuestion();
+          this.loadQuestion();
         });
     }else{
       window.location.href="/My";
@@ -91,6 +91,66 @@ fetchItems(isTrue) {
         ++this.page;
     });
 }
+loadQuestion(){
+  let listParam = {};
+  listParam.pageNum  = 1;
+  listParam.perPage  = 5;
+  HttpService.post('/reportServer/questions/getQuestionsList', JSON.stringify(listParam))
+  .then(res => {
+    if (res.resultCode != "1000") {
+      
+      this.setState({questionList:res.list,data: [...this.state.data,{data:res.list,message_type:"question"}] });
+      // this.setState({questionList:res.list});
+      // renderCustomComponent(this.QuestionList, {data:res.list});
+    }
+  })
+}
+
+async onQuestionClick(question_id,question){
+  var anchorElement = document.getElementById("scrolld");
+  var ist=true; 
+  //先保存发送信息
+  let userInfo={'from_userId':this.state.userId,
+                'to_userId':this.state.to_userId,
+                'post_message':question,
+                'message_type':'0',
+                'message_state':'0'
+              }
+  await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
+  .then(res => {
+    if (res.resultCode != "1000") {
+      ist=false;
+    }else{
+      this.setState({
+        data: [...this.state.data, {from_userId: this.state.userId,'post_message':question,to_userId:this.state.to_userId}]
+      });
+    }
+  })
+  if(ist){
+    let listParam = {};
+        listParam.question_id  =question_id;
+        listParam.pageNum  = 1;
+        listParam.perPage  = 1;
+    HttpService.post('/reportServer/questions/getDefaultAnswerByQID/'+question_id,null)
+    .then(res=>{
+      if(null!=res && res.data.length>0){
+        this.setState({
+          data: [...this.state.data, {from_userId: this.state.to_userId,'post_message':res.data[0].answer,to_userId:this.state.userId}]
+        },function(){
+          anchorElement.scrollIntoView();
+        });
+      }else{
+        this.setState({
+          data: [...this.state.data, {from_userId: this.state.to_userId,'post_message':"没有符合您问题的答案，请重新选择",to_userId:this.state.userId}]
+        },function(){
+          this.setState({questionList:res.list,data: [...this.state.data,{data:this.state.questionList,message_type:"question"}] },function(){
+            anchorElement.scrollIntoView();
+          });
+        });
+      }
+    });
+  }
+}
 initRefresh=()=> {
   var self = this;//对象转存，防止闭包函数内无法访问
   var isTouchStart = false; // 是否已经触发下拉条件
@@ -98,7 +158,7 @@ initRefresh=()=> {
   var startX, startY;        // 下拉方向，touchstart 时的点坐标
   var hasTouch = 'ontouchstart' in window;//判断是否是在移动端手机上
   // 监听下拉加载，兼容电脑端
-  let pullDown = document.getElementById("messages");
+  //let pullDown = document.getElementById("messages");
   if (self.state.openDragLoading) {
     self.refs.scroller.addEventListener('touchstart', touchStart, false);
     self.refs.scroller.addEventListener('touchmove', touchMove, false);
@@ -260,9 +320,9 @@ componentWillReceiveProps=(nextProps)=> {
         })
         if(ist){
           let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
-          await HttpService.post('/reportServer/query/execqueryToExcel/2/87', JSON.stringify(qryParam))
+          await HttpService.post('/reportServer/query/execQuery/2/87', JSON.stringify(qryParam))
           .then(res=>{
-                //函数查询execQuery
+                //函数查询 execQuery  execqueryToExcel
           // })
           // //首先进行
           // await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
