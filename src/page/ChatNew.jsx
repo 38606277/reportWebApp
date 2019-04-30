@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { PureComponent, lazy, Suspense }  from 'react';
 import ReactDOM from 'react-dom';
-import { List, ListView,PullToRefresh,WhiteSpace, WingBlank, Checkbox, SwipeAction,  NavBar, Icon } from 'antd-mobile';
+import { List, ListView,PullToRefresh,WhiteSpace,WingBlank, Checkbox, SwipeAction,  NavBar, Icon } from 'antd-mobile';
 import { Link, Redirect } from 'react-router-dom';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
@@ -44,7 +44,9 @@ function genDatas(dataArr) {
 }
 //查看历史信息使用下列加载 结束
 const url=window.getServerUrl();
-
+// 渲染不同内容的组件
+//const LazyComponent = lazy(() => import('./RenderContent'));
+import LazyComponent from './RenderContent';
 export default class ChatNew extends React.Component {
   constructor(props) {
     super(props);
@@ -114,27 +116,28 @@ onRefreshs = () => {
     .then(res => {
       let list=res.data;
       for(var i=0;i<list.length;i++){
-          if(this.state.userId==list[i].from_userId){
-            this.setState({data: [list[i],...this.state.data] });
-           // addUserMessage(list[i].post_message);
-          }else{
-            if(list[i].message_type=='json'){
-                let ress=JSON.parse(list[i].post_message);
-                this.setState({
-                  data:  [this.FormD(data:ress.data.list, out: ress.data.out),...this.state.data]
-                }); 
-            }else if(list[i].message_type=="file"){
-                let ress=JSON.parse(list[i].post_message);
-               // renderCustomComponent(this.FormFile, {data:  ress.data.fileName, file:ress.data.filePath }); 
-            }else if(list[i].message_type=="text"){
-               // addResponseMessage(list[i].post_message);
-                this.setState({data: [list[i],...this.state.data] });
+        this.setState({data: [list[i],...this.state.data] });
+          // if(this.state.userId==list[i].from_userId){
+          //   this.setState({data: [list[i],...this.state.data] });
+          //  // addUserMessage(list[i].post_message);
+          // }else{
+          //   if(list[i].message_type=='json'){
+          //       let ress=JSON.parse(list[i].post_message);
+          //       this.setState({
+          //         data:  [this.FormD(data:ress.data.list, out: ress.data.out),...this.state.data]
+          //       }); 
+          //   }else if(list[i].message_type=="file"){
+          //       let ress=JSON.parse(list[i].post_message);
+          //      // renderCustomComponent(this.FormFile, {data:  ress.data.fileName, file:ress.data.filePath }); 
+          //   }else if(list[i].message_type=="text"){
+          //      // addResponseMessage(list[i].post_message);
+          //       this.setState({data: [list[i],...this.state.data] });
 
-            }else{
-               // addResponseMessage(list[i].post_message);
-                this.setState({data: [list[i],...this.state.data] });
-            }
-          }
+          //   }else{
+          //      // addResponseMessage(list[i].post_message);
+          //       this.setState({data: [list[i],...this.state.data] });
+          //   }
+          // }
       }
       if(isTrue){
        this.initRefresh();//初始化下拉刷新
@@ -160,6 +163,7 @@ initRefresh=()=> {
     pullDown.addEventListener('mouseup', touchEnd, false);
   }
   function touchStart(event) {
+   // event.preventDefault();
       if (pullDown.scrollTop <= 0) {
           isTouchStart = true;
           startY = hasTouch ? event.changedTouches[0].pageY : event.pageY;
@@ -168,6 +172,8 @@ initRefresh=()=> {
   }
 
   function touchMove(event) {
+   // event.preventDefault();
+
       if (!isTouchStart) return;
       var distanceY = (hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY;
       var distanceX = (hasTouch ? event.changedTouches[0].pageX : event.pageX) - startX;
@@ -203,6 +209,8 @@ initRefresh=()=> {
       }
     }
     function touchEnd(event) {
+    //  event.preventDefault();
+
         isDragStart = false;
         if (!isTouchStart) return;
         isTouchStart = false;
@@ -311,7 +319,7 @@ componentWillReceiveProps=(nextProps)=> {
     })
     if(ist){
       let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
-      await HttpService.post('/reportServer/query/execqueryToExcel/2/87', JSON.stringify(qryParam))
+      await HttpService.post('/reportServer/query/execQuery/2/87', JSON.stringify(qryParam))
       .then(res=>{
 
       // })
@@ -335,6 +343,9 @@ componentWillReceiveProps=(nextProps)=> {
                   // console.log(res);
                   }
               })
+              this.setState({
+                data: [...this.state.data, {from_userId: 0,'post_message':res,'message_type':res.data.filetype,to_userId: 1}]
+              });
               // if(res.data.filetype=="json"){
               //     return renderCustomComponent(this.FormD, {data: res.data.list, out: res.data.out }); 
               // }else if(res.data.filetype=="file"){
@@ -481,22 +492,27 @@ componentWillReceiveProps=(nextProps)=> {
             <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
             <span style={{float: "right"}} id="root"></span>
         </div> */}
-        <div id="messages">
-        <List >
+        <ul id="messages" className="contentes">
+        {/* <List > */}
             {this.state.data.map((elem,index) => {
-              console.log(elem);
+              // console.log(elem);
                 if(elem.from_userId==1){
-                  return <Item><div style={{background:'#f5f5f9' }} >
-                        <li ><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{elem.post_message} </span></li>
-                    </div></Item>
+                  return <div style={{background:'#f5f5f9' }} >
+                        <li ><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>
+                        <LazyComponent {...elem} />
+                       </span></li>
+                    </div>
                 } else{
-                  return <Item><div style={{background:'#f5f5f9' }}>
-                      <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left",background:'#f1ebeb00'}}>{elem.post_message} </span></li>
-                    </div></Item>
+                  return <div style={{background:'#f5f5f9' }}>
+                      <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left",background:'#f1ebeb00'}}>
+                      <LazyComponent {...elem} />
+                      {/* {elem.post_message}  */}
+                      </span></li>
+                    </div>
                 }
             })}
-        </List>
-          </div>
+        {/* </List> */}
+          </ul>
         {/* <ul className="contentes">
           <PullToRefresh
               damping={60}
