@@ -1,6 +1,6 @@
 import React, { PureComponent, lazy, Suspense }  from 'react';
 import ReactDOM from 'react-dom';
-import { List, ListView,PullToRefresh,WhiteSpace,WingBlank, Checkbox, SwipeAction,  NavBar, Icon } from 'antd-mobile';
+import { List, ListView,PullToRefresh,WhiteSpace,WingBlank, TextareaItem , SwipeAction,  NavBar, Icon } from 'antd-mobile';
 import { Link, Redirect } from 'react-router-dom';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
@@ -13,7 +13,7 @@ import './Chat.css';
 import "babel-polyfill";
 const Item = List.Item;
 const Brief = Item.Brief;
-var XLJZ = '下拉加载';
+var XLJZ = '查看更多信息';
 var SKJZ = '松开加载';
 var JZ = '加载中...'
 var dropDownRefreshText = XLJZ;
@@ -27,33 +27,15 @@ var scrollValve = 40; // 滚动加载阀值
 //   );
 // }
 
-//查看历史信息使用下列加载 开始
-function genData(dataArr) {
-  // const dataArr = [];
-  for (let i = 0; i < 10; i++) {
-    dataArr.push(i);
-  }
-  return dataArr;
-}
-function genDatas(dataArr) {
-  // const dataArr = [];
-  for (let i = 10; i <20; i++) {
-    dataArr.unshift(i);
-  }
-  return dataArr;
-}
 //查看历史信息使用下列加载 结束
 const url=window.getServerUrl();
 // 渲染不同内容的组件
-//const LazyComponent = lazy(() => import('./RenderContent'));
 import LazyComponent from './RenderContent';
 export default class ChatNew extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       meg: '',
-      respon: [],
-      megArray: [],
       isWrite:true,
       saying:false,
       refreshing: false,
@@ -76,22 +58,13 @@ export default class ChatNew extends React.Component {
     this.page=1;
   }
   componentDidMount() {
-    // const hei = this.state.height - ReactDOM.findDOMNode(this.lv).offsetTop;
-    // setTimeout(() => {
-    //   this.setState({
-    //     height: hei,
-    //    // data: genData(this.state.data),
-    //     height: hei,
-    //     refreshing: false
-    //   });
-    // }, 1500);
     let userInfo = localStorge.getStorage('userInfo');
     if (undefined != userInfo && null != userInfo && '' != userInfo) {
       this.setState({ userId:userInfo.id,
         userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon,
         translate: 0,
-        openDragLoading: this.openDragLoading || true,//根据外面设置的开关改变自己的状态
-        openScrollLoading: this.openScrollLoading || true},function(){
+        openDragLoading:true,//根据外面设置的开关改变自己的状态
+        openScrollLoading:true},function(){
           this.fetchItems(true);
           //this.loadQuestion();
         });
@@ -100,45 +73,17 @@ export default class ChatNew extends React.Component {
     }
 }
 
-onRefreshs = () => {
-    this.setState({ refreshing: true });
-    setTimeout(() => {
-      this.setState({ refreshing: false,
-       // data:, 
-      });
-      this.fetchItems(false);
-    }, 600);
-}
-  fetchItems(isTrue) {
+fetchItems(isTrue) {
     let mInfo={'from_userId':this.state.userId,'to_userId':this.state.to_userId,
           pageNumd:this.page,perPaged:5}
     HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
     .then(res => {
       let list=res.data;
+   
       for(var i=0;i<list.length;i++){
         this.setState({data: [list[i],...this.state.data] });
-          // if(this.state.userId==list[i].from_userId){
-          //   this.setState({data: [list[i],...this.state.data] });
-          //  // addUserMessage(list[i].post_message);
-          // }else{
-          //   if(list[i].message_type=='json'){
-          //       let ress=JSON.parse(list[i].post_message);
-          //       this.setState({
-          //         data:  [this.FormD(data:ress.data.list, out: ress.data.out),...this.state.data]
-          //       }); 
-          //   }else if(list[i].message_type=="file"){
-          //       let ress=JSON.parse(list[i].post_message);
-          //      // renderCustomComponent(this.FormFile, {data:  ress.data.fileName, file:ress.data.filePath }); 
-          //   }else if(list[i].message_type=="text"){
-          //      // addResponseMessage(list[i].post_message);
-          //       this.setState({data: [list[i],...this.state.data] });
-
-          //   }else{
-          //      // addResponseMessage(list[i].post_message);
-          //       this.setState({data: [list[i],...this.state.data] });
-          //   }
-          // }
       }
+      this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
       if(isTrue){
        this.initRefresh();//初始化下拉刷新
        this.initScroll();//初始化滚动加载更多
@@ -155,16 +100,16 @@ initRefresh=()=> {
   // 监听下拉加载，兼容电脑端
   let pullDown = document.getElementById("messages");
   if (self.state.openDragLoading) {
-    pullDown.addEventListener('touchstart', touchStart, false);
-    pullDown.addEventListener('touchmove', touchMove, false);
-    pullDown.addEventListener('touchend', touchEnd, false);
-    pullDown.addEventListener('mousedown', touchStart, false);
-    pullDown.addEventListener('mousemove', touchMove, false);
-    pullDown.addEventListener('mouseup', touchEnd, false);
+    self.refs.scroller.addEventListener('touchstart', touchStart, false);
+    self.refs.scroller.addEventListener('touchmove', touchMove, false);
+    self.refs.scroller.addEventListener('touchend', touchEnd, false);
+    self.refs.scroller.addEventListener('mousedown', touchStart, false);
+    self.refs.scroller.addEventListener('mousemove', touchMove, false);
+    self.refs.scroller.addEventListener('mouseup', touchEnd, false);
   }
   function touchStart(event) {
    // event.preventDefault();
-      if (pullDown.scrollTop <= 0) {
+      if (self.refs.scroller.scrollTop <= 0) {
           isTouchStart = true;
           startY = hasTouch ? event.changedTouches[0].pageY : event.pageY;
           startX = hasTouch ? event.changedTouches[0].pageX : event.pageX;
@@ -173,7 +118,6 @@ initRefresh=()=> {
 
   function touchMove(event) {
    // event.preventDefault();
-
       if (!isTouchStart) return;
       var distanceY = (hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY;
       var distanceX = (hasTouch ? event.changedTouches[0].pageX : event.pageX) - startX;
@@ -189,19 +133,18 @@ initRefresh=()=> {
               self.transformScroller(0, self.state.translate);
           }
       }
-
       if (distanceY > 0) {
           if (!isDragStart) {
               isDragStart = true;
           }
           if (self.state.translate <= dragValve) {// 下拉中，但还没到刷新阀值
               if (dropDownRefreshText !== XLJZ){
-                 // self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
+                  self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
                   console.log("下拉加载")
               }
           } else { // 下拉中，已经达到刷新阀值
               if (dropDownRefreshText !== SKJZ){
-                 // self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = SKJZ);
+                  self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = SKJZ);
                   console.log("松开加载");
                 }
           }
@@ -210,7 +153,6 @@ initRefresh=()=> {
     }
     function touchEnd(event) {
     //  event.preventDefault();
-
         isDragStart = false;
         if (!isTouchStart) return;
         isTouchStart = false;
@@ -220,7 +162,7 @@ initRefresh=()=> {
             self.setState({dragLoading: true});//设置在下拉刷新状态中
             self.transformScroller(0.1, 0);
             console.log("加载中....");
-          //  self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = JZ);
+            self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = JZ);
             self.fetchItems(false);//触发冲外面传进来的刷新回调函数
         }
     }
@@ -228,18 +170,16 @@ initRefresh=()=> {
 
 initScroll=()=> {
     var self = this;
-    let scroller = document.getElementById("messages");
-
+    //let scroller = document.getElementById("messages");
     // 监听滚动加载
     if (this.state.openScrollLoading) {
-        scroller.addEventListener('scroll', scrolling, false);
+      this.refs.scroller.addEventListener('scroll', scrolling, false);
     }
-
     function scrolling() {
         if (self.state.scrollerLoading) return;
-        var scrollerscrollHeight = scroller.scrollHeight; // 容器滚动总高度
-        var scrollerHeight =scroller.getBoundingClientRect().height;// 容器滚动可见高度
-        var scrollerTop = scroller.scrollTop;//滚过的高度
+        var scrollerscrollHeight = self.refs.scroller.scrollHeight; // 容器滚动总高度
+        var scrollerHeight =self.refs.scroller.getBoundingClientRect().height;// 容器滚动可见高度
+        var scrollerTop = self.refs.scroller.scrollTop;//滚过的高度
         // 达到滚动加载阀值
         if (scrollerscrollHeight - scrollerHeight - scrollerTop <= scrollValve) {
             self.setState({scrollerLoading: true});
@@ -254,8 +194,8 @@ initScroll=()=> {
  */
 transformScroller=(time, translate)=> {
     this.setState({translate: translate});
-    let scroller = document.getElementById("messages");
-    var elStyle = scroller.style;
+    //let scroller = document.getElementById("messages");
+    var elStyle =  this.refs.scroller.style;
     elStyle.webkitTransition = elStyle.MozTransition = elStyle.transition = 'all ' + time + 's ease-in-out';
     elStyle.webkitTransform = elStyle.MozTransform = elStyle.transform = 'translate3d(0, ' + translate + 'px, 0)';
 }
@@ -272,7 +212,7 @@ dragLoadingDone=()=> {
 scrollLoadingDone=()=> {
     this.setState({scrollerLoading: false});
     console.log("下拉加载");
-  //  this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
+    this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
 }
 componentWillReceiveProps=(nextProps)=> {
     var self = this;
@@ -290,7 +230,7 @@ componentWillReceiveProps=(nextProps)=> {
 }
   handleData(e) {
     this.setState({
-      meg: e.target.value
+      meg: e
     })
   }
   //发送消息
@@ -299,7 +239,7 @@ componentWillReceiveProps=(nextProps)=> {
     //先保存发送信息
     var message = this.state.meg;
     this.setState({
-              data: [...this.state.data, {from_userId: 1,'post_message':message,to_userId: 0}]
+              data: [...this.state.data, {from_userId: this.state.userId,'post_message':message,to_userId:this.state.to_userId}]
             });
     this.state.meg = '';        
     let userInfo={'from_userId':this.state.userId,
@@ -319,11 +259,11 @@ componentWillReceiveProps=(nextProps)=> {
     })
     if(ist){
       let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
-      await HttpService.post('/reportServer/query/execQuery/2/87', JSON.stringify(qryParam))
+      await HttpService.post('/reportServer/query/execqueryToExcel/2/87', JSON.stringify(qryParam))
       .then(res=>{
-
+            //函数查询execQuery
       // })
-      // //首先进行函数查询
+      // //首先进行
       // await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
       //   .then(res => {
           if (res.resultCode == "1000") {
@@ -344,15 +284,8 @@ componentWillReceiveProps=(nextProps)=> {
                   }
               })
               this.setState({
-                data: [...this.state.data, {from_userId: 0,'post_message':res,'message_type':res.data.filetype,to_userId: 1}]
+                data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res,'message_type':res.data.filetype,to_userId: this.state.userId}]
               });
-              // if(res.data.filetype=="json"){
-              //     return renderCustomComponent(this.FormD, {data: res.data.list, out: res.data.out }); 
-              // }else if(res.data.filetype=="file"){
-              //     return renderCustomComponent(this.FormFile, {data:res.data.fileName, file:res.data.filePath });//url+'report/'+res.data.filePath 
-              // }else if(res.data.filetype=="text"){
-              //     return addResponseMessage(res.data);
-              // }
               var anchorElement = document.getElementById("scrolld");
               anchorElement.scrollIntoView();
           } else {
@@ -362,12 +295,6 @@ componentWillReceiveProps=(nextProps)=> {
         .catch((error) => {
           // Toast.fail(error);
         });
-    // return;
-      // alert('await over');
-    // return addResponseMessage("hello");
-    // return renderCustomComponent(this.FormD, {data: newMessage, action: this.handleModalDataChange }); 
-   
-    
       var that = this
       fetch('https://api.ownthink.com/bot?spoken=' + message, {
         method: 'POST',
@@ -395,70 +322,13 @@ componentWillReceiveProps=(nextProps)=> {
                     var anchorElement = document.getElementById("scrolld");
                     anchorElement.scrollIntoView();
                   });
-         
-         // return addResponseMessage(detail.data.info.text);
         } else {
         }
       })
      
     }
   }
-  // sendMessage() {
-    
-  //     var message = this.state.meg
-  //     if (message === '') {
-  //       alert('不能发送空白消息哦')
-  //     } else {
-  //       this.setState({
-  //         data: [...this.state.data, {from_userId: 1,'post_message':message,to_userId: 0}]
-  //       })
-  //       var that = this
-  //       var func = fetch('http://www.tuling123.com/openapi/api?key=f0d11b6cae4647b2bd810a6a3df2136f&info=' + message, {
-  //         method: 'POST',
-  //         type: 'cors'
-  //       }).then(function(response) {
-  //         return response.json();
-  //         //return "hello";//response.json()
-  //     }).then(function(detail) {
-  //         if(detail.code===100000){
-  //           return (that.setState({respon: [...that.state.respon, detail.text]}, () => {
-  //             // var el = ReactDOM.findDOMNode(that.refs.msgList);
-  //             // el.scrollTop=el.scrollHeight;
-  //             let anchorElement = document.getElementById("scrolld");
-  //             anchorElement.scrollIntoView();
-  //           }))
-  //         }else{
-  //           return (that.setState({respon: [...that.state.respon, "不知道你说什么,好像服务器发生错误"]}, () => {
-  //             // var el = ReactDOM.findDOMNode(that.refs.msgList);
-  //             // el.scrollTop=el.scrollHeight;
-  //             let anchorElement = document.getElementById("scrolld");
-  //             anchorElement.scrollIntoView();
-  //           }))
-  //         }
-  //       })
-  //       this.state.meg = ''
-  //     }
-  //   }
-    FormD = ({ data, out }) => {
-      return <Card style={{backgroundColor:'#f4f7f9'}}>
-        <List>
-          {data.map(val => (
-            <Item
-              multipleLine
-              onClick={() => this.onClassClick(val.class_id)}
-            >
-               {out.map((item) => {
-                 return <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
-                  {item.out_name}:{val[item.out_id.toUpperCase()]}
-                </div> 
-              }
-              )} 
-            </Item>
-          ))}
-        </List>
-      </Card>
-    }
-  
+   
     onInputKeyUp(e){
         if(e.keyCode === 13){
           this.sendMessage();
@@ -482,78 +352,73 @@ componentWillReceiveProps=(nextProps)=> {
 
   render() {
     var meg = this.state.meg
-    var megArray = this.state.megArray
-    var respon = this.state.respon
-    
     return (
-      <div className="content">
-      
-       {/* <div className="header">
-            <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
-            <span style={{float: "right"}} id="root"></span>
-        </div> */}
-        <ul id="messages" className="contentes">
-        {/* <List > */}
+      <div className="content" >
+        <div className="header" style={{textAlign:'center'}}>
+            <span style={{textAlign:'center'}}>PCCW智能机器人</span>
+            {/* <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
+            <span style={{float: "right"}} id="root"></span> */}
+        </div>
+        <div ref="scroller">
+          <div style={{textAlign:'center'}}>
+            <span ref="dropDownRefreshText">查看更多信息</span>
+          </div>
+          <ul id="messages" className="contentes">
             {this.state.data.map((elem,index) => {
-              // console.log(elem);
                 if(elem.from_userId==1){
                   return <div style={{background:'#f5f5f9' }} >
-                        <li ><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>
+                        <li ><img src={this.state.userIcon==''?my:this.state.userIcon} className="imgright"/><span style={{float:"right"}}>
                         <LazyComponent {...elem} />
                        </span></li>
                     </div>
                 } else{
                   return <div style={{background:'#f5f5f9' }}>
-                      <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left",background:'#f1ebeb00'}}>
+                      <li><img src={ai} className="imgleft"/><span style={{float:"left",background:'#f1ebeb00'}}>
                       <LazyComponent {...elem} />
-                      {/* {elem.post_message}  */}
                       </span></li>
                     </div>
                 }
             })}
-        {/* </List> */}
           </ul>
-        {/* <ul className="contentes">
-          <PullToRefresh
-              damping={60}
-              ref={el => this.lv = el}
-              style={{
-                height: this.state.height,
-                overflow: 'auto',
-              }}
-              indicator={this.state.down ? {} : { deactivate: '上拉可以刷新' }}
-              direction={this.state.down ? 'down' : 'up'}
-              refreshing={this.state.refreshing}
-              onRefresh={this.onRefreshs}
-          >
-            {this.state.data.map((elem,index) => {
-              console.log(elem);
-                if(elem.from_userId==1){
-                  return <div style={{background:'#f5f5f9' }} >
-                        <li ><img src={require("../assets/奥巴马-02.jpg")} className="imgright"/><span style={{float:"right"}}>{elem.post_message} </span></li>
-                    </div>
-                } else{
-                  return <div style={{background:'#f5f5f9' }}>
-                      <li><img src={require("../assets/川普-01.jpg")} className="imgleft"/><span style={{float:"left",background:'#f1ebeb00'}}>{elem.post_message} </span></li>
-                    </div>
-                }
-            })}
-          </PullToRefresh>
-        </ul> */}
-        
+        </div>
+        <div id="scrolld" > </div>
         {this.state.saying==true?<div className="saying"> <img src={require("../assets/saying.gif")}/></div>:''}
-        <div className="footer">
+        <div className="smartnlp-chat-msg-input">
+          <div className="smartnlp-write-block">
+            <div className="smartnlp-user-write-block">
+              <div className="smartnlp-user-textarea">
+                {/* <span className="smartnlp-text-tip">请输入您要咨询的问题</span> */}
+                <TextareaItem ref={el => this.autoFocusInst = el} 
+                placeholder="请输入您要咨询的问题"
+                value={meg} 
+                onChange={this.handleData.bind(this)}  
+                onKeyUp={e => this.onInputKeyUp(e)} 
+                className="smartnlp-text-content smartnlp-writeBox smartnlp-text-content-pc" 
+                name="writeBox" 
+                style={{height:'40px'}}
+                ></TextareaItem>
+              </div>
+            </div>
+          </div>
+          <div className="smartnlp-power-by">
+          <p className="smartnlp-copy-right">Powered By PCCW机器人</p>
+          </div>
+          <div onClick={this.sendMessage.bind(this)} style={{backgroundColor: 'rgb(45, 142, 242)'}} className="smartnlp-send-out smartnlp-theme-color smartnlp-send-out-pc">
+            <p >发送消息</p>
+          </div>
+        </div>
+        {/* <div className="footer">
             <div className="user_face_icon">
               <img src={this.state.isWrite==true?require("../assets/jp_btn.png"):require("../assets/yy_btn.png")} onClick={()=>this.changeSpeack()}/>
             </div>
             {this.state.isWrite==true? <div>
             <input id="text" type="text" placeholder="说点什么吧..." value={meg} onChange={this.handleData.bind(this)} onKeyUp={e => this.onInputKeyUp(e)}/>
-            <span id="btn"  onClick={this.sendMessage.bind(this)} >发送</span>
+            <span id="btn" className="sendmessagebtn" onClick={this.sendMessage.bind(this)} >发送</span>
             </div>
             : <div className="wenwen_text" id="wenwen" onClick={()=>this._touch_start(event)}>  按住 说话  </div>
             }
-        </div>
-        <div id="scrolld" > </div>
+        </div> */}
+      
       </div>
     )
   }

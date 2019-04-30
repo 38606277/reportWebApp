@@ -17,8 +17,8 @@ export default class My extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      UserCode: '',
-      Pwd: '',
+      UserCode: 'sysadmin',
+      Pwd: 'system',
       address: '',
       class_id: this.props.class_id,
       data: [],

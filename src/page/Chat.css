@@ -5,80 +5,18 @@
     list-style: none;
     font-family: '微软雅黑'
   }
- 
-
-  
-  
   .content {
-    /* display: flex;
-    flex-direction: column; */
-    /* height: 100%; */
-    /* background: #eee; */
-    /* min-height: 600px; */
     margin: 0 auto 0;
     position: relative;
     padding-bottom:50px;
   }
-  
-  /* .msg-list {
-    padding: 10px;
-    flex: 1 1 auto;
-    overflow: auto;
-  }
-  
-  .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .input {
-    border: none;
-    outline: none;
-    border-bottom: 1px solid gray;
-    flex: 1;
-    height: 35px;
-    font-size: 18px;
-  }
-  
-  .button {
-    margin-left: 10px;
-    padding: 5px;
-  }
-  
-  .message {
-    background-color: #f2f2f2;
-    padding: 15px;
-    border-radius: 3px;
-    align-self: flex-end;
-    max-width: 80%;
-  }
-  
-  .response {
-    background-color: #f2f2f2;
-    padding: 15px;
-    border-radius: 3px;
-    align-self: flex-start;
-    margin: 2px;
-    max-width: 80%;
-  }
-  
-  .fixedBottom {
-    border-top: 1px solid gray;
-    align-items: center;
-    display: flex;
-    width: 100%;
-    flex: 0 0 auto;
-    padding: 10px;
-  } */
   .header {
-    background: #000;
+    background: #3bd9e2;
     height: 40px;
     width: 100%;
     color: #fff;
     line-height: 34px;
-    font-size: 14px;
+    font-size: 20px;
     padding: 0 10px;
     position:fixed; 
     z-index:9999;
@@ -116,7 +54,8 @@
     text-align: center;
     position: absolute;
     right: 10px;
-    border-radius: 6px;
+    border-radius: 6px; 
+    
   }
   .footer span:hover {
     color: #fff;
@@ -144,6 +83,7 @@
     overflow: auto;
     padding: 5px;
     padding-top:40px;
+    padding-bottom: 45px;
 }
 .contentes  li {
     /* margin-top: 10px; */
@@ -191,6 +131,18 @@
   text-align:center;overflow:hidden;margin-left:20%;
 }
 .saying{position:fixed;bottom:30%;left:50%;width:120px;margin-left:-60px;}
+.sendmessagebtn{
+  background-color: #2d8ef2;
+  position: absolute;
+    bottom: 8px;
+    right: 0;
+    width: 65px;
+    height: 24px;
+    overflow: hidden;
+    border-radius: 12px;
+    padding: 0 5px;
+    cursor: pointer;
+}
 
 
 .rcw-widget-container .rcw-launcher{
@@ -267,4 +219,133 @@
   font-size: 15px;
   background-color: white;
   line-height: 40px;
+}
+
+
+/**第三版*/
+.smartnlp-chat-msg-input {
+  
+  height: 85px;
+  box-sizing: border-box;
+  bottom: 45px;
+  right: 0;
+  left: 0;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  flex: 0 0 auto;
+  position:fixed; 
+  z-index: 9999;
+  background: #fff;
+}
+.smartnlp-write-block {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 83px;
+}
+.smartnlp-user-write-block {
+  width: 100%;
+  height: 40px;
+  position: relative;
+}
+.smartnlp-user-write-block .smartnlp-user-textarea {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 10px 0 10px;
+  position: relative;
+}
+.smartnlp-user-textarea .smartnlp-text-tip {
+  font-size: 13.33px;
+  line-height: 20px;
+  color: #ccc;
+  position: absolute;
+  top: 0;
+  left: 10px;
+  z-index: 2;
+}
+
+.smartnlp-user-textarea .smartnlp-text-content {
+  border: none;
+  width: 100%;
+  height: 100%;
+  line-height: 20px;
+  overflow-y: auto;
+  position: relative;
+  background-color: transparent;
+  z-index: 3;
+  padding: 0 !important;
+}
+textarea {
+  font-family: monospace;
+  background-color: white;
+  border: 1px solid rgb(169, 169, 169);
+}
+textarea {
+  resize: none;
+}
+input, button, select, textarea {
+  outline: none;
+}
+.smartnlp-power-by {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 4px;
+}
+.smartnlp-power-by .smartnlp-copy-right {
+  margin: 0;
+  width: 180px;
+  line-height: 22px;
+  font-size: 12px;
+  color: #ccc;
+  margin-left: 10px;
+  cursor: pointer;
+}
+.smartnlp-theme-color {
+  background-color: #2d8ef2;
+}
+
+.smartnlp-send-out {
+  right: 10px;
+}
+.smartnlp-send-out, .smartnlp-artificial {
+  position: absolute;
+  bottom: 8px;
+  right: 0;
+  width: 65px;
+  height: 24px;
+  overflow: hidden;
+  border-radius: 12px;
+  padding: 0 5px;
+  cursor: pointer;
+}
+.smartnlp-theme-color {
+  background-color: #2d8ef2;
+}
+
+.smartnlp-artificial {
+  right: 90px;
+}
+.smartnlp-send-out, .smartnlp-artificial {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  width: 65px;
+  height: 24px;
+  overflow: hidden;
+  border-radius: 12px;
+  padding: 0 5px;
+  cursor: pointer;
+}
+.smartnlp-send-out p, .smartnlp-artificial p {
+  margin: 0;
+  line-height: 24px;
+  font-size: 12px;
+  color: #fff;
+  text-align: center;
 }
