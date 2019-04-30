@@ -235,97 +235,98 @@ componentWillReceiveProps=(nextProps)=> {
   }
   //发送消息
   async sendMessage(){ 
-    var ist=true; 
-    //先保存发送信息
-    var message = this.state.meg;
-    this.setState({
-              data: [...this.state.data, {from_userId: this.state.userId,'post_message':message,to_userId:this.state.to_userId}]
-            });
-    this.state.meg = '';        
-    let userInfo={'from_userId':this.state.userId,
-                  'to_userId':this.state.to_userId,
-                  'post_message':message,
-                  'message_type':'0',
-                  'message_state':'0'
+    if(null!=this.state.meg && ""!=this.state.meg){
+        var ist=true; 
+        //先保存发送信息
+        var message = this.state.meg;
+        this.setState({
+                  data: [...this.state.data, {from_userId: this.state.userId,'post_message':message,to_userId:this.state.to_userId}]
+                });
+        this.state.meg = '';        
+        let userInfo={'from_userId':this.state.userId,
+                      'to_userId':this.state.to_userId,
+                      'post_message':message,
+                      'message_type':'0',
+                      'message_state':'0'
+                    }
+        await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
+        .then(res => {
+          if (res.resultCode != "1000") {
+            ist=false;
+          }else{
+            var anchorElement = document.getElementById("scrolld");
+            anchorElement.scrollIntoView();
+          }
+        })
+        if(ist){
+          let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
+          await HttpService.post('/reportServer/query/execqueryToExcel/2/87', JSON.stringify(qryParam))
+          .then(res=>{
+                //函数查询execQuery
+          // })
+          // //首先进行
+          // await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
+          //   .then(res => {
+              if (res.resultCode == "1000") {
+                if(undefined== res.data.filetype){
+                  res.data.filetype="json";
                 }
-    await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
-    .then(res => {
-      if (res.resultCode != "1000") {
-        ist=false;
-      }else{
-        var anchorElement = document.getElementById("scrolld");
-        anchorElement.scrollIntoView();
-      }
-    })
-    if(ist){
-      let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
-      await HttpService.post('/reportServer/query/execqueryToExcel/2/87', JSON.stringify(qryParam))
-      .then(res=>{
-            //函数查询execQuery
-      // })
-      // //首先进行
-      // await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
-      //   .then(res => {
-          if (res.resultCode == "1000") {
-            if(undefined== res.data.filetype){
-              res.data.filetype="json";
-            }
-             //数据保存到数据库
-             let responseInfo={'from_userId':this.state.to_userId,
-             'to_userId':this.state.userId,
-             'post_message':res,
-             'message_type':res.data.filetype,
-             'message_state':'0'
-             }
+                //数据保存到数据库
+                let responseInfo={'from_userId':this.state.to_userId,
+                'to_userId':this.state.userId,
+                'post_message':res,
+                'message_type':res.data.filetype,
+                'message_state':'0'
+                }
+                  HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
+                      .then(res => {
+                      if (res.resultCode != "1000") {
+                      // console.log(res);
+                      }
+                  })
+                  this.setState({
+                    data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res,'message_type':res.data.filetype,to_userId: this.state.userId}]
+                  });
+                  var anchorElement = document.getElementById("scrolld");
+                  anchorElement.scrollIntoView();
+              } else {
+
+              }
+            })
+            .catch((error) => {
+              // Toast.fail(error);
+            });
+          var that = this
+          fetch('https://api.ownthink.com/bot?spoken=' + message, {
+            method: 'POST',
+            type: 'cors'
+          }).then(function (response) {
+            return response.json();
+          }).then(function (detail) {
+            if (detail.message =="success") {
+              let responseInfo={'from_userId':that.state.to_userId,
+                      'to_userId':that.state.userId,
+                      'post_message':detail.data.info.text,
+                      'message_type':'0',
+                      'message_state':'0'
+                    }
               HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
-                  .then(res => {
+                .then(res => {
                   if (res.resultCode != "1000") {
                   // console.log(res);
                   }
-              })
-              this.setState({
-                data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res,'message_type':res.data.filetype,to_userId: this.state.userId}]
-              });
-              var anchorElement = document.getElementById("scrolld");
-              anchorElement.scrollIntoView();
-          } else {
-
-          }
-        })
-        .catch((error) => {
-          // Toast.fail(error);
-        });
-      var that = this
-      fetch('https://api.ownthink.com/bot?spoken=' + message, {
-        method: 'POST',
-        type: 'cors'
-      }).then(function (response) {
-        return response.json();
-      }).then(function (detail) {
-        if (detail.message =="success") {
-          let responseInfo={'from_userId':that.state.to_userId,
-                  'to_userId':that.state.userId,
-                  'post_message':detail.data.info.text,
-                  'message_type':'0',
-                  'message_state':'0'
-                }
-          HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
-            .then(res => {
-              if (res.resultCode != "1000") {
-               // console.log(res);
-              }
-            })
-          //  renderCustomComponent(that.FormFile, {data: "改为文件名", file:"http://localhost:8080/report/upload/PRC02 利润表.xlsx" }); 
-         return that.setState({
-                    data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: 1}]
-                  },function(){
-                    var anchorElement = document.getElementById("scrolld");
-                    anchorElement.scrollIntoView();
-                  });
-        } else {
+                })
+              //  renderCustomComponent(that.FormFile, {data: "改为文件名", file:"http://localhost:8080/report/upload/PRC02 利润表.xlsx" }); 
+            return that.setState({
+                        data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: 1}]
+                      },function(){
+                        var anchorElement = document.getElementById("scrolld");
+                        anchorElement.scrollIntoView();
+                      });
+            } else {
+            }
+          })
         }
-      })
-     
     }
   }
    
