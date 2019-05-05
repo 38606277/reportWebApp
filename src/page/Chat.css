@@ -76,27 +76,28 @@
     height: 30px;
   }
 
-.contentes {
+ul {
     font-size: 14px;
     width: 100%;
-    /* min-height: 500px; */
     overflow: auto;
     padding: 5px;
     padding-top:40px;
     padding-bottom: 45px;
+    overflow-x:hidden;
+    overflow-y:hidden;
 }
-.contentes  li {
-    /* margin-top: 10px; */
-    /* padding-left: 10px;
-    width: 412px; */
+
+li {
     display: block;
     clear: both;
     overflow: hidden;
+    overflow-x:hidden;
+    overflow-y:hidden;
 }
-.contentes  li img {
+li img {
     float: left;
 }
-.contentes li span{
+li span{
     background: #7cfc00;
     padding: 10px;
     border-radius: 10px;
@@ -107,19 +108,27 @@
     box-shadow: 0 0 3px #ccc;
 }
 
-.contentes  li img.imgleft { 
+li img.imgleft { 
     float: left; 
 }
-.contentes  li img.imgright { 
+li img.imgright { 
     float: right; 
 }
-.contentes  li span.spanleft { 
+li span.spanleft { 
     float: left;
     background: #fff;
 }
-.contentes  li span.spanright { 
+li span.spanright { 
     float: right;
     background: #7cfc00;
+}
+ul{
+  list-style: none;
+  overflow-x: hidden;
+  overflow-y: scroll; 
+}
+ul::-webkit-scrollbar{
+  display:none;
 }
 .wenwen_text{
   border-radius:5px;
@@ -201,25 +210,6 @@
   color: rgb(45, 142, 242);
 }
 
-#PullDown {
-  margin:0px;
-  height: 40px;
-  width: 100%;
-  text-align: center;
-  font-size: 15px;
-  background-color: white;
-  line-height: 40px;
-}
-
-#PullUp {
-  margin:0px;
-  height: 40px;
-  width: 100%;
-  text-align: center;
-  font-size: 15px;
-  background-color: white;
-  line-height: 40px;
-}
 
 
 /**第三版*/
