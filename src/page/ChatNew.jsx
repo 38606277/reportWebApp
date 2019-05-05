@@ -1,10 +1,10 @@
 import React, { PureComponent, lazy, Suspense }  from 'react';
 import {  Card,List,Toast, ListView,PullToRefresh,WhiteSpace,WingBlank, TextareaItem , SwipeAction,  NavBar, Icon } from 'antd-mobile';
-import { Link, Redirect } from 'react-router-dom';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
 import my from './../assets/icon/chart.png';
-import down from './../assets/icon/down.png';
+import Script from 'react-load-script';
+
 import LocalStorge from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
 //import 'antd-mobile/dist/antd-mobile.css';
@@ -12,13 +12,47 @@ import './Chat.css';
 import "babel-polyfill";
 const Item = List.Item;
 const Brief = Item.Brief;
+var recorder;        
 var XLJZ = '查看更多信息';
 var SKJZ = '松开加载';
 var JZ = '加载中...'
 var dropDownRefreshText = XLJZ;
 var dragValve = 40; // 下拉加载阀值
 var scrollValve = 40; // 滚动加载阀值
-
+function initEvent() {
+  
+  var btnElem=document.getElementById("microphone");//获取ID
+  btnElem.addEventListener("touchstart", function(event) {
+      event.preventDefault();//阻止浏览器默认行为
+      HZRecorder.get(function (rec) {
+          recorder = rec;
+          recorder.start();
+      });
+  });
+ 
+  btnElem.addEventListener("touchend", function(event) {
+      event.preventDefault();
+      HZRecorder.get(function (rec) {
+          recorder = rec;
+          recorder.stop();
+      })
+      //发送音频片段
+      var data=recorder.getBlob();
+      if(data.duration!==0){
+          recorder.clear();
+          var dur=data.duration/10;
+          let formData = new FormData();
+          formData.append("file", data.blob);
+          HttpService.post("reportServer/MyVoiceApplication/uploadai",formData).then(response=>{
+              if(response.resultCode=="1000"){
+                  this.setState({msg:response.data.content});
+              }
+          });
+      }else{
+          console.log("没有声音输入");
+      } 
+  });
+}
 const url=window.getServerUrl();
 export default class ChatNew extends React.Component {
   constructor(props) {
@@ -40,6 +74,7 @@ export default class ChatNew extends React.Component {
       scrollerLoading: false,//是否在加载更多中
       openDragLoading: true,//是否开启下拉刷新
       openScrollLoading: true,//是否开启下拉刷新
+      btnText:"按住  说话",
     }
     this.page=1;
   }
@@ -47,11 +82,12 @@ export default class ChatNew extends React.Component {
     let userInfo = localStorge.getStorage('userInfo');
     if (undefined != userInfo && null != userInfo && '' != userInfo) {
       this.setState({ userId:userInfo.id,
-        userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon},
-      function(){
-          this.fetchItems(true);
-          this.loadQuestion();
+            userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon},
+        function(){
+            this.fetchItems(true);
+            this.loadQuestion();
         });
+        initEvent();
     }else{
       window.location.href="/My";
     }
@@ -502,10 +538,32 @@ componentWillReceiveProps=(nextProps)=> {
          });
            
      }
+  handleStart(e){
+      this.setState({
+          saying:true,
+          btnText:"松开  结束"
+      });
+  }
+  handleTouchMove(e) {
+      this.setState({
+          saying:false,
+          btnText:"按住  说话"
+      });
+  }
+
+  handleTouchEnd (e) {
+      this.setState({
+          saying:false,
+          btnText:"按住  说话"
+
+      });
+  }
   render() {
     var meg = this.state.meg
     return (
-      <div className="content" >
+      <div className="content" style={{overflow: 'auto'}}>
+        <Script url="../src/page/ai/jquery-3.2.1.min.js"/>
+        <Script url="../src/page/ai/record.js"/>
         <div className="header" style={{textAlign:'center'}}>
             <span style={{textAlign:'center'}}>PCCW智能机器人</span>
             {/* <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
@@ -557,9 +615,12 @@ componentWillReceiveProps=(nextProps)=> {
           <div onClick={this.sendMessage.bind(this)} style={{backgroundColor: 'rgb(45, 142, 242)'}} className="smartnlp-send-out smartnlp-theme-color smartnlp-send-out-pc">
             <p >发送消息</p>
           </div>
-          {/* <div onClick={this.sendMessage.bind(this)} style={{}} className="smartnlp-artificial smartnlp-theme-color">
+          <div id="microphone"  
+                        onTouchStart={this.handleStart.bind(this)}  //使用bind(this)改变函数作用域，不加上bind则this指向的是全局对象window而报错。
+                        onTouchMove={this.handleTouchMove.bind(this)}
+                        onTouchEnd={this.handleTouchEnd.bind(this)}  className="smartnlp-artificial smartnlp-theme-color">
             <p >语音发送</p>
-          </div> */}
+          </div>
         </div>
         {/* <div className="footer">
             <div className="user_face_icon">

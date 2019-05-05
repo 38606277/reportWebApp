@@ -316,7 +316,7 @@ input, button, select, textarea {
 .smartnlp-send-out, .smartnlp-artificial {
   position: absolute;
   bottom: 8px;
-  right: 0;
+  right: 10px;
   width: 65px;
   height: 24px;
   overflow: hidden;
@@ -331,17 +331,7 @@ input, button, select, textarea {
 .smartnlp-artificial {
   right: 90px;
 }
-.smartnlp-send-out, .smartnlp-artificial {
-  position: absolute;
-  bottom: 8px;
-  right: 10px;
-  width: 65px;
-  height: 24px;
-  overflow: hidden;
-  border-radius: 12px;
-  padding: 0 5px;
-  cursor: pointer;
-}
+
 .smartnlp-send-out p, .smartnlp-artificial p {
   margin: 0;
   line-height: 24px;
