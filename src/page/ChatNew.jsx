@@ -446,7 +446,7 @@ componentWillReceiveProps=(nextProps)=> {
         return (<div  style={{backgroundColor:'#f4f7f9',maxWidth:'370px'}}>
                 <List>
                   <Item align="top" thumb={fileIcon} multipleLine>
-                    <a href={file} target="_black" style={{marginRight:'5px'}}>{data}</a>
+                    <a onClick={()=>this.domnFile(file)} href="javascript:void(0);" target="_black" style={{marginRight:'5px'}}>{data}</a>
                     <Brief><a onClick={()=>this.domnFile(file)} href="javascript:void(0);" target="_black" style={{marginRight:'5px'}}>点击下载</a></Brief>
                   </Item>
                 </List>
