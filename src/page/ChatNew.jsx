@@ -1,6 +1,5 @@
 import React, { PureComponent, lazy, Suspense }  from 'react';
-import ReactDOM from 'react-dom';
-import { List, ListView,PullToRefresh,WhiteSpace,WingBlank, TextareaItem , SwipeAction,  NavBar, Icon } from 'antd-mobile';
+import {  Card,List,Toast, ListView,PullToRefresh,WhiteSpace,WingBlank, TextareaItem , SwipeAction,  NavBar, Icon } from 'antd-mobile';
 import { Link, Redirect } from 'react-router-dom';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
@@ -8,7 +7,7 @@ import my from './../assets/icon/chart.png';
 import down from './../assets/icon/down.png';
 import LocalStorge from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
-import 'antd-mobile/dist/antd-mobile.css';
+//import 'antd-mobile/dist/antd-mobile.css';
 import './Chat.css';
 import "babel-polyfill";
 const Item = List.Item;
@@ -19,18 +18,8 @@ var JZ = '加载中...'
 var dropDownRefreshText = XLJZ;
 var dragValve = 40; // 下拉加载阀值
 var scrollValve = 40; // 滚动加载阀值
-// function ticking(){
-//   const element = (new Date().toLocaleTimeString());
-//   ReactDOM.render(
-//     element,
-//     document.getElementById('root')
-//   );
-// }
 
-//查看历史信息使用下列加载 结束
 const url=window.getServerUrl();
-// 渲染不同内容的组件
-import LazyComponent from './RenderContent';
 export default class ChatNew extends React.Component {
   constructor(props) {
     super(props);
@@ -38,9 +27,6 @@ export default class ChatNew extends React.Component {
       meg: '',
       isWrite:true,
       saying:false,
-      refreshing: false,
-      down: true,
-      height: document.documentElement.clientHeight,
       data: [],
       userId:null,
       to_userId:0,
@@ -61,10 +47,8 @@ export default class ChatNew extends React.Component {
     let userInfo = localStorge.getStorage('userInfo');
     if (undefined != userInfo && null != userInfo && '' != userInfo) {
       this.setState({ userId:userInfo.id,
-        userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon,
-        translate: 0,
-        openDragLoading:true,//根据外面设置的开关改变自己的状态
-        openScrollLoading:true},function(){
+        userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon},
+      function(){
           this.fetchItems(true);
           this.loadQuestion();
         });
@@ -79,7 +63,6 @@ fetchItems(isTrue) {
     HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
     .then(res => {
       let list=res.data;
-   
       for(var i=0;i<list.length;i++){
         this.setState({data: [list[i],...this.state.data] });
       }
@@ -98,10 +81,7 @@ loadQuestion(){
   HttpService.post('/reportServer/questions/getQuestionsList', JSON.stringify(listParam))
   .then(res => {
     if (res.resultCode != "1000") {
-      
       this.setState({questionList:res.list,data: [...this.state.data,{data:res.list,message_type:"question"}] });
-      // this.setState({questionList:res.list});
-      // renderCustomComponent(this.QuestionList, {data:res.list});
     }
   })
 }
@@ -169,15 +149,18 @@ initRefresh=()=> {
   }
   function touchStart(event) {
    // event.preventDefault();
+   if(undefined!=event.changedTouches){
       if (self.refs.scroller.scrollTop <= 0) {
           isTouchStart = true;
           startY = hasTouch ? event.changedTouches[0].pageY : event.pageY;
           startX = hasTouch ? event.changedTouches[0].pageX : event.pageX;
       }
+    }
   }
 
   function touchMove(event) {
    // event.preventDefault();
+   if(undefined!=event.changedTouches){
       if (!isTouchStart) return;
       var distanceY = (hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY;
       var distanceX = (hasTouch ? event.changedTouches[0].pageX : event.pageX) - startX;
@@ -211,8 +194,10 @@ initRefresh=()=> {
           self.transformScroller(0, self.state.translate);
       }
     }
-    function touchEnd(event) {
+  }
+  function touchEnd(event) {
     //  event.preventDefault();
+    if(undefined!=event.changedTouches){
         isDragStart = false;
         if (!isTouchStart) return;
         isTouchStart = false;
@@ -226,6 +211,7 @@ initRefresh=()=> {
             self.fetchItems(false);//触发冲外面传进来的刷新回调函数
         }
     }
+  } 
 }
 
 initScroll=()=> {
@@ -322,7 +308,7 @@ componentWillReceiveProps=(nextProps)=> {
           let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
           await HttpService.post('/reportServer/query/execQuery/2/87', JSON.stringify(qryParam))
           .then(res=>{
-                //函数查询 execQuery  execqueryToExcel
+          //函数查询 execQuery  execqueryToExcel
           // })
           // //首先进行
           // await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
@@ -341,7 +327,6 @@ componentWillReceiveProps=(nextProps)=> {
                   HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
                       .then(res => {
                       if (res.resultCode != "1000") {
-                      // console.log(res);
                       }
                   })
                   this.setState({
@@ -354,7 +339,7 @@ componentWillReceiveProps=(nextProps)=> {
               }
             })
             .catch((error) => {
-              // Toast.fail(error);
+               Toast.fail(error);
             });
           var that = this
           fetch('https://api.ownthink.com/bot?spoken=' + message, {
@@ -373,10 +358,8 @@ componentWillReceiveProps=(nextProps)=> {
               HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
                 .then(res => {
                   if (res.resultCode != "1000") {
-                  // console.log(res);
                   }
                 })
-              //  renderCustomComponent(that.FormFile, {data: "改为文件名", file:"http://localhost:8080/report/upload/PRC02 利润表.xlsx" }); 
             return that.setState({
                         data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: 1}]
                       },function(){
@@ -411,6 +394,114 @@ componentWillReceiveProps=(nextProps)=> {
            this.setState({saying:true});
     }
 
+    RenderContent = (props) => {
+      if (props.message_type=="json"){
+        let ress=null;
+        if (typeof props.post_message === 'string') {
+          ress=JSON.parse(props.post_message);
+        }else{
+          ress=props.post_message;
+        }
+        let data=ress.data.list;
+        let out=ress.data.out;
+        return (
+        <Card style={{backgroundColor:'#f4f7f9'}}>
+            <List>
+                {data.map(val => (
+                    <Item
+                    multipleLine
+                    onClick={() => this.onClassClick(val.class_id)}
+                    >
+                    {out.map((item) => {
+                        return <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
+                        {item.out_name}:{val[item.out_id.toUpperCase()]}
+                        </div> 
+                    }
+                    )} 
+                    </Item>
+                ))}
+            </List>
+        </Card>
+        );
+      }else 
+      if (props.message_type=="file"){
+        let fileIcon='./../src/assets/icon/down.png';
+        let ress=null;
+        if (typeof props.post_message === 'string') {
+          ress=JSON.parse(props.post_message);
+        }else{
+          ress=props.post_message;
+        }
+        let data= ress.data.fileName;
+        let file= ress.data.filePath;
+        var fileExtension = file.substring(file.lastIndexOf('.') + 1);
+        fileExtension=fileExtension.toUpperCase();
+        if(fileExtension=='DOC' || fileExtension=='DOCX'){
+          fileIcon="./../src/assets/icon/word.png";
+        }else  if(fileExtension=='XLS' || fileExtension=='XLSX'){
+          fileIcon="./../src/assets/icon/excel.png";
+        }else  if(fileExtension=='PPT' || fileExtension=='PPTX'){
+          fileIcon="./../src/assets/icon/ppt.png";
+        }
+        return (<div  style={{backgroundColor:'#f4f7f9',maxWidth:'370px'}}>
+                <List>
+                  <Item align="top" thumb={fileIcon} multipleLine>
+                    <a href={file} target="_black" style={{marginRight:'5px'}}>{data}</a>
+                    <Brief><a onClick={()=>this.domnFile(file)} href="javascript:void(0);" target="_black" style={{marginRight:'5px'}}>点击下载</a></Brief>
+                  </Item>
+                </List>
+              </div>
+        );
+      } else 
+      if (props.message_type=="text"){
+        return <div >{props.post_message}</div>;
+      }else 
+      if (props.message_type=="voice") {
+        return <audio src={props.post_message ? props.post_message : ''} controls />;
+      }else if(props.message_type=="question"){
+        return <List renderHeader={() => '常见问题'} className="my-list">
+            {props.data.map(item => (
+              <Item arrow="horizontal"
+                multipleLine
+                onClick={() => this.onQuestionClick(item.ai_question_id,item.ai_question)}
+               >
+                 <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
+                    {item.ai_question}
+                 </div>
+              </Item>
+            ))}
+          </List>
+      }
+      else{
+        return <div >{props.post_message}</div>;
+      }
+    };
+    async domnFile(filepath){
+      await fetch(url+'reportServer/uploadFile/downloadFile', {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+             'credentials': JSON.stringify(localStorge.getStorage('userInfo') || '')
+           },
+           body:filepath
+         }).then(function (response) {
+           if (response.ok) {
+             response.blob().then((blob) => {
+               if(blob.size>0){
+               const a = window.document.createElement('a');
+               const downUrl = window.URL.createObjectURL(blob);// 获取 blob 本地文件连接 (blob 为纯二进制对象，不能够直接保存到磁盘上)
+                a.href = downUrl;
+                a.download = filepath.substr(filepath.lastIndexOf("/")+1);
+                a.click();
+               window.URL.revokeObjectURL(downUrl);
+             }else{
+               Toast.fail("文件已丢失，请重新导出下载！");
+             }
+             });
+           }
+         });
+           
+     }
   render() {
     var meg = this.state.meg
     return (
@@ -429,13 +520,13 @@ componentWillReceiveProps=(nextProps)=> {
                 if(elem.from_userId==1){
                   return <div style={{background:'#f5f5f9' }} >
                         <li ><img src={this.state.userIcon==''?my:this.state.userIcon} className="imgright"/><span style={{float:"right"}}>
-                        <LazyComponent {...elem} />
+                        {this.RenderContent(elem)}
                        </span></li>
                     </div>
                 } else{
                   return <div style={{background:'#f5f5f9' }}>
                       <li><img src={ai} className="imgleft"/><span style={{float:"left",background:'#f1ebeb00'}}>
-                      <LazyComponent {...elem} />
+                      {this.RenderContent(elem)}
                       </span></li>
                     </div>
                 }
@@ -448,7 +539,6 @@ componentWillReceiveProps=(nextProps)=> {
           <div className="smartnlp-write-block">
             <div className="smartnlp-user-write-block">
               <div className="smartnlp-user-textarea">
-                {/* <span className="smartnlp-text-tip">请输入您要咨询的问题</span> */}
                 <TextareaItem ref={el => this.autoFocusInst = el} 
                 placeholder="请输入您要咨询的问题"
                 value={meg} 
