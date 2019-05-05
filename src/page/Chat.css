@@ -125,7 +125,7 @@ li span.spanright {
 ul{
   list-style: none;
   overflow-x: hidden;
-  overflow-y: scroll; 
+  overflow-y: hidden; 
 }
 ul::-webkit-scrollbar{
   display:none;
