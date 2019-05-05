@@ -515,7 +515,7 @@ componentWillReceiveProps=(nextProps)=> {
           <div style={{textAlign:'center'}}>
             <span ref="dropDownRefreshText">查看更多信息</span>
           </div>
-          <ul id="messages" className="contentes">
+          <ul id="messages" className="contentes" style={{overflow: 'auto'}}>
             {this.state.data.map((elem,index) => {
                 if(elem.from_userId==1){
                   return <div style={{background:'#f5f5f9' }} >
@@ -557,6 +557,9 @@ componentWillReceiveProps=(nextProps)=> {
           <div onClick={this.sendMessage.bind(this)} style={{backgroundColor: 'rgb(45, 142, 242)'}} className="smartnlp-send-out smartnlp-theme-color smartnlp-send-out-pc">
             <p >发送消息</p>
           </div>
+          {/* <div onClick={this.sendMessage.bind(this)} style={{}} className="smartnlp-artificial smartnlp-theme-color">
+            <p >语音发送</p>
+          </div> */}
         </div>
         {/* <div className="footer">
             <div className="user_face_icon">
