@@ -9,6 +9,8 @@
     margin: 0 auto 0;
     position: relative;
     padding-bottom:50px;
+    display: flex;
+    flex-direction: column;
   }
   .header {
     background: #3bd9e2;
