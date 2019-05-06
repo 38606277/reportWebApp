@@ -1,4 +1,5 @@
 import React, { PureComponent, lazy, Suspense }  from 'react';
+import ReactDOM from 'react-dom';
 import {  Card,List,Toast, ListView,PullToRefresh,WhiteSpace,WingBlank, TextareaItem , SwipeAction,  NavBar, Icon } from 'antd-mobile';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
@@ -38,13 +39,24 @@ export default class ChatNew extends React.Component {
       translate: 0,//位移
       dragLoading: false,//是否在下拉刷新中
       scrollerLoading: false,//是否在加载更多中
-      openDragLoading: true,//是否开启下拉刷新
-      openScrollLoading: true,//是否开启下拉刷新
+      openDragLoading: false,//是否开启下拉刷新
+      openScrollLoading: false,//是否开启下拉刷新
       btnText:"按住录音",
+      refreshing: false,
+      down: true,
+      height: document.documentElement.clientHeight,
     }
     this.page=1;
   }
   componentDidMount() {
+    const hei = this.state.height - ReactDOM.findDOMNode(this.lv).offsetTop;
+    setTimeout(() => {
+      this.setState({
+        height: hei,
+        //data: genData(this.state.data),
+        refreshing: false
+      });
+    }, 1500);
     let userInfo = localStorge.getStorage('userInfo');
     if (undefined != userInfo && null != userInfo && '' != userInfo) {
       this.setState({ userId:userInfo.id,
@@ -58,6 +70,15 @@ export default class ChatNew extends React.Component {
       window.location.href="/My";
     }
   }
+  onRefreshs = () => {
+    this.setState({ refreshing: true });
+    setTimeout(() => {
+      this.setState({ refreshing: false,
+      //  data: genData(this.state.data), 
+      });
+      this.fetchItems(false);
+    }, 600);
+}
   initEvent() {
     var btnElem=document.getElementById("microphone");//获取ID
     btnElem.addEventListener("touchstart", function(event) {
@@ -100,11 +121,11 @@ export default class ChatNew extends React.Component {
         for(var i=0;i<list.length;i++){
           this.setState({data: [list[i],...this.state.data] });
         }
-        this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
-        if(isTrue){
-        this.initRefresh();//初始化下拉刷新
-        this.initScroll();//初始化滚动加载更多
-        }
+        // this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
+        // if(isTrue){
+        // this.initRefresh();//初始化下拉刷新
+        // this.initScroll();//初始化滚动加载更多
+        // }
           ++this.page;
       });
   }
@@ -165,149 +186,149 @@ export default class ChatNew extends React.Component {
       });
     }
   }
-  initRefresh=()=> {
-    var self = this;//对象转存，防止闭包函数内无法访问
-    var isTouchStart = false; // 是否已经触发下拉条件
-    var isDragStart = false; // 是否已经开始下拉
-    var startX, startY;        // 下拉方向，touchstart 时的点坐标
-    var hasTouch = 'ontouchstart' in window;//判断是否是在移动端手机上
-    // 监听下拉加载，兼容电脑端
-    //let pullDown = document.getElementById("messages");
-    if (self.state.openDragLoading) {
-      self.refs.scroller.addEventListener('touchstart', touchStart, false);
-      self.refs.scroller.addEventListener('touchmove', touchMove, false);
-      self.refs.scroller.addEventListener('touchend', touchEnd, false);
-      self.refs.scroller.addEventListener('mousedown', touchStart, false);
-      self.refs.scroller.addEventListener('mousemove', touchMove, false);
-      self.refs.scroller.addEventListener('mouseup', touchEnd, false);
-    }
-    function touchStart(event) {
-    // event.preventDefault();
-    if(undefined!=event.changedTouches){
-        if (self.refs.scroller.scrollTop <= 0) {
-            isTouchStart = true;
-            startY = hasTouch ? event.changedTouches[0].pageY : event.pageY;
-            startX = hasTouch ? event.changedTouches[0].pageX : event.pageX;
-        }
-      }
-    }
+  // initRefresh=()=> {
+  //   var self = this;//对象转存，防止闭包函数内无法访问
+  //   var isTouchStart = false; // 是否已经触发下拉条件
+  //   var isDragStart = false; // 是否已经开始下拉
+  //   var startX, startY;        // 下拉方向，touchstart 时的点坐标
+  //   var hasTouch = 'ontouchstart' in window;//判断是否是在移动端手机上
+  //   // 监听下拉加载，兼容电脑端
+  //   //let pullDown = document.getElementById("messages");
+  //   if (self.state.openDragLoading) {
+  //     self.refs.scroller.addEventListener('touchstart', touchStart, false);
+  //     self.refs.scroller.addEventListener('touchmove', touchMove, false);
+  //     self.refs.scroller.addEventListener('touchend', touchEnd, false);
+  //     self.refs.scroller.addEventListener('mousedown', touchStart, false);
+  //     self.refs.scroller.addEventListener('mousemove', touchMove, false);
+  //     self.refs.scroller.addEventListener('mouseup', touchEnd, false);
+  //   }
+  //   function touchStart(event) {
+  //   // event.preventDefault();
+  //   if(undefined!=event.changedTouches){
+  //       if (self.refs.scroller.scrollTop <= 0) {
+  //           isTouchStart = true;
+  //           startY = hasTouch ? event.changedTouches[0].pageY : event.pageY;
+  //           startX = hasTouch ? event.changedTouches[0].pageX : event.pageX;
+  //       }
+  //     }
+  //   }
 
-    function touchMove(event) {
-    // event.preventDefault();
-    if(undefined!=event.changedTouches){
-        if (!isTouchStart) return;
-        var distanceY = (hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY;
-        var distanceX = (hasTouch ? event.changedTouches[0].pageX : event.pageX) - startX;
-        //如果X方向上的位移大于Y方向，则认为是左右滑动
-        if (Math.abs(distanceX) > Math.abs(distanceY))return;
-        if (distanceY > 0) {
-            self.setState({
-                translate: Math.pow((hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY, 0.85)
-            });
-        } else {
-            if (self.state.translate !== 0) {
-                self.setState({translate: 0});
-                self.transformScroller(0, self.state.translate);
-            }
-        }
-        if (distanceY > 0) {
-            if (!isDragStart) {
-                isDragStart = true;
-            }
-            if (self.state.translate <= dragValve) {// 下拉中，但还没到刷新阀值
-                if (dropDownRefreshText !== XLJZ){
-                    self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
-                    console.log("下拉加载")
-                }
-            } else { // 下拉中，已经达到刷新阀值
-                if (dropDownRefreshText !== SKJZ){
-                    self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = SKJZ);
-                    console.log("松开加载");
-                  }
-            }
-            self.transformScroller(0, self.state.translate);
-        }
-      }
-    }
-    function touchEnd(event) {
-      //  event.preventDefault();
-      if(undefined!=event.changedTouches){
-          isDragStart = false;
-          if (!isTouchStart) return;
-          isTouchStart = false;
-          if (self.state.translate <= dragValve) {
-              self.transformScroller(0.3, 0);
-          } else {
-              self.setState({dragLoading: true});//设置在下拉刷新状态中
-              self.transformScroller(0.1, 0);
-              console.log("加载中....");
-              self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = JZ);
-              self.fetchItems(false);//触发冲外面传进来的刷新回调函数
-          }
-      }
-    } 
-  }
+  //   function touchMove(event) {
+  //   // event.preventDefault();
+  //   if(undefined!=event.changedTouches){
+  //       if (!isTouchStart) return;
+  //       var distanceY = (hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY;
+  //       var distanceX = (hasTouch ? event.changedTouches[0].pageX : event.pageX) - startX;
+  //       //如果X方向上的位移大于Y方向，则认为是左右滑动
+  //       if (Math.abs(distanceX) > Math.abs(distanceY))return;
+  //       if (distanceY > 0) {
+  //           self.setState({
+  //               translate: Math.pow((hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY, 0.85)
+  //           });
+  //       } else {
+  //           if (self.state.translate !== 0) {
+  //               self.setState({translate: 0});
+  //               self.transformScroller(0, self.state.translate);
+  //           }
+  //       }
+  //       if (distanceY > 0) {
+  //           if (!isDragStart) {
+  //               isDragStart = true;
+  //           }
+  //           if (self.state.translate <= dragValve) {// 下拉中，但还没到刷新阀值
+  //               if (dropDownRefreshText !== XLJZ){
+  //                   self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
+  //                   console.log("下拉加载")
+  //               }
+  //           } else { // 下拉中，已经达到刷新阀值
+  //               if (dropDownRefreshText !== SKJZ){
+  //                   self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = SKJZ);
+  //                   console.log("松开加载");
+  //                 }
+  //           }
+  //           self.transformScroller(0, self.state.translate);
+  //       }
+  //     }
+  //   }
+  //   function touchEnd(event) {
+  //     //  event.preventDefault();
+  //     if(undefined!=event.changedTouches){
+  //         isDragStart = false;
+  //         if (!isTouchStart) return;
+  //         isTouchStart = false;
+  //         if (self.state.translate <= dragValve) {
+  //             self.transformScroller(0.3, 0);
+  //         } else {
+  //             self.setState({dragLoading: true});//设置在下拉刷新状态中
+  //             self.transformScroller(0.1, 0);
+  //             console.log("加载中....");
+  //             self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = JZ);
+  //             self.fetchItems(false);//触发冲外面传进来的刷新回调函数
+  //         }
+  //     }
+  //   } 
+  // }
 
-  initScroll=()=> {
-      var self = this;
-      //let scroller = document.getElementById("messages");
-      // 监听滚动加载
-      if (this.state.openScrollLoading) {
-        this.refs.scroller.addEventListener('scroll', scrolling, false);
-      }
-      function scrolling() {
-          if (self.state.scrollerLoading) return;
-          var scrollerscrollHeight = self.refs.scroller.scrollHeight; // 容器滚动总高度
-          var scrollerHeight =self.refs.scroller.getBoundingClientRect().height;// 容器滚动可见高度
-          var scrollerTop = self.refs.scroller.scrollTop;//滚过的高度
-          // 达到滚动加载阀值
-          if (scrollerscrollHeight - scrollerHeight - scrollerTop <= scrollValve) {
-              self.setState({scrollerLoading: true});
-              self.fetchItems(false);
-          }
-      }
-  }
+  // initScroll=()=> {
+  //     var self = this;
+  //     //let scroller = document.getElementById("messages");
+  //     // 监听滚动加载
+  //     if (this.state.openScrollLoading) {
+  //       this.refs.scroller.addEventListener('scroll', scrolling, false);
+  //     }
+  //     function scrolling() {
+  //         if (self.state.scrollerLoading) return;
+  //         var scrollerscrollHeight = self.refs.scroller.scrollHeight; // 容器滚动总高度
+  //         var scrollerHeight =self.refs.scroller.getBoundingClientRect().height;// 容器滚动可见高度
+  //         var scrollerTop = self.refs.scroller.scrollTop;//滚过的高度
+  //         // 达到滚动加载阀值
+  //         if (scrollerscrollHeight - scrollerHeight - scrollerTop <= scrollValve) {
+  //             self.setState({scrollerLoading: true});
+  //             self.fetchItems(false);
+  //         }
+  //     }
+  // }
   /**
    * 利用 transition 和transform  改变位移
    * @param time 时间
    * @param translate  距离
    */
-  transformScroller=(time, translate)=> {
-      this.setState({translate: translate});
-      //let scroller = document.getElementById("messages");
-      var elStyle =  this.refs.scroller.style;
-      elStyle.webkitTransition = elStyle.MozTransition = elStyle.transition = 'all ' + time + 's ease-in-out';
-      elStyle.webkitTransform = elStyle.MozTransform = elStyle.transform = 'translate3d(0, ' + translate + 'px, 0)';
-  }
+  // transformScroller=(time, translate)=> {
+  //     this.setState({translate: translate});
+  //     //let scroller = document.getElementById("messages");
+  //     var elStyle =  this.refs.scroller.style;
+  //     elStyle.webkitTransition = elStyle.MozTransition = elStyle.transition = 'all ' + time + 's ease-in-out';
+  //     elStyle.webkitTransform = elStyle.MozTransform = elStyle.transform = 'translate3d(0, ' + translate + 'px, 0)';
+  // }
   /**
    * 下拉刷新完毕
    */
-  dragLoadingDone=()=> {
-      this.setState({dragLoading: false});
-      this.transformScroller(0.1, 0);
-  }
+  // dragLoadingDone=()=> {
+  //     this.setState({dragLoading: false});
+  //     this.transformScroller(0.1, 0);
+  // }
   /**
    * 滚动加载完毕
    */
-  scrollLoadingDone=()=> {
-      this.setState({scrollerLoading: false});
-      console.log("下拉加载");
-      this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
-  }
-  componentWillReceiveProps=(nextProps)=> {
-      var self = this;
-      self.fetchItems(false);//把新的数据填进列表
-      if (this.state.dragLoading) {//如果之前是下拉刷新状态，恢复
-          setTimeout(function () {
-              self.dragLoadingDone();
-          }, 1000);
-      }
-      if (this.state.scrollerLoading) {//如果之前是滚动加载状态，恢复
-          setTimeout(function () {
-              self.scrollLoadingDone();
-          }, 1000);
-      }
-  }
+  // scrollLoadingDone=()=> {
+  //     this.setState({scrollerLoading: false});
+  //     console.log("下拉加载");
+  //     this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
+  // }
+  // componentWillReceiveProps=(nextProps)=> {
+  //     var self = this;
+  //     self.fetchItems(false);//把新的数据填进列表
+  //     if (this.state.dragLoading) {//如果之前是下拉刷新状态，恢复
+  //         setTimeout(function () {
+  //             self.dragLoadingDone();
+  //         }, 1000);
+  //     }
+  //     if (this.state.scrollerLoading) {//如果之前是滚动加载状态，恢复
+  //         setTimeout(function () {
+  //             self.scrollLoadingDone();
+  //         }, 1000);
+  //     }
+  // }
   handleData(e) {
     this.setState({
       meg: e
@@ -569,11 +590,23 @@ export default class ChatNew extends React.Component {
               {/* <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
               <span style={{float: "right"}} id="root"></span> */}
           </div>
-          <div ref="scroller" style={{overflow:"hidden"}}>
-            <div style={{textAlign:'center'}}>
+          {/* <div ref="scroller" style={{overflow:"hidden"}}> */}
+            {/* <div style={{textAlign:'center'}}>
               <span ref="dropDownRefreshText">查看更多信息</span>
-            </div>
+            </div> */}
             <ul id="messages">
+            <PullToRefresh
+                damping={60}
+                ref={el => this.lv = el}
+                style={{
+                  height: this.state.height,
+                  overflow: 'auto',
+                }}
+                indicator={this.state.down ? {} : { deactivate: '上拉可以刷新' }}
+                direction={this.state.down ? 'down' : 'up'}
+                refreshing={this.state.refreshing}
+                onRefresh={this.onRefreshs}
+            >
               {this.state.data.map((elem,index) => {
                   if(elem.from_userId==this.state.userId){
                     return <li style={{background:'#f5f5f9' }} >
@@ -588,8 +621,9 @@ export default class ChatNew extends React.Component {
                         </span></li>
                   }
               })}
+              </PullToRefresh>
             </ul>
-          </div>
+          {/* </div> */}
           <div id="scrolld"></div>
           {this.state.saying==true?<div className="saying"> <img src={require("../assets/saying.gif")}/></div>:''}
           <div className="smartnlp-chat-msg-input">
