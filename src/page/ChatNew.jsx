@@ -337,6 +337,7 @@ export default class ChatNew extends React.Component {
   //发送消息
   async sendMessage(){ 
     if(null!=this.state.meg && ""!=this.state.meg){
+      var anchorElement = document.getElementById("scrolld");
         var ist=true; 
         //先保存发送信息
         var message = this.state.meg;
@@ -355,13 +356,12 @@ export default class ChatNew extends React.Component {
           if (res.resultCode != "1000") {
             ist=false;
           }else{
-            var anchorElement = document.getElementById("scrolld");
             anchorElement.scrollIntoView();
           }
         })
         if(ist){
           let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
-          await HttpService.post('/reportServer/query/execQuery/2/87', JSON.stringify(qryParam))
+          await HttpService.post('/reportServer/query/execqueryToExcel/2/87', JSON.stringify(qryParam))
           .then(res=>{
           //函数查询 execQuery  execqueryToExcel
           // })
@@ -387,7 +387,6 @@ export default class ChatNew extends React.Component {
                   this.setState({
                     data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res,'message_type':res.data.filetype,to_userId: this.state.userId}]
                   });
-                  var anchorElement = document.getElementById("scrolld");
                   anchorElement.scrollIntoView();
               } else {
 
@@ -418,9 +417,10 @@ export default class ChatNew extends React.Component {
             return that.setState({
                         data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: that.state.userId}]
                       },function(){
-                        var anchorElement = document.getElementById("scrolld");
                         anchorElement.scrollIntoView();
                       });
+                      anchorElement.scrollIntoView();
+
             } else {
             }
           })
@@ -621,9 +621,10 @@ export default class ChatNew extends React.Component {
                         </span></li>
                   }
               })}
+               <div id="scrolld"> </div>
               </PullToRefresh>
             </ul>
-            <div id="scrolld"></div>
+           
           </div>
          
           {this.state.saying==true?<div className="saying"> <img src={require("../assets/saying.gif")}/></div>:''}
