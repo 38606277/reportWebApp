@@ -51,7 +51,7 @@ export default class ChatNew extends React.Component {
             userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon},
         function(){
             this.fetchItems(true);
-            this.loadQuestion();
+            // this.loadQuestion();
         });
         this.initEvent();
     }else{
@@ -338,7 +338,7 @@ export default class ChatNew extends React.Component {
             anchorElement.scrollIntoView();
           }
         })
-        if(ist){
+        if(false){
           let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
           await HttpService.post('/reportServer/query/execQuery/2/87', JSON.stringify(qryParam))
           .then(res=>{
