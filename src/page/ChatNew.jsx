@@ -590,7 +590,7 @@ export default class ChatNew extends React.Component {
               {/* <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
               <span style={{float: "right"}} id="root"></span> */}
           </div>
-          <div ref="scroller" style={{width:"100%",hyphens:'100%',overflow:'auto',flex:1}}>
+          <div ref="scroller" style={{width:"100%",height:'100%',overflow:'auto',flex:1}}>
             {/* <div style={{textAlign:'center'}}>
               <span ref="dropDownRefreshText">查看更多信息</span>
             </div> */}
