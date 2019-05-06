@@ -396,7 +396,7 @@ export default class ChatNew extends React.Component {
             .catch((error) => {
                Toast.fail(error);
             });
-         // var that = this
+          var that = this;
           fetch('https://api.ownthink.com/bot?spoken=' + message, {
             method: 'POST',
             type: 'cors'
@@ -404,8 +404,8 @@ export default class ChatNew extends React.Component {
             return response.json();
           }).then(function (detail) {
             if (detail.message =="success") {
-              let responseInfo={'from_userId':this.state.to_userId,
-                      'to_userId':this.state.userId,
+              let responseInfo={'from_userId':that.state.to_userId,
+                      'to_userId':that.state.userId,
                       'post_message':detail.data.info.text,
                       'message_type':'0',
                       'message_state':'0'
@@ -415,8 +415,8 @@ export default class ChatNew extends React.Component {
                   if (res.resultCode != "1000") {
                   }
                 })
-            return this.setState({
-                        data: [...this.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: this.state.userId}]
+            return that.setState({
+                        data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: that.state.userId}]
                       },function(){
                         var anchorElement = document.getElementById("scrolld");
                         anchorElement.scrollIntoView();
@@ -623,8 +623,9 @@ export default class ChatNew extends React.Component {
               })}
               </PullToRefresh>
             </ul>
+            <div id="scrolld"></div>
           </div>
-          <div id="scrolld"></div>
+         
           {this.state.saying==true?<div className="saying"> <img src={require("../assets/saying.gif")}/></div>:''}
           <div className="smartnlp-chat-msg-input">
             <div className="smartnlp-write-block">
