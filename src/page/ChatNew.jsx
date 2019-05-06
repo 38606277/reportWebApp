@@ -416,7 +416,7 @@ export default class ChatNew extends React.Component {
                   }
                 })
             return that.setState({
-                        data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: 1}]
+                        data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: this.state.userId}]
                       },function(){
                         var anchorElement = document.getElementById("scrolld");
                         anchorElement.scrollIntoView();
@@ -608,7 +608,7 @@ export default class ChatNew extends React.Component {
                 onRefresh={this.onRefreshs}
             >
               {this.state.data.map((elem,index) => {
-                  if(elem.from_userId==1){
+                  if(elem.from_userId==this.state.userId){
                     return <li style={{background:'#f5f5f9' }} >
                           <img src={this.state.userIcon==''?my:this.state.userIcon} className="imgright"/><span style={{float:"right"}}>
                           {this.RenderContent(elem)}
