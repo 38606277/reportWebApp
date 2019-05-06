@@ -396,7 +396,7 @@ export default class ChatNew extends React.Component {
             .catch((error) => {
                Toast.fail(error);
             });
-          var that = this
+         // var that = this
           fetch('https://api.ownthink.com/bot?spoken=' + message, {
             method: 'POST',
             type: 'cors'
@@ -404,8 +404,8 @@ export default class ChatNew extends React.Component {
             return response.json();
           }).then(function (detail) {
             if (detail.message =="success") {
-              let responseInfo={'from_userId':that.state.to_userId,
-                      'to_userId':that.state.userId,
+              let responseInfo={'from_userId':this.state.to_userId,
+                      'to_userId':this.state.userId,
                       'post_message':detail.data.info.text,
                       'message_type':'0',
                       'message_state':'0'
@@ -415,8 +415,8 @@ export default class ChatNew extends React.Component {
                   if (res.resultCode != "1000") {
                   }
                 })
-            return that.setState({
-                        data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: this.state.userId}]
+            return this.setState({
+                        data: [...this.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: this.state.userId}]
                       },function(){
                         var anchorElement = document.getElementById("scrolld");
                         anchorElement.scrollIntoView();
@@ -590,7 +590,7 @@ export default class ChatNew extends React.Component {
               {/* <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
               <span style={{float: "right"}} id="root"></span> */}
           </div>
-          {/* <div ref="scroller" style={{overflow:"hidden"}}> */}
+          <div ref="scroller" style={{width:"100%",hyphens:'100%',overflow:'auto',flex:1}}>
             {/* <div style={{textAlign:'center'}}>
               <span ref="dropDownRefreshText">查看更多信息</span>
             </div> */}
@@ -623,38 +623,38 @@ export default class ChatNew extends React.Component {
               })}
               </PullToRefresh>
             </ul>
-          {/* </div> */}
+          </div>
           <div id="scrolld"></div>
           {this.state.saying==true?<div className="saying"> <img src={require("../assets/saying.gif")}/></div>:''}
           <div className="smartnlp-chat-msg-input">
             <div className="smartnlp-write-block">
               <div className="smartnlp-user-write-block">
                 <div className="smartnlp-user-textarea">
-                  <TextareaItem ref={el => this.autoFocusInst = el} 
-                  placeholder="请输入您要咨询的问题"
-                  value={meg} 
-                  onChange={this.handleData.bind(this)}  
-                  onKeyUp={e => this.onInputKeyUp(e)} 
-                  className="smartnlp-text-content smartnlp-writeBox smartnlp-text-content-pc" 
-                  name="writeBox" 
-                  style={{height:'40px'}}
-                  ></TextareaItem>
+                    <TextareaItem ref={el => this.autoFocusInst = el} 
+                    placeholder="请输入您要咨询的问题"
+                    value={meg} 
+                    onChange={this.handleData.bind(this)}  
+                    onKeyUp={e => this.onInputKeyUp(e)} 
+                    className="smartnlp-text-content smartnlp-writeBox smartnlp-text-content-pc" 
+                    name="writeBox" 
+                    style={{height:'40px'}}
+                    ></TextareaItem>
+                  </div>
                 </div>
               </div>
+              <div className="smartnlp-power-by">
+              <p className="smartnlp-copy-right">Powered By PCCW机器人</p>
+              </div>
+              <div onClick={this.sendMessage.bind(this)} style={{backgroundColor: 'rgb(45, 142, 242)'}} className="smartnlp-send-out smartnlp-theme-color smartnlp-send-out-pc">
+                <p >发送消息</p>
+              </div>
+              <div id="microphone"  
+                            onTouchStart={this.handleStart.bind(this)}  //使用bind(this)改变函数作用域，不加上bind则this指向的是全局对象window而报错。
+                            onTouchMove={this.handleTouchMove.bind(this)}
+                            onTouchEnd={this.handleTouchEnd.bind(this)}  className="smartnlp-artificial smartnlp-theme-color">
+                <p >{this.state.btnText}</p>
+              </div>
             </div>
-            <div className="smartnlp-power-by">
-            <p className="smartnlp-copy-right">Powered By PCCW机器人</p>
-            </div>
-            <div onClick={this.sendMessage.bind(this)} style={{backgroundColor: 'rgb(45, 142, 242)'}} className="smartnlp-send-out smartnlp-theme-color smartnlp-send-out-pc">
-              <p >发送消息</p>
-            </div>
-            <div id="microphone"  
-                          onTouchStart={this.handleStart.bind(this)}  //使用bind(this)改变函数作用域，不加上bind则this指向的是全局对象window而报错。
-                          onTouchMove={this.handleTouchMove.bind(this)}
-                          onTouchEnd={this.handleTouchEnd.bind(this)}  className="smartnlp-artificial smartnlp-theme-color">
-              <p >{this.state.btnText}</p>
-            </div>
-          </div>
           {/* <div className="footer">
               <div className="user_face_icon">
                 <img src={this.state.isWrite==true?require("../assets/jp_btn.png"):require("../assets/yy_btn.png")} onClick={()=>this.changeSpeack()}/>
