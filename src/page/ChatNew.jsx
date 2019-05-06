@@ -337,6 +337,7 @@ export default class ChatNew extends React.Component {
   //发送消息
   async sendMessage(){ 
     if(null!=this.state.meg && ""!=this.state.meg){
+      var anchorElement = document.getElementById("scrolld");
         var ist=true; 
         //先保存发送信息
         var message = this.state.meg;
@@ -355,13 +356,12 @@ export default class ChatNew extends React.Component {
           if (res.resultCode != "1000") {
             ist=false;
           }else{
-            var anchorElement = document.getElementById("scrolld");
             anchorElement.scrollIntoView();
           }
         })
         if(false){
           let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
-          await HttpService.post('/reportServer/query/execQuery/2/87', JSON.stringify(qryParam))
+          await HttpService.post('/reportServer/query/execqueryToExcel/2/87', JSON.stringify(qryParam))
           .then(res=>{
           //函数查询 execQuery  execqueryToExcel
           // })
@@ -387,7 +387,6 @@ export default class ChatNew extends React.Component {
                   this.setState({
                     data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res,'message_type':res.data.filetype,to_userId: this.state.userId}]
                   });
-                  var anchorElement = document.getElementById("scrolld");
                   anchorElement.scrollIntoView();
               } else {
 
@@ -396,7 +395,7 @@ export default class ChatNew extends React.Component {
             .catch((error) => {
                Toast.fail(error);
             });
-         // var that = this
+          var that = this;
           fetch('https://api.ownthink.com/bot?spoken=' + message, {
             method: 'POST',
             type: 'cors'
@@ -404,8 +403,8 @@ export default class ChatNew extends React.Component {
             return response.json();
           }).then(function (detail) {
             if (detail.message =="success") {
-              let responseInfo={'from_userId':this.state.to_userId,
-                      'to_userId':this.state.userId,
+              let responseInfo={'from_userId':that.state.to_userId,
+                      'to_userId':that.state.userId,
                       'post_message':detail.data.info.text,
                       'message_type':'0',
                       'message_state':'0'
@@ -415,12 +414,13 @@ export default class ChatNew extends React.Component {
                   if (res.resultCode != "1000") {
                   }
                 })
-            return this.setState({
-                        data: [...this.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: this.state.userId}]
+            return that.setState({
+                        data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: that.state.userId}]
                       },function(){
-                        var anchorElement = document.getElementById("scrolld");
                         anchorElement.scrollIntoView();
                       });
+                      anchorElement.scrollIntoView();
+
             } else {
             }
           })
@@ -590,7 +590,7 @@ export default class ChatNew extends React.Component {
               {/* <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
               <span style={{float: "right"}} id="root"></span> */}
           </div>
-          <div ref="scroller" style={{width:"100%",hyphens:'100%',overflow:'auto',flex:1}}>
+          <div ref="scroller" style={{width:"100%",height:'100%',overflow:'auto',flex:1}}>
             {/* <div style={{textAlign:'center'}}>
               <span ref="dropDownRefreshText">查看更多信息</span>
             </div> */}
@@ -621,10 +621,12 @@ export default class ChatNew extends React.Component {
                         </span></li>
                   }
               })}
+               <div id="scrolld"> </div>
               </PullToRefresh>
             </ul>
+           
           </div>
-          <div id="scrolld"></div>
+         
           {this.state.saying==true?<div className="saying"> <img src={require("../assets/saying.gif")}/></div>:''}
           <div className="smartnlp-chat-msg-input">
             <div className="smartnlp-write-block">
