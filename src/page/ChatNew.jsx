@@ -1,6 +1,6 @@
-import React, { PureComponent, lazy, Suspense }  from 'react';
+import React, { PureComponent, lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom';
-import {  Card,List,Toast, ListView,Modal,PullToRefresh,WhiteSpace,WingBlank, TextareaItem , SwipeAction,  NavBar, Icon } from 'antd-mobile';
+import { Card, List, Toast, ListView, Modal, PullToRefresh, WhiteSpace, WingBlank, TextareaItem, SwipeAction, NavBar, Icon } from 'antd-mobile';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
 import my from './../assets/icon/chart.png';
@@ -13,61 +13,50 @@ import './Chat.css';
 import "babel-polyfill";
 const Item = List.Item;
 const Brief = Item.Brief;
-var recorder;        
-var XLJZ = '查看更多信息';
-var SKJZ = '松开加载';
-var JZ = '加载中...'
-var dropDownRefreshText = XLJZ;
-var dragValve = 40; // 下拉加载阀值
-var scrollValve = 40; // 滚动加载阀值
-const url=window.getServerUrl();
+var recorder;
+const url = window.getServerUrl();
 export default class ChatNew extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       meg: '',
       modal1: false,
-      isWrite:true,
-      saying:false,
+      isWrite: true,
+      saying: false,
       data: [],
       modelData: [],
-      modelOut:[],
-      userId:null,
-      to_userId:0,
-      pageNumd: 1, 
+      modelOut: [],
+      userId: null,
+      to_userId: 0,
+      pageNumd: 1,
       perPaged: 5,
-      userIcon:'',
-      fileIcon:'./../src/assets/icon/down.png',
+      userIcon: '',
+      fileIcon: './../src/assets/icon/down.png',
       questionList: [],
-      translate: 0,//位移
-      dragLoading: false,//是否在下拉刷新中
-      scrollerLoading: false,//是否在加载更多中
-      openDragLoading: false,//是否开启下拉刷新
-      openScrollLoading: false,//是否开启下拉刷新
-      btnText:"按住录音",
+      btnText: "按住录音",
       refreshing: false,
       down: true,
       height: document.documentElement.clientHeight,
     }
-    this.page=1;
+    this.page = 1;
   }
-    componentDidMount() {
+  componentDidMount() {
       const hei = this.state.height - ReactDOM.findDOMNode(this.lv).offsetTop;
-     
       let userInfo = localStorge.getStorage('userInfo');
       if (undefined != userInfo && null != userInfo && '' != userInfo) {
         this.setState({ userId:userInfo.id,
-                userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon},
-            function(){
+                userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon,
+                height: hei, refreshing: false,
+          },function(){
               this.fetchItems(true);
-              setTimeout(() => {
-                this.setState({
-                  height: hei,
-                //  data: this.fetchItems(false), 
-                  refreshing: false,
+              // setTimeout(() => {
+              //   this.setState({
+              //     height: hei,
+              //   //  data: this.fetchItems(false), 
+              //     refreshing: false,
                  
-                });
-              }, 1500);
+              //   });
+              // }, 1500);
             });
        
         // this.setState({ userId:userInfo.id,
@@ -140,7 +129,7 @@ export default class ChatNew extends React.Component {
             // this.initScroll();//初始化滚动加载更多
           }
         });
-    }
+  }
     //显示问答列表
     loadQuestion(){
       var anchorElement = document.getElementById("scrolld");
@@ -169,43 +158,42 @@ export default class ChatNew extends React.Component {
       await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
       .then(res => {
         if (res.resultCode != "1000") {
-          ist=false;
-        }else{
+          ist = false;
+        } else {
           this.setState({
-            data: [...this.state.data, {from_userId: this.state.userId,'post_message':question,to_userId:this.state.to_userId}]
-          },function(){
+            data: [...this.state.data, { from_userId: this.state.userId, 'post_message': question, to_userId: this.state.to_userId }]
+          }, function () {
             anchorElement.scrollIntoView();
           });
         }
       })
-      if(ist){
+      if (ist) {
         let listParam = {};
-            listParam.question_id  =question_id;
-            listParam.pageNum  = 1;
-            listParam.perPage  = 1;
-        HttpService.post('/reportServer/questions/getDefaultAnswerByQID/'+question_id,null)
-        .then(res=>{
-          if(null!=res && res.data.length>0){
-            this.setState({
-              data: [...this.state.data, {from_userId: this.state.to_userId,'post_message':res.data[0].answer,to_userId:this.state.userId}]
-            },function(){
-              anchorElement.scrollIntoView();
-            });
-          }else{
-            this.setState({
-              data: [...this.state.data, {from_userId: this.state.to_userId,'post_message':"没有符合您问题的答案，请重新选择",to_userId:this.state.userId}]
-            },function(){
+        listParam.question_id = question_id;
+        listParam.pageNum = 1;
+        listParam.perPage = 1;
+        HttpService.post('/reportServer/questions/getDefaultAnswerByQID/' + question_id, null)
+          .then(res => {
+            if (null != res && res.data.length > 0) {
               this.setState({
-                questionList:res.list,data: [...this.state.data,{data:this.state.questionList,message_type:"question"}] 
-              },function(){
+                data: [...this.state.data, { from_userId: this.state.to_userId, 'post_message': res.data[0].answer, to_userId: this.state.userId }]
+              }, function () {
                 anchorElement.scrollIntoView();
               });
-            });
-          }
-        });
+            } else {
+              this.setState({
+                data: [...this.state.data, {from_userId: this.state.to_userId,'post_message':"没有符合您问题的答案，请重新选择",to_userId:this.state.userId}]
+              },function(){
+                this.setState({
+                  questionList:res.list,data: [...this.state.data,{data:this.state.questionList,message_type:"question"}] 
+                },function(){
+                  anchorElement.scrollIntoView();
+                });
+              });
+            }
+          });
       }
     }
-  
     //实时把数据写入state的meg中
     handleData(e) {
       this.setState({
@@ -245,7 +233,7 @@ export default class ChatNew extends React.Component {
             //函数查询 execQuery  execqueryToExcel
             // })
             //首先进行
-            await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
+            await HttpService.post('/reportServer/nlp/getResult/' + message, null)
               .then(res => {
                 if (res.resultCode == "1000") {
                   this.setState({
@@ -471,189 +459,46 @@ export default class ChatNew extends React.Component {
       e.preventDefault();
     }
   }
-    // initRefresh=()=> {
-    //   var self = this;//对象转存，防止闭包函数内无法访问
-    //   var isTouchStart = false; // 是否已经触发下拉条件
-    //   var isDragStart = false; // 是否已经开始下拉
-    //   var startX, startY;        // 下拉方向，touchstart 时的点坐标
-    //   var hasTouch = 'ontouchstart' in window;//判断是否是在移动端手机上
-    //   // 监听下拉加载，兼容电脑端
-    //   //let pullDown = document.getElementById("messages");
-    //   if (self.state.openDragLoading) {
-    //     self.refs.scroller.addEventListener('touchstart', touchStart, false);
-    //     self.refs.scroller.addEventListener('touchmove', touchMove, false);
-    //     self.refs.scroller.addEventListener('touchend', touchEnd, false);
-    //     self.refs.scroller.addEventListener('mousedown', touchStart, false);
-    //     self.refs.scroller.addEventListener('mousemove', touchMove, false);
-    //     self.refs.scroller.addEventListener('mouseup', touchEnd, false);
-    //   }
-    //   function touchStart(event) {
-    //   // event.preventDefault();
-    //   if(undefined!=event.changedTouches){
-    //       if (self.refs.scroller.scrollTop <= 0) {
-    //           isTouchStart = true;
-    //           startY = hasTouch ? event.changedTouches[0].pageY : event.pageY;
-    //           startX = hasTouch ? event.changedTouches[0].pageX : event.pageX;
-    //       }
-    //     }
-    //   }
-
-    //   function touchMove(event) {
-    //   // event.preventDefault();
-    //   if(undefined!=event.changedTouches){
-    //       if (!isTouchStart) return;
-    //       var distanceY = (hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY;
-    //       var distanceX = (hasTouch ? event.changedTouches[0].pageX : event.pageX) - startX;
-    //       //如果X方向上的位移大于Y方向，则认为是左右滑动
-    //       if (Math.abs(distanceX) > Math.abs(distanceY))return;
-    //       if (distanceY > 0) {
-    //           self.setState({
-    //               translate: Math.pow((hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY, 0.85)
-    //           });
-    //       } else {
-    //           if (self.state.translate !== 0) {
-    //               self.setState({translate: 0});
-    //               self.transformScroller(0, self.state.translate);
-    //           }
-    //       }
-    //       if (distanceY > 0) {
-    //           if (!isDragStart) {
-    //               isDragStart = true;
-    //           }
-    //           if (self.state.translate <= dragValve) {// 下拉中，但还没到刷新阀值
-    //               if (dropDownRefreshText !== XLJZ){
-    //                   self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
-    //                   console.log("下拉加载")
-    //               }
-    //           } else { // 下拉中，已经达到刷新阀值
-    //               if (dropDownRefreshText !== SKJZ){
-    //                   self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = SKJZ);
-    //                   console.log("松开加载");
-    //                 }
-    //           }
-    //           self.transformScroller(0, self.state.translate);
-    //       }
-    //     }
-    //   }
-    //   function touchEnd(event) {
-    //     //  event.preventDefault();
-    //     if(undefined!=event.changedTouches){
-    //         isDragStart = false;
-    //         if (!isTouchStart) return;
-    //         isTouchStart = false;
-    //         if (self.state.translate <= dragValve) {
-    //             self.transformScroller(0.3, 0);
-    //         } else {
-    //             self.setState({dragLoading: true});//设置在下拉刷新状态中
-    //             self.transformScroller(0.1, 0);
-    //             console.log("加载中....");
-    //             self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = JZ);
-    //             self.fetchItems(false);//触发冲外面传进来的刷新回调函数
-    //         }
-    //     }
-    //   } 
-    // }
-
-    // initScroll=()=> {
-    //     var self = this;
-    //     //let scroller = document.getElementById("messages");
-    //     // 监听滚动加载
-    //     if (this.state.openScrollLoading) {
-    //       this.refs.scroller.addEventListener('scroll', scrolling, false);
-    //     }
-    //     function scrolling() {
-    //         if (self.state.scrollerLoading) return;
-    //         var scrollerscrollHeight = self.refs.scroller.scrollHeight; // 容器滚动总高度
-    //         var scrollerHeight =self.refs.scroller.getBoundingClientRect().height;// 容器滚动可见高度
-    //         var scrollerTop = self.refs.scroller.scrollTop;//滚过的高度
-    //         // 达到滚动加载阀值
-    //         if (scrollerscrollHeight - scrollerHeight - scrollerTop <= scrollValve) {
-    //             self.setState({scrollerLoading: true});
-    //             self.fetchItems(false);
-    //         }
-    //     }
-    // }
-    /**
-     * 利用 transition 和transform  改变位移
-     * @param time 时间
-     * @param translate  距离
-     */
-    // transformScroller=(time, translate)=> {
-    //     this.setState({translate: translate});
-    //     //let scroller = document.getElementById("messages");
-    //     var elStyle =  this.refs.scroller.style;
-    //     elStyle.webkitTransition = elStyle.MozTransition = elStyle.transition = 'all ' + time + 's ease-in-out';
-    //     elStyle.webkitTransform = elStyle.MozTransform = elStyle.transform = 'translate3d(0, ' + translate + 'px, 0)';
-    // }
-    /**
-     * 下拉刷新完毕
-     */
-    // dragLoadingDone=()=> {
-    //     this.setState({dragLoading: false});
-    //     this.transformScroller(0.1, 0);
-    // }
-    /**
-     * 滚动加载完毕
-     */
-    // scrollLoadingDone=()=> {
-    //     this.setState({scrollerLoading: false});
-    //     console.log("下拉加载");
-    //     this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
-    // }
-    // componentWillReceiveProps=(nextProps)=> {
-    //     var self = this;
-    //     self.fetchItems(false);//把新的数据填进列表
-    //     if (this.state.dragLoading) {//如果之前是下拉刷新状态，恢复
-    //         setTimeout(function () {
-    //             self.dragLoadingDone();
-    //         }, 1000);
-    //     }
-    //     if (this.state.scrollerLoading) {//如果之前是滚动加载状态，恢复
-    //         setTimeout(function () {
-    //             self.scrollLoadingDone();
-    //         }, 1000);
-    //     }
-    // }
-
+  
   render() {
     var meg = this.state.meg
     return (
-        <div className="content" >
-          <Script url="../src/page/ai/jquery-3.2.1.min.js"/>
-          <Script url="../src/page/ai/record.js"/>
-          <div className="header" style={{textAlign:'center'}}>
-              <span style={{textAlign:'center'}}>PCCW智能机器人</span>
-              {/* <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
+      <div className="content" >
+        <Script url="../src/page/ai/jquery-3.2.1.min.js" />
+        <Script url="../src/page/ai/record.js" />
+        <div className="header" style={{ textAlign: 'center' }}>
+          <span style={{ textAlign: 'center' }}>PCCW智能机器人</span>
+          {/* <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
               <span style={{float: "right"}} id="root"></span> */}
-          </div>
-          <div ref="scroller" style={{width:"100%",height:'100%',overflow:'auto',flex:1}}>
-            {/* <div style={{textAlign:'center'}}>
+        </div>
+        <div ref="scroller" style={{ width: "100%", height: '100%', overflow: 'auto', flex: 1 }}>
+          {/* <div style={{textAlign:'center'}}>
               <span ref="dropDownRefreshText">查看更多信息</span>
             </div> */}
-            <ul id="messages">
+          <ul id="messages">
             <PullToRefresh
-                damping={60}
-                ref={el => this.lv = el}
-                style={{
-                  height: this.state.height,
-                  overflow: 'auto',
-                }}
-                indicator={this.state.down ? {} : { deactivate: '上拉可以刷新' }}
-                direction={this.state.down ? 'down' : 'up'}
-                refreshing={this.state.refreshing}
-                onRefresh={this.onRefreshs}
+              damping={60}
+              ref={el => this.lv = el}
+              style={{
+                height: this.state.height,
+                overflow: 'auto',
+              }}
+              indicator={this.state.down ? {} : { deactivate: '上拉可以刷新' }}
+              direction={this.state.down ? 'down' : 'up'}
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefreshs}
             >
-              {this.state.data!=null?this.state.data.map((elem,index) => {
-                  if(elem.from_userId==this.state.userId){
-                    return <li style={{background:'#f5f5f9' }} >
-                            <div style={{textAlign:'center',padding:'3px'}}>{ moment(elem.message_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                          <img src={this.state.userIcon==''?my:this.state.userIcon} className="imgright"/><span style={{float:"right"}}>
-                          {this.RenderContent(elem)}
-                        </span>
-                      </li>
-                  } else{
-                    return <li style={{background:'#f5f5f9' }} >
-                            <div style={{textAlign:'center',padding:'3px'}}>{ moment(elem.message_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+              {this.state.data != null ? this.state.data.map((elem, index) => {
+                if (elem.from_userId == this.state.userId) {
+                  return <li style={{ background: '#f5f5f9' }} >
+                    <div style={{ textAlign: 'center', padding: '3px' }}>{moment(elem.message_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <img src={this.state.userIcon == '' ? my : this.state.userIcon} className="imgright" /><span style={{ float: "right" }}>
+                      {this.RenderContent(elem)}
+                    </span>
+                  </li>
+                } else {
+                  return <li style={{ background: '#f5f5f9' }} >
+                    <div style={{ textAlign: 'center', padding: '3px' }}>{moment(elem.message_time).format('YYYY-MM-DD HH:mm:ss')}</div>
 
                         <img src={ai} className="imgleft"/><span style={{float:"left",background:'#f1ebeb00'}}>
                         {this.RenderContent(elem)}
@@ -680,7 +525,7 @@ export default class ChatNew extends React.Component {
                     name="writeBox" 
                     style={{height:'40px'}}
                     ></TextareaItem>
-                  </div>
+                 
                 </div>
               </div>
               <div className="smartnlp-power-by">
@@ -696,7 +541,9 @@ export default class ChatNew extends React.Component {
                 <p >{this.state.btnText}</p>
               </div>
             </div>
-          {/* <div className="footer">
+          </div>
+         
+        {/* <div className="footer">
               <div className="user_face_icon">
                 <img src={this.state.isWrite==true?require("../assets/jp_btn.png"):require("../assets/yy_btn.png")} onClick={()=>this.changeSpeack()}/>
               </div>
@@ -707,31 +554,31 @@ export default class ChatNew extends React.Component {
               : <div className="wenwen_text" id="wenwen" onClick={()=>this._touch_start(event)}>  按住 说话  </div>
               }
           </div> */}
-          <Modal
+        <Modal
           visible={this.state.modal1}
           transparent
           maskClosable={false}
           closable={true}
           onClose={this.onClose()}
           wrapProps={{ onTouchStart: this.onWrapTouchStart }}
-          style={{height:'80%',width:'90%'}}
+          style={{ height: '80%', width: '90%' }}
         >
-          <div style={{ height: '100%', overflow: 'scroll',backgroundColor:'#f4f7f9' }}>
-                <List>
-                    {this.state.modelData.map(val => (
-                        <Item
-                        // multipleLine
-                        // onClick={() => this.onClassClick(val.class_id)}
-                        >
-                        {this.state.modelOut.map((item) => {
-                            return <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
-                            {item.out_name}:{val[item.out_id.toUpperCase()]}
-                            </div> 
-                        }
-                        )} 
-                        </Item>
-                    ))}
-                </List>
+          <div style={{ height: '100%', overflow: 'scroll', backgroundColor: '#f4f7f9' }}>
+            <List>
+              {this.state.modelData.map(val => (
+                <Item
+                // multipleLine
+                // onClick={() => this.onClassClick(val.class_id)}
+                >
+                  {this.state.modelOut.map((item) => {
+                    return <div style={{ fontSize: '14px', fontFamily: '微软雅黑', backgroundColor: '#F4F7F9' }}>
+                      {item.out_name}:{val[item.out_id.toUpperCase()]}
+                    </div>
+                  }
+                  )}
+                </Item>
+              ))}
+            </List>
           </div>
         </Modal>
       </div>
