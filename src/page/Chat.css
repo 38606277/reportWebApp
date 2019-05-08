@@ -226,7 +226,7 @@ ul::-webkit-scrollbar{
   display: flex;
   flex: 0 0 auto;
   position:fixed; 
-  z-index: 9999;
+  z-index: 99;
   background: #fff;
 }
 .smartnlp-write-block {

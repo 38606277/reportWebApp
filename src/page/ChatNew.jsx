@@ -1,11 +1,11 @@
 import React, { PureComponent, lazy, Suspense }  from 'react';
 import ReactDOM from 'react-dom';
-import {  Card,List,Toast, ListView,PullToRefresh,WhiteSpace,WingBlank, TextareaItem , SwipeAction,  NavBar, Icon } from 'antd-mobile';
+import {  Card,List,Toast, ListView,Modal,PullToRefresh,WhiteSpace,WingBlank, TextareaItem , SwipeAction,  NavBar, Icon } from 'antd-mobile';
 import ai from './../assets/icon/ai.png';
 import HttpService from '../util/HttpService.jsx';
 import my from './../assets/icon/chart.png';
 import Script from 'react-load-script';
-
+import moment from 'moment';
 import LocalStorge from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
 //import 'antd-mobile/dist/antd-mobile.css';
@@ -26,9 +26,12 @@ export default class ChatNew extends React.Component {
     super(props);
     this.state = {
       meg: '',
+      modal1: false,
       isWrite:true,
       saying:false,
       data: [],
+      modelData: [],
+      modelOut:[],
       userId:null,
       to_userId:0,
       pageNumd: 1, 
@@ -48,385 +51,436 @@ export default class ChatNew extends React.Component {
     }
     this.page=1;
   }
-  componentDidMount() {
-    const hei = this.state.height - ReactDOM.findDOMNode(this.lv).offsetTop;
-    setTimeout(() => {
-      this.setState({
-        height: hei,
-        //data: genData(this.state.data),
-        refreshing: false
-      });
-    }, 1500);
-    let userInfo = localStorge.getStorage('userInfo');
-    if (undefined != userInfo && null != userInfo && '' != userInfo) {
-      this.setState({ userId:userInfo.id,
-            userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon},
-        function(){
-            this.fetchItems(true);
-            this.loadQuestion();
-        });
-        this.initEvent();
-    }else{
-      window.location.href="/My";
+    componentDidMount() {
+      const hei = this.state.height - ReactDOM.findDOMNode(this.lv).offsetTop;
+     
+      let userInfo = localStorge.getStorage('userInfo');
+      if (undefined != userInfo && null != userInfo && '' != userInfo) {
+        this.setState({ userId:userInfo.id,
+                userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon},
+            function(){
+              this.fetchItems(true);
+             // this.loadQuestion();
+              setTimeout(() => {
+                this.setState({
+                  height: hei,
+                //  data: this.fetchItems(false), 
+                  refreshing: false,
+                 
+                });
+              }, 1500);
+            });
+       
+        // this.setState({ userId:userInfo.id,
+        //       userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon},
+        //   function(){
+        //       this.fetchItems(true);
+        //       this.loadQuestion();
+        //   });
+        this.loadQuestion();
+          this.initEvent();
+      }else{
+        window.location.href="/My";
+      }
+  }
+  showModal(data,out) {
+    //e.preventDefault(); // 修复 Android 上点击穿透
+    this.setState({
+      modal1: true,
+      modelData:data,
+      modelOut:out
+    });
+  }
+  onClose= key => () => {
+    this.setState({
+      modal1: false,
+      modelData:[],
+      modelOut:[]
+    });
+  }
+  onWrapTouchStart = (e) => {
+    // fix touch to scroll background page on iOS
+    if (!/iPhone|iPod|iPad/i.test(navigator.userAgent)) {
+      return;
+    }
+    const pNode = closest(e.target, '.am-modal-content');
+    if (!pNode) {
+      e.preventDefault();
     }
   }
   onRefreshs = () => {
-    this.setState({ refreshing: true });
-    setTimeout(() => {
-      this.setState({ refreshing: false,
-      //  data: genData(this.state.data), 
-      });
-      this.fetchItems(false);
-    }, 600);
-}
-  initEvent() {
-    var btnElem=document.getElementById("microphone");//获取ID
-    btnElem.addEventListener("touchstart", function(event) {
-        event.preventDefault();//阻止浏览器默认行为
-        HZRecorder.get(function (rec) {
-            recorder = rec;
-            recorder.start();
+      this.setState({ refreshing: true });
+      setTimeout(() => {
+        this.setState({ refreshing: false,
+         // data:this.fetchItems(false), 
         });
-    });
-    let that =this;
-    btnElem.addEventListener("touchend", function(event) {
-        event.preventDefault();
-        HZRecorder.get(function (rec) {
-            recorder = rec;
-            recorder.stop();
-        })
-        //发送音频片段
-        var data=recorder.getBlob();
-        if(data.duration!==0){
-            recorder.clear();
-            var dur=data.duration/10;
-            let formData = new FormData();
-            formData.append("file", data.blob);
-            HttpService.post("reportServer/MyVoiceApplication/uploadai",formData).then(response=>{
-                if(response.resultCode=="1000"){
-                  that.setState({meg:response.data.content});
-                }
-            });
-        }else{
-            console.log("没有声音输入");
-        } 
-    });
+        this.fetchItems(false)
+      }, 600);
   }
-  fetchItems(isTrue) {
-      let mInfo={'from_userId':this.state.userId,'to_userId':this.state.to_userId,
-            pageNumd:this.page,perPaged:5}
-      HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
-      .then(res => {
-        let list=res.data;
-        for(var i=0;i<list.length;i++){
-          this.setState({data: [list[i],...this.state.data] });
-        }
-        // this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
-        // if(isTrue){
-        // this.initRefresh();//初始化下拉刷新
-        // this.initScroll();//初始化滚动加载更多
-        // }
-          ++this.page;
+    initEvent() {
+      var btnElem=document.getElementById("microphone");//获取ID
+      btnElem.addEventListener("touchstart", function(event) {
+          event.preventDefault();//阻止浏览器默认行为
+          HZRecorder.get(function (rec) {
+              recorder = rec;
+              recorder.start();
+          });
       });
-  }
-  loadQuestion(){
-    let listParam = {};
-    listParam.pageNum  = 1;
-    listParam.perPage  = 5;
-    HttpService.post('/reportServer/questions/getQuestionsList', JSON.stringify(listParam))
-    .then(res => {
-      if (res.resultCode != "1000") {
-        this.setState({questionList:res.list,data: [...this.state.data,{data:res.list,message_type:"question"}] });
-      }
-    })
-  }
-
-  async onQuestionClick(question_id,question){
-    var anchorElement = document.getElementById("scrolld");
-    var ist=true; 
-    //先保存发送信息
-    let userInfo={'from_userId':this.state.userId,
-                  'to_userId':this.state.to_userId,
-                  'post_message':question,
-                  'message_type':'0',
-                  'message_state':'0'
-                }
-    await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
-    .then(res => {
-      if (res.resultCode != "1000") {
-        ist=false;
-      }else{
-        this.setState({
-          data: [...this.state.data, {from_userId: this.state.userId,'post_message':question,to_userId:this.state.to_userId}]
-        });
-      }
-    })
-    if(ist){
-      let listParam = {};
-          listParam.question_id  =question_id;
-          listParam.pageNum  = 1;
-          listParam.perPage  = 1;
-      HttpService.post('/reportServer/questions/getDefaultAnswerByQID/'+question_id,null)
-      .then(res=>{
-        if(null!=res && res.data.length>0){
-          this.setState({
-            data: [...this.state.data, {from_userId: this.state.to_userId,'post_message':res.data[0].answer,to_userId:this.state.userId}]
-          },function(){
-            anchorElement.scrollIntoView();
-          });
-        }else{
-          this.setState({
-            data: [...this.state.data, {from_userId: this.state.to_userId,'post_message':"没有符合您问题的答案，请重新选择",to_userId:this.state.userId}]
-          },function(){
-            this.setState({questionList:res.list,data: [...this.state.data,{data:this.state.questionList,message_type:"question"}] },function(){
-              anchorElement.scrollIntoView();
-            });
-          });
-        }
+      let that =this;
+      btnElem.addEventListener("touchend", function(event) {
+          event.preventDefault();
+          HZRecorder.get(function (rec) {
+              recorder = rec;
+              recorder.stop();
+          })
+          //发送音频片段
+          var data=recorder.getBlob();
+          if(data.duration!==0){
+              recorder.clear();
+              var dur=data.duration/10;
+              let formData = new FormData();
+              formData.append("file", data.blob);
+              HttpService.post("reportServer/MyVoiceApplication/uploadai",formData).then(response=>{
+                  if(response.resultCode=="1000"){
+                    that.setState({meg:response.data.content});
+                  }
+              });
+          }else{
+              console.log("没有声音输入");
+          } 
       });
     }
-  }
-  // initRefresh=()=> {
-  //   var self = this;//对象转存，防止闭包函数内无法访问
-  //   var isTouchStart = false; // 是否已经触发下拉条件
-  //   var isDragStart = false; // 是否已经开始下拉
-  //   var startX, startY;        // 下拉方向，touchstart 时的点坐标
-  //   var hasTouch = 'ontouchstart' in window;//判断是否是在移动端手机上
-  //   // 监听下拉加载，兼容电脑端
-  //   //let pullDown = document.getElementById("messages");
-  //   if (self.state.openDragLoading) {
-  //     self.refs.scroller.addEventListener('touchstart', touchStart, false);
-  //     self.refs.scroller.addEventListener('touchmove', touchMove, false);
-  //     self.refs.scroller.addEventListener('touchend', touchEnd, false);
-  //     self.refs.scroller.addEventListener('mousedown', touchStart, false);
-  //     self.refs.scroller.addEventListener('mousemove', touchMove, false);
-  //     self.refs.scroller.addEventListener('mouseup', touchEnd, false);
-  //   }
-  //   function touchStart(event) {
-  //   // event.preventDefault();
-  //   if(undefined!=event.changedTouches){
-  //       if (self.refs.scroller.scrollTop <= 0) {
-  //           isTouchStart = true;
-  //           startY = hasTouch ? event.changedTouches[0].pageY : event.pageY;
-  //           startX = hasTouch ? event.changedTouches[0].pageX : event.pageX;
-  //       }
-  //     }
-  //   }
-
-  //   function touchMove(event) {
-  //   // event.preventDefault();
-  //   if(undefined!=event.changedTouches){
-  //       if (!isTouchStart) return;
-  //       var distanceY = (hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY;
-  //       var distanceX = (hasTouch ? event.changedTouches[0].pageX : event.pageX) - startX;
-  //       //如果X方向上的位移大于Y方向，则认为是左右滑动
-  //       if (Math.abs(distanceX) > Math.abs(distanceY))return;
-  //       if (distanceY > 0) {
-  //           self.setState({
-  //               translate: Math.pow((hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY, 0.85)
-  //           });
-  //       } else {
-  //           if (self.state.translate !== 0) {
-  //               self.setState({translate: 0});
-  //               self.transformScroller(0, self.state.translate);
-  //           }
-  //       }
-  //       if (distanceY > 0) {
-  //           if (!isDragStart) {
-  //               isDragStart = true;
-  //           }
-  //           if (self.state.translate <= dragValve) {// 下拉中，但还没到刷新阀值
-  //               if (dropDownRefreshText !== XLJZ){
-  //                   self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
-  //                   console.log("下拉加载")
-  //               }
-  //           } else { // 下拉中，已经达到刷新阀值
-  //               if (dropDownRefreshText !== SKJZ){
-  //                   self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = SKJZ);
-  //                   console.log("松开加载");
-  //                 }
-  //           }
-  //           self.transformScroller(0, self.state.translate);
-  //       }
-  //     }
-  //   }
-  //   function touchEnd(event) {
-  //     //  event.preventDefault();
-  //     if(undefined!=event.changedTouches){
-  //         isDragStart = false;
-  //         if (!isTouchStart) return;
-  //         isTouchStart = false;
-  //         if (self.state.translate <= dragValve) {
-  //             self.transformScroller(0.3, 0);
-  //         } else {
-  //             self.setState({dragLoading: true});//设置在下拉刷新状态中
-  //             self.transformScroller(0.1, 0);
-  //             console.log("加载中....");
-  //             self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = JZ);
-  //             self.fetchItems(false);//触发冲外面传进来的刷新回调函数
-  //         }
-  //     }
-  //   } 
-  // }
-
-  // initScroll=()=> {
-  //     var self = this;
-  //     //let scroller = document.getElementById("messages");
-  //     // 监听滚动加载
-  //     if (this.state.openScrollLoading) {
-  //       this.refs.scroller.addEventListener('scroll', scrolling, false);
-  //     }
-  //     function scrolling() {
-  //         if (self.state.scrollerLoading) return;
-  //         var scrollerscrollHeight = self.refs.scroller.scrollHeight; // 容器滚动总高度
-  //         var scrollerHeight =self.refs.scroller.getBoundingClientRect().height;// 容器滚动可见高度
-  //         var scrollerTop = self.refs.scroller.scrollTop;//滚过的高度
-  //         // 达到滚动加载阀值
-  //         if (scrollerscrollHeight - scrollerHeight - scrollerTop <= scrollValve) {
-  //             self.setState({scrollerLoading: true});
-  //             self.fetchItems(false);
-  //         }
-  //     }
-  // }
-  /**
-   * 利用 transition 和transform  改变位移
-   * @param time 时间
-   * @param translate  距离
-   */
-  // transformScroller=(time, translate)=> {
-  //     this.setState({translate: translate});
-  //     //let scroller = document.getElementById("messages");
-  //     var elStyle =  this.refs.scroller.style;
-  //     elStyle.webkitTransition = elStyle.MozTransition = elStyle.transition = 'all ' + time + 's ease-in-out';
-  //     elStyle.webkitTransform = elStyle.MozTransform = elStyle.transform = 'translate3d(0, ' + translate + 'px, 0)';
-  // }
-  /**
-   * 下拉刷新完毕
-   */
-  // dragLoadingDone=()=> {
-  //     this.setState({dragLoading: false});
-  //     this.transformScroller(0.1, 0);
-  // }
-  /**
-   * 滚动加载完毕
-   */
-  // scrollLoadingDone=()=> {
-  //     this.setState({scrollerLoading: false});
-  //     console.log("下拉加载");
-  //     this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
-  // }
-  // componentWillReceiveProps=(nextProps)=> {
-  //     var self = this;
-  //     self.fetchItems(false);//把新的数据填进列表
-  //     if (this.state.dragLoading) {//如果之前是下拉刷新状态，恢复
-  //         setTimeout(function () {
-  //             self.dragLoadingDone();
-  //         }, 1000);
-  //     }
-  //     if (this.state.scrollerLoading) {//如果之前是滚动加载状态，恢复
-  //         setTimeout(function () {
-  //             self.scrollLoadingDone();
-  //         }, 1000);
-  //     }
-  // }
-  handleData(e) {
-    this.setState({
-      meg: e
-    })
-  }
-  //发送消息
-  async sendMessage(){ 
-    if(null!=this.state.meg && ""!=this.state.meg){
+    fetchItems(isTrue) {
+      let newdata=[];
       var anchorElement = document.getElementById("scrolld");
-        var ist=true; 
-        //先保存发送信息
-        var message = this.state.meg;
-        this.setState({
-                  data: [...this.state.data, {from_userId: this.state.userId,'post_message':message,to_userId:this.state.to_userId}]
-                });
-        this.state.meg = '';        
-        let userInfo={'from_userId':this.state.userId,
-                      'to_userId':this.state.to_userId,
-                      'post_message':message,
-                      'message_type':'0',
-                      'message_state':'0'
-                    }
-        await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
+        let mInfo={'from_userId':this.state.userId,'to_userId':this.state.to_userId,
+              pageNumd:this.page,perPaged:5}
+        HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
         .then(res => {
-          if (res.resultCode != "1000") {
-            ist=false;
-          }else{
-            anchorElement.scrollIntoView();
-          }
-        })
-        if(ist){
-          let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
-          await HttpService.post('/reportServer/query/execqueryToExcel/2/87', JSON.stringify(qryParam))
-          .then(res=>{
-          //函数查询 execQuery  execqueryToExcel
-          // })
-          // //首先进行
-          // await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
-          //   .then(res => {
-              if (res.resultCode == "1000") {
-                if(undefined== res.data.filetype){
-                  res.data.filetype="json";
-                }
-                //数据保存到数据库
-                let responseInfo={'from_userId':this.state.to_userId,
-                'to_userId':this.state.userId,
-                'post_message':res,
-                'message_type':res.data.filetype,
-                'message_state':'0'
-                }
-                  HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
-                      .then(res => {
-                      if (res.resultCode != "1000") {
-                      }
-                  })
-                  this.setState({
-                    data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res,'message_type':res.data.filetype,to_userId: this.state.userId}]
-                  });
-                  anchorElement.scrollIntoView();
-              } else {
+          
+          let list=res.data;
+          ++this.page;
+          for(var i=0;i<list.length;i++){
+            this.setState({data: [list[i],...this.state.data] },function(){
+             
 
-              }
-            })
-            .catch((error) => {
-               Toast.fail(error);
             });
-          var that = this;
-          fetch('https://api.ownthink.com/bot?spoken=' + message, {
-            method: 'POST',
-            type: 'cors'
-          }).then(function (response) {
-            return response.json();
-          }).then(function (detail) {
-            if (detail.message =="success") {
-              let responseInfo={'from_userId':that.state.to_userId,
-                      'to_userId':that.state.userId,
-                      'post_message':detail.data.info.text,
-                      'message_type':'0',
-                      'message_state':'0'
-                    }
-              HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
-                .then(res => {
-                  if (res.resultCode != "1000") {
+            //newdata=[list[i],...this.state.data];
+          }
+           anchorElement.scrollIntoView();
+         // console.log(res.data)
+          //var newdata=[res.data,...this.state.data];
+         // console.log(newdata);
+          //return newdata;
+          // this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
+          // if(isTrue){
+          // this.initRefresh();//初始化下拉刷新
+          // this.initScroll();//初始化滚动加载更多
+          // }
+           
+
+        });
+    }
+    loadQuestion(){
+      var anchorElement = document.getElementById("scrolld");
+
+      let listParam = {};
+      listParam.pageNum  = 1;
+      listParam.perPage  = 5;
+      HttpService.post('/reportServer/questions/getQuestionsList', JSON.stringify(listParam))
+      .then(res => {
+        if (res.resultCode != "1000") {
+          this.setState({questionList:res.list,data: [...this.state.data,{data:res.list,message_type:"question"}] },function(){
+            anchorElement.scrollIntoView();
+          });
+        }
+      })
+    }
+
+    async onQuestionClick(question_id,question){
+      var anchorElement = document.getElementById("scrolld");
+      var ist=true; 
+      //先保存发送信息
+      let userInfo={'from_userId':this.state.userId,
+                    'to_userId':this.state.to_userId,
+                    'post_message':question,
+                    'message_type':'0',
+                    'message_state':'0'
                   }
-                })
-            return that.setState({
+      await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
+      .then(res => {
+        if (res.resultCode != "1000") {
+          ist=false;
+        }else{
+          this.setState({
+            data: [...this.state.data, {from_userId: this.state.userId,'post_message':question,to_userId:this.state.to_userId}]
+          },function(){
+            anchorElement.scrollIntoView();
+          });
+        }
+      })
+      if(ist){
+        let listParam = {};
+            listParam.question_id  =question_id;
+            listParam.pageNum  = 1;
+            listParam.perPage  = 1;
+        HttpService.post('/reportServer/questions/getDefaultAnswerByQID/'+question_id,null)
+        .then(res=>{
+          if(null!=res && res.data.length>0){
+            this.setState({
+              data: [...this.state.data, {from_userId: this.state.to_userId,'post_message':res.data[0].answer,to_userId:this.state.userId}]
+            },function(){
+              anchorElement.scrollIntoView();
+            });
+          }else{
+            this.setState({
+              data: [...this.state.data, {from_userId: this.state.to_userId,'post_message':"没有符合您问题的答案，请重新选择",to_userId:this.state.userId}]
+            },function(){
+              this.setState({questionList:res.list,data: [...this.state.data,{data:this.state.questionList,message_type:"question"}] },function(){
+                anchorElement.scrollIntoView();
+              });
+            });
+          }
+        });
+      }
+    }
+    // initRefresh=()=> {
+    //   var self = this;//对象转存，防止闭包函数内无法访问
+    //   var isTouchStart = false; // 是否已经触发下拉条件
+    //   var isDragStart = false; // 是否已经开始下拉
+    //   var startX, startY;        // 下拉方向，touchstart 时的点坐标
+    //   var hasTouch = 'ontouchstart' in window;//判断是否是在移动端手机上
+    //   // 监听下拉加载，兼容电脑端
+    //   //let pullDown = document.getElementById("messages");
+    //   if (self.state.openDragLoading) {
+    //     self.refs.scroller.addEventListener('touchstart', touchStart, false);
+    //     self.refs.scroller.addEventListener('touchmove', touchMove, false);
+    //     self.refs.scroller.addEventListener('touchend', touchEnd, false);
+    //     self.refs.scroller.addEventListener('mousedown', touchStart, false);
+    //     self.refs.scroller.addEventListener('mousemove', touchMove, false);
+    //     self.refs.scroller.addEventListener('mouseup', touchEnd, false);
+    //   }
+    //   function touchStart(event) {
+    //   // event.preventDefault();
+    //   if(undefined!=event.changedTouches){
+    //       if (self.refs.scroller.scrollTop <= 0) {
+    //           isTouchStart = true;
+    //           startY = hasTouch ? event.changedTouches[0].pageY : event.pageY;
+    //           startX = hasTouch ? event.changedTouches[0].pageX : event.pageX;
+    //       }
+    //     }
+    //   }
+
+    //   function touchMove(event) {
+    //   // event.preventDefault();
+    //   if(undefined!=event.changedTouches){
+    //       if (!isTouchStart) return;
+    //       var distanceY = (hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY;
+    //       var distanceX = (hasTouch ? event.changedTouches[0].pageX : event.pageX) - startX;
+    //       //如果X方向上的位移大于Y方向，则认为是左右滑动
+    //       if (Math.abs(distanceX) > Math.abs(distanceY))return;
+    //       if (distanceY > 0) {
+    //           self.setState({
+    //               translate: Math.pow((hasTouch ? event.changedTouches[0].pageY : event.pageY) - startY, 0.85)
+    //           });
+    //       } else {
+    //           if (self.state.translate !== 0) {
+    //               self.setState({translate: 0});
+    //               self.transformScroller(0, self.state.translate);
+    //           }
+    //       }
+    //       if (distanceY > 0) {
+    //           if (!isDragStart) {
+    //               isDragStart = true;
+    //           }
+    //           if (self.state.translate <= dragValve) {// 下拉中，但还没到刷新阀值
+    //               if (dropDownRefreshText !== XLJZ){
+    //                   self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
+    //                   console.log("下拉加载")
+    //               }
+    //           } else { // 下拉中，已经达到刷新阀值
+    //               if (dropDownRefreshText !== SKJZ){
+    //                   self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = SKJZ);
+    //                   console.log("松开加载");
+    //                 }
+    //           }
+    //           self.transformScroller(0, self.state.translate);
+    //       }
+    //     }
+    //   }
+    //   function touchEnd(event) {
+    //     //  event.preventDefault();
+    //     if(undefined!=event.changedTouches){
+    //         isDragStart = false;
+    //         if (!isTouchStart) return;
+    //         isTouchStart = false;
+    //         if (self.state.translate <= dragValve) {
+    //             self.transformScroller(0.3, 0);
+    //         } else {
+    //             self.setState({dragLoading: true});//设置在下拉刷新状态中
+    //             self.transformScroller(0.1, 0);
+    //             console.log("加载中....");
+    //             self.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = JZ);
+    //             self.fetchItems(false);//触发冲外面传进来的刷新回调函数
+    //         }
+    //     }
+    //   } 
+    // }
+
+    // initScroll=()=> {
+    //     var self = this;
+    //     //let scroller = document.getElementById("messages");
+    //     // 监听滚动加载
+    //     if (this.state.openScrollLoading) {
+    //       this.refs.scroller.addEventListener('scroll', scrolling, false);
+    //     }
+    //     function scrolling() {
+    //         if (self.state.scrollerLoading) return;
+    //         var scrollerscrollHeight = self.refs.scroller.scrollHeight; // 容器滚动总高度
+    //         var scrollerHeight =self.refs.scroller.getBoundingClientRect().height;// 容器滚动可见高度
+    //         var scrollerTop = self.refs.scroller.scrollTop;//滚过的高度
+    //         // 达到滚动加载阀值
+    //         if (scrollerscrollHeight - scrollerHeight - scrollerTop <= scrollValve) {
+    //             self.setState({scrollerLoading: true});
+    //             self.fetchItems(false);
+    //         }
+    //     }
+    // }
+    /**
+     * 利用 transition 和transform  改变位移
+     * @param time 时间
+     * @param translate  距离
+     */
+    // transformScroller=(time, translate)=> {
+    //     this.setState({translate: translate});
+    //     //let scroller = document.getElementById("messages");
+    //     var elStyle =  this.refs.scroller.style;
+    //     elStyle.webkitTransition = elStyle.MozTransition = elStyle.transition = 'all ' + time + 's ease-in-out';
+    //     elStyle.webkitTransform = elStyle.MozTransform = elStyle.transform = 'translate3d(0, ' + translate + 'px, 0)';
+    // }
+    /**
+     * 下拉刷新完毕
+     */
+    // dragLoadingDone=()=> {
+    //     this.setState({dragLoading: false});
+    //     this.transformScroller(0.1, 0);
+    // }
+    /**
+     * 滚动加载完毕
+     */
+    // scrollLoadingDone=()=> {
+    //     this.setState({scrollerLoading: false});
+    //     console.log("下拉加载");
+    //     this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
+    // }
+    // componentWillReceiveProps=(nextProps)=> {
+    //     var self = this;
+    //     self.fetchItems(false);//把新的数据填进列表
+    //     if (this.state.dragLoading) {//如果之前是下拉刷新状态，恢复
+    //         setTimeout(function () {
+    //             self.dragLoadingDone();
+    //         }, 1000);
+    //     }
+    //     if (this.state.scrollerLoading) {//如果之前是滚动加载状态，恢复
+    //         setTimeout(function () {
+    //             self.scrollLoadingDone();
+    //         }, 1000);
+    //     }
+    // }
+    handleData(e) {
+      this.setState({
+        meg: e
+      })
+    }
+    //发送消息
+    async sendMessage(){ 
+      if(null!=this.state.meg && ""!=this.state.meg){
+        var anchorElement = document.getElementById("scrolld");
+          var ist=true; 
+          //先保存发送信息
+          var message = this.state.meg;
+          this.state.meg = '';
+          let userInfo={'from_userId':this.state.userId,
+                        'to_userId':this.state.to_userId,
+                        'post_message':message,
+                        'message_type':'0',
+                        'message_state':'0'
+                      }
+          await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
+          .then(res => {
+            if (res.resultCode != "1000") {
+              ist=false;
+            }else{
+              this.setState({
+                data: [...this.state.data, {from_userId: this.state.userId,'post_message':message,to_userId:this.state.to_userId}]
+              },function(){
+                anchorElement.scrollIntoView();
+              });
+            }
+          })
+          if(ist){
+            let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
+            await HttpService.post('/reportServer/query/execQuery/2/87', JSON.stringify(qryParam))
+            .then(res=>{
+            //函数查询 execQuery  execqueryToExcel
+            // })
+            // //首先进行
+            // await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
+            //   .then(res => {
+                if (res.resultCode == "1000") {
+                  if(undefined== res.data.filetype){
+                    res.data.filetype="json";
+                  }
+                  //数据保存到数据库
+                  let responseInfo={'from_userId':this.state.to_userId,
+                  'to_userId':this.state.userId,
+                  'post_message':res,
+                  'message_type':res.data.filetype,
+                  'message_state':'0'
+                  }
+                    HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
+                        .then(resChat => {
+                        if (resChat.resultCode == "1000") {
+                          this.setState({
+                            data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res,'message_type':res.data.filetype,to_userId: this.state.userId}]
+                          });
+                          anchorElement.scrollIntoView();
+                        }
+                    })
+                }
+              })
+              .catch((error) => {
+                  Toast.fail(error);
+              });
+            var that = this;
+            fetch('https://api.ownthink.com/bot?spoken=' + message, {
+              method: 'POST',
+              type: 'cors'
+            }).then(function (response) {
+              return response.json();
+            }).then(function (detail) {
+              if (detail.message =="success") {
+                let responseInfo={'from_userId':that.state.to_userId,
+                        'to_userId':that.state.userId,
+                        'post_message':detail.data.info.text,
+                        'message_type':'0',
+                        'message_state':'0'
+                      }
+                HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
+                  .then(resChats => {
+                    if (resChats.resultCode == "1000") {
+                      return that.setState({
                         data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: that.state.userId}]
                       },function(){
                         anchorElement.scrollIntoView();
                       });
-                      anchorElement.scrollIntoView();
-
-            } else {
-            }
-          })
-        }
+                    }
+                  })
+              }
+            })
+          }
+      }
     }
-  }
    
     onInputKeyUp(e){
         if(e.keyCode === 13){
@@ -461,23 +515,24 @@ export default class ChatNew extends React.Component {
         let out=ress.data.out;
         if(null!=data){
             return (
-            <Card style={{backgroundColor:'#f4f7f9'}}>
-                <List>
-                    {data.map(val => (
+              <Card style={{backgroundColor:'#f4f7f9'}}>
+                  <List>
                         <Item
-                        multipleLine
-                        onClick={() => this.onClassClick(val.class_id)}
-                        >
-                        {out.map((item) => {
-                            return <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
-                            {item.out_name}:{val[item.out_id.toUpperCase()]}
-                            </div> 
-                        }
-                        )} 
-                        </Item>
-                    ))}
-                </List>
-            </Card>
+                          multipleLine
+                          >
+                          {out.map((item) => {
+                              return <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
+                              {item.out_name}:{data[0][item.out_id.toUpperCase()]}
+                              </div> 
+                          }
+                          )} 
+                          </Item>
+                    {data.length>1? <Item>
+                      <a onClick={()=>this.showModal(data,out)} href="javascript:void(0)">查看更多详情</a>
+
+                     </Item>:''}
+                  </List>
+              </Card> 
             );
         }else{
          
@@ -607,27 +662,29 @@ export default class ChatNew extends React.Component {
                 refreshing={this.state.refreshing}
                 onRefresh={this.onRefreshs}
             >
-              {this.state.data.map((elem,index) => {
+              {this.state.data!=null?this.state.data.map((elem,index) => {
                   if(elem.from_userId==this.state.userId){
                     return <li style={{background:'#f5f5f9' }} >
+                            <div style={{textAlign:'center',padding:'3px'}}>{ moment(elem.message_time).format('YYYY-MM-DD HH:mm:ss')}</div>
                           <img src={this.state.userIcon==''?my:this.state.userIcon} className="imgright"/><span style={{float:"right"}}>
                           {this.RenderContent(elem)}
                         </span>
                       </li>
                   } else{
                     return <li style={{background:'#f5f5f9' }} >
+                            <div style={{textAlign:'center',padding:'3px'}}>{ moment(elem.message_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+
                         <img src={ai} className="imgleft"/><span style={{float:"left",background:'#f1ebeb00'}}>
                         {this.RenderContent(elem)}
                         </span></li>
                   }
-              })}
-               <div id="scrolld"> </div>
+              }):''}
               </PullToRefresh>
             </ul>
-           
+            <div id="scrolld"></div>
           </div>
          
-          {this.state.saying==true?<div className="saying"> <img src={require("../assets/saying.gif")}/></div>:''}
+          {/* {this.state.saying==true?<div className="saying"> <img src={require("../assets/saying.gif")}/></div>:''} */}
           <div className="smartnlp-chat-msg-input">
             <div className="smartnlp-write-block">
               <div className="smartnlp-user-write-block">
@@ -668,6 +725,33 @@ export default class ChatNew extends React.Component {
               : <div className="wenwen_text" id="wenwen" onClick={()=>this._touch_start(event)}>  按住 说话  </div>
               }
           </div> */}
+          <Modal
+          visible={this.state.modal1}
+          transparent
+          maskClosable={false}
+          closable={true}
+          onClose={this.onClose()}
+          wrapProps={{ onTouchStart: this.onWrapTouchStart }}
+          style={{height:'80%',width:'90%'}}
+        >
+          <div style={{ height: '100%', overflow: 'scroll',backgroundColor:'#f4f7f9' }}>
+                <List>
+                    {this.state.modelData.map(val => (
+                        <Item
+                        // multipleLine
+                        // onClick={() => this.onClassClick(val.class_id)}
+                        >
+                        {this.state.modelOut.map((item) => {
+                            return <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
+                            {item.out_name}:{val[item.out_id.toUpperCase()]}
+                            </div> 
+                        }
+                        )} 
+                        </Item>
+                    ))}
+                </List>
+          </div>
+        </Modal>
       </div>
     )
   }
