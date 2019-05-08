@@ -60,7 +60,6 @@ export default class ChatNew extends React.Component {
                 userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon},
             function(){
               this.fetchItems(true);
-             // this.loadQuestion();
               setTimeout(() => {
                 this.setState({
                   height: hei,
@@ -78,78 +77,47 @@ export default class ChatNew extends React.Component {
         //       this.loadQuestion();
         //   });
         this.loadQuestion();
-          this.initEvent();
+        this.initEvent();
       }else{
         window.location.href="/My";
       }
   }
-  showModal(data,out) {
-    //e.preventDefault(); // 修复 Android 上点击穿透
-    this.setState({
-      modal1: true,
-      modelData:data,
-      modelOut:out
-    });
-  }
-  onClose= key => () => {
-    this.setState({
-      modal1: false,
-      modelData:[],
-      modelOut:[]
-    });
-  }
-  onWrapTouchStart = (e) => {
-    // fix touch to scroll background page on iOS
-    if (!/iPhone|iPod|iPad/i.test(navigator.userAgent)) {
-      return;
-    }
-    const pNode = closest(e.target, '.am-modal-content');
-    if (!pNode) {
-      e.preventDefault();
-    }
-  }
-  onRefreshs = () => {
-      this.setState({ refreshing: true });
-      setTimeout(() => {
-        this.setState({ refreshing: false,
-         // data:this.fetchItems(false), 
+ 
+  //初始化音频
+  initEvent() {
+    var btnElem=document.getElementById("microphone");//获取ID
+    btnElem.addEventListener("touchstart", function(event) {
+        event.preventDefault();//阻止浏览器默认行为
+        HZRecorder.get(function (rec) {
+            recorder = rec;
+            recorder.start();
         });
-        this.fetchItems(false)
-      }, 600);
+    });
+    let that =this;
+    btnElem.addEventListener("touchend", function(event) {
+        event.preventDefault();
+        HZRecorder.get(function (rec) {
+            recorder = rec;
+            recorder.stop();
+        })
+        //发送音频片段
+        var data=recorder.getBlob();
+        if(data.duration!==0){
+            recorder.clear();
+            var dur=data.duration/10;
+            let formData = new FormData();
+            formData.append("file", data.blob);
+            HttpService.post("reportServer/MyVoiceApplication/uploadai",formData).then(response=>{
+                if(response.resultCode=="1000"){
+                  that.setState({meg:response.data.content});
+                }
+            });
+        }else{
+            console.log("没有声音输入");
+        } 
+    });
   }
-    initEvent() {
-      var btnElem=document.getElementById("microphone");//获取ID
-      btnElem.addEventListener("touchstart", function(event) {
-          event.preventDefault();//阻止浏览器默认行为
-          HZRecorder.get(function (rec) {
-              recorder = rec;
-              recorder.start();
-          });
-      });
-      let that =this;
-      btnElem.addEventListener("touchend", function(event) {
-          event.preventDefault();
-          HZRecorder.get(function (rec) {
-              recorder = rec;
-              recorder.stop();
-          })
-          //发送音频片段
-          var data=recorder.getBlob();
-          if(data.duration!==0){
-              recorder.clear();
-              var dur=data.duration/10;
-              let formData = new FormData();
-              formData.append("file", data.blob);
-              HttpService.post("reportServer/MyVoiceApplication/uploadai",formData).then(response=>{
-                  if(response.resultCode=="1000"){
-                    that.setState({meg:response.data.content});
-                  }
-              });
-          }else{
-              console.log("没有声音输入");
-          } 
-      });
-    }
+    //获取服务器信息
     fetchItems(isTrue) {
       let newdata=[];
       var anchorElement = document.getElementById("scrolld");
@@ -161,42 +129,33 @@ export default class ChatNew extends React.Component {
           let list=res.data;
           ++this.page;
           for(var i=0;i<list.length;i++){
-            this.setState({data: [list[i],...this.state.data] },function(){
-             
-
-            });
-            //newdata=[list[i],...this.state.data];
+            this.setState({data: [list[i],...this.state.data] });
           }
-           anchorElement.scrollIntoView();
-         // console.log(res.data)
-          //var newdata=[res.data,...this.state.data];
-         // console.log(newdata);
-          //return newdata;
+          
+        
           // this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
-          // if(isTrue){
-          // this.initRefresh();//初始化下拉刷新
-          // this.initScroll();//初始化滚动加载更多
-          // }
-           
-
+          if(isTrue){
+            anchorElement.scrollIntoView();
+            // this.initRefresh();//初始化下拉刷新
+            // this.initScroll();//初始化滚动加载更多
+          }
         });
     }
+    //显示问答列表
     loadQuestion(){
       var anchorElement = document.getElementById("scrolld");
-
       let listParam = {};
       listParam.pageNum  = 1;
       listParam.perPage  = 5;
       HttpService.post('/reportServer/questions/getQuestionsList', JSON.stringify(listParam))
-      .then(res => {
-        if (res.resultCode != "1000") {
-          this.setState({questionList:res.list,data: [...this.state.data,{data:res.list,message_type:"question"}] },function(){
+      .then(resQes => {
+          this.setState({questionList:resQes.list,data: [...this.state.data,{data:resQes.list,message_type:"question"}] 
+        },function(){
             anchorElement.scrollIntoView();
           });
-        }
       })
     }
-
+    //选中问答列表的问题获取答案
     async onQuestionClick(question_id,question){
       var anchorElement = document.getElementById("scrolld");
       var ist=true; 
@@ -236,7 +195,9 @@ export default class ChatNew extends React.Component {
             this.setState({
               data: [...this.state.data, {from_userId: this.state.to_userId,'post_message':"没有符合您问题的答案，请重新选择",to_userId:this.state.userId}]
             },function(){
-              this.setState({questionList:res.list,data: [...this.state.data,{data:this.state.questionList,message_type:"question"}] },function(){
+              this.setState({
+                questionList:res.list,data: [...this.state.data,{data:this.state.questionList,message_type:"question"}] 
+              },function(){
                 anchorElement.scrollIntoView();
               });
             });
@@ -244,6 +205,272 @@ export default class ChatNew extends React.Component {
         });
       }
     }
+  
+    //实时把数据写入state的meg中
+    handleData(e) {
+      this.setState({
+        meg: e
+      })
+    }
+    //发送消息
+    async sendMessage(){ 
+      if(null!=this.state.meg && ""!=this.state.meg){
+        var anchorElement = document.getElementById("scrolld");
+          var ist=true; 
+          //先保存发送信息
+          var message = this.state.meg;
+          this.state.meg = '';
+          let userInfo={'from_userId':this.state.userId,
+                        'to_userId':this.state.to_userId,
+                        'post_message':message,
+                        'message_type':'0',
+                        'message_state':'0'
+                      }
+          await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
+          .then(res => {
+            if (res.resultCode != "1000") {
+              ist=false;
+            }else{
+              this.setState({
+                data: [...this.state.data, {from_userId: this.state.userId,'post_message':message,to_userId:this.state.to_userId}]
+              },function(){
+                anchorElement.scrollIntoView();
+              });
+            }
+          })
+          if(ist){
+            // let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
+            // await HttpService.post('/reportServer/query/execQuery/2/87', JSON.stringify(qryParam))
+            // .then(res=>{
+            //函数查询 execQuery  execqueryToExcel
+            // })
+            //首先进行
+            await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
+              .then(res => {
+                if (res.resultCode == "1000") {
+                  this.setState({
+                    data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res.data.post_message,'message_type':res.data.filetype,to_userId: this.state.userId}]
+                  });
+                  anchorElement.scrollIntoView();
+
+            //       if(undefined== res.data.filetype){
+            //         res.data.filetype="json";
+            //       }
+            //       //数据保存到数据库
+            //       let responseInfo={'from_userId':this.state.to_userId,
+            //       'to_userId':this.state.userId,
+            //       'post_message':res,
+            //       'message_type':res.data.filetype,
+            //       'message_state':'0'
+            //       }
+            //         HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
+            //             .then(resChat => {
+            //             if (resChat.resultCode == "1000") {
+            //               this.setState({
+            //                 data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res,'message_type':res.data.filetype,to_userId: this.state.userId}]
+            //               });
+            //               anchorElement.scrollIntoView();
+            //             }
+            //         })
+            //     }
+            //   })
+            //   .catch((error) => {
+            //       Toast.fail(error);
+            //   });
+            // var that = this;
+            // fetch('https://api.ownthink.com/bot?spoken=' + message, {
+            //   method: 'POST',
+            //   type: 'cors'
+            // }).then(function (response) {
+            //   return response.json();
+            // }).then(function (detail) {
+            //   if (detail.message =="success") {
+            //     let responseInfo={'from_userId':that.state.to_userId,
+            //             'to_userId':that.state.userId,
+            //             'post_message':detail.data.info.text,
+            //             'message_type':'0',
+            //             'message_state':'0'
+            //           }
+            //     HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
+            //       .then(resChats => {
+            //         if (resChats.resultCode == "1000") {
+            //           return that.setState({
+            //             data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: that.state.userId}]
+            //           },function(){
+            //             anchorElement.scrollIntoView();
+            //           });
+            //         }
+            //       })
+              }
+            })
+          }
+      }
+    }
+  //下拉加载数据  
+  onRefreshs = () => {
+    this.setState({ refreshing: true });
+    setTimeout(() => {
+      this.setState({ refreshing: false,
+       // data:this.fetchItems(false), 
+      });
+      this.fetchItems(false)
+    }, 600);
+  }
+   //回车发送消息
+    onInputKeyUp(e){
+        if(e.keyCode === 13){
+          this.sendMessage();
+        }
+    }
+    //组装显示数据
+    RenderContent = (props) => {
+      if (props.message_type=="json"){
+        let ress=null;
+        if (typeof props.post_message === 'string') {
+          ress=JSON.parse(props.post_message);
+        }else{
+          ress=props.post_message;
+        }
+        let data=ress.data.list;
+        let out=ress.data.out;
+        if(null!=data){
+            return (
+              <Card style={{backgroundColor:'#f4f7f9'}}>
+                  <List>
+                        <Item
+                          multipleLine
+                          >
+                          {out.map((item) => {
+                              return <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
+                              {item.out_name}:{data[0][item.out_id.toUpperCase()]}
+                              </div> 
+                          }
+                          )} 
+                          </Item>
+                    {data.length>1? <Item>
+                      <a onClick={()=>this.showModal(data,out)} href="javascript:void(0)">查看更多详情</a>
+
+                     </Item>:''}
+                  </List>
+              </Card> 
+            );
+        }
+      }else if (props.message_type=="file"){
+          let fileIcon='./../src/assets/icon/down.png';
+          let ress=null;
+          if (typeof props.post_message === 'string') {
+            ress=JSON.parse(props.post_message);
+          }else{
+            ress=props.post_message;
+          }
+          let data= ress.data.fileName;
+          let file= ress.data.filePath;
+          var fileExtension = file.substring(file.lastIndexOf('.') + 1);
+          fileExtension=fileExtension.toUpperCase();
+          if(fileExtension=='DOC' || fileExtension=='DOCX'){
+            fileIcon="./../src/assets/icon/word.png";
+          }else  if(fileExtension=='XLS' || fileExtension=='XLSX'){
+            fileIcon="./../src/assets/icon/excel.png";
+          }else  if(fileExtension=='PPT' || fileExtension=='PPTX'){
+            fileIcon="./../src/assets/icon/ppt.png";
+          }
+          return (<List style={{backgroundColor:'#f4f7f9',maxWidth:'370px'}}>
+                    <Item align="top" thumb={fileIcon} multipleLine>
+                      <a onClick={()=>this.domnFile(file)} href="javascript:void(0);" target="_black" style={{marginRight:'5px'}}>{data}</a>
+                      <Brief><a onClick={()=>this.domnFile(file)} href="javascript:void(0);" target="_black" style={{marginRight:'5px'}}>点击下载</a></Brief>
+                    </Item>
+                  </List>
+          );
+      }else if(props.message_type=="text"){
+        return props.post_message;
+      }else if(props.message_type=="voice") {
+        return <audio src={props.post_message ? props.post_message : ''} controls />;
+      }else if(props.message_type=="question"){
+        return <List renderHeader={() => '常见问题'} className="my-list">
+                {props.data.map(item => (
+                  <Item arrow="horizontal"
+                    multipleLine
+                    onClick={() => this.onQuestionClick(item.ai_question_id,item.ai_question)}
+                  >
+                    <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
+                        {item.ai_question}
+                    </div>
+                  </Item>
+                ))}
+              </List>
+      }else{
+        return props.post_message;
+      }
+    }
+    async domnFile(filepath){
+      await fetch(url+'reportServer/uploadFile/downloadFile', {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+             'credentials': JSON.stringify(localStorge.getStorage('userInfo') || '')
+           },
+           body:filepath
+         }).then(function (response) {
+           if (response.ok) {
+             response.blob().then((blob) => {
+               if(blob.size>0){
+               const a = window.document.createElement('a');
+               const downUrl = window.URL.createObjectURL(blob);// 获取 blob 本地文件连接 (blob 为纯二进制对象，不能够直接保存到磁盘上)
+                a.href = downUrl;
+                a.download = filepath.substr(filepath.lastIndexOf("/")+1);
+                a.click();
+               window.URL.revokeObjectURL(downUrl);
+             }else{
+               Toast.fail("文件已丢失，请重新导出下载！");
+             }
+             });
+           }
+         });
+     }
+  handleStart(e){
+      this.setState({
+          saying:true,
+          btnText:"松开结束"
+      });
+  }
+  handleTouchMove(e) {
+      this.setState({
+          saying:false,
+          btnText:"正在录音"
+      });
+  }
+  handleTouchEnd (e) {
+      this.setState({
+          saying:false,
+          btnText:"按住录音"
+      });
+  }
+  //打开模式窗口
+  showModal(data,out) {
+    //e.preventDefault(); // 修复 Android 上点击穿透
+    this.setState({
+      modal1: true,
+      modelData:data,
+      modelOut:out
+    });
+  }
+  onClose= key => () => {
+    this.setState({
+      modal1: false,
+      modelData:[],
+      modelOut:[]
+    });
+  }
+  onWrapTouchStart = (e) => {
+    // fix touch to scroll background page on iOS
+    if (!/iPhone|iPod|iPad/i.test(navigator.userAgent)) {
+      return;
+    }
+    const pNode = closest(e.target, '.am-modal-content');
+    if (!pNode) {
+      e.preventDefault();
+    }
+  }
     // initRefresh=()=> {
     //   var self = this;//对象转存，防止闭包函数内无法访问
     //   var isTouchStart = false; // 是否已经触发下拉条件
@@ -387,253 +614,7 @@ export default class ChatNew extends React.Component {
     //         }, 1000);
     //     }
     // }
-    handleData(e) {
-      this.setState({
-        meg: e
-      })
-    }
-    //发送消息
-    async sendMessage(){ 
-      if(null!=this.state.meg && ""!=this.state.meg){
-        var anchorElement = document.getElementById("scrolld");
-          var ist=true; 
-          //先保存发送信息
-          var message = this.state.meg;
-          this.state.meg = '';
-          let userInfo={'from_userId':this.state.userId,
-                        'to_userId':this.state.to_userId,
-                        'post_message':message,
-                        'message_type':'0',
-                        'message_state':'0'
-                      }
-          await HttpService.post('/reportServer/chat/createChat', JSON.stringify(userInfo))
-          .then(res => {
-            if (res.resultCode != "1000") {
-              ist=false;
-            }else{
-              this.setState({
-                data: [...this.state.data, {from_userId: this.state.userId,'post_message':message,to_userId:this.state.to_userId}]
-              },function(){
-                anchorElement.scrollIntoView();
-              });
-            }
-          })
-          if(ist){
-            let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
-            await HttpService.post('/reportServer/query/execQuery/2/87', JSON.stringify(qryParam))
-            .then(res=>{
-            //函数查询 execQuery  execqueryToExcel
-            // })
-            // //首先进行
-            // await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
-            //   .then(res => {
-                if (res.resultCode == "1000") {
-                  if(undefined== res.data.filetype){
-                    res.data.filetype="json";
-                  }
-                  //数据保存到数据库
-                  let responseInfo={'from_userId':this.state.to_userId,
-                  'to_userId':this.state.userId,
-                  'post_message':res,
-                  'message_type':res.data.filetype,
-                  'message_state':'0'
-                  }
-                    HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
-                        .then(resChat => {
-                        if (resChat.resultCode == "1000") {
-                          this.setState({
-                            data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res,'message_type':res.data.filetype,to_userId: this.state.userId}]
-                          });
-                          anchorElement.scrollIntoView();
-                        }
-                    })
-                }
-              })
-              .catch((error) => {
-                  Toast.fail(error);
-              });
-            var that = this;
-            fetch('https://api.ownthink.com/bot?spoken=' + message, {
-              method: 'POST',
-              type: 'cors'
-            }).then(function (response) {
-              return response.json();
-            }).then(function (detail) {
-              if (detail.message =="success") {
-                let responseInfo={'from_userId':that.state.to_userId,
-                        'to_userId':that.state.userId,
-                        'post_message':detail.data.info.text,
-                        'message_type':'0',
-                        'message_state':'0'
-                      }
-                HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
-                  .then(resChats => {
-                    if (resChats.resultCode == "1000") {
-                      return that.setState({
-                        data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: that.state.userId}]
-                      },function(){
-                        anchorElement.scrollIntoView();
-                      });
-                    }
-                  })
-              }
-            })
-          }
-      }
-    }
-   
-    onInputKeyUp(e){
-        if(e.keyCode === 13){
-          this.sendMessage();
-        }
-    }
-    changeSpeack(){
-      let isw=this.state.isWrite;
-      if(isw){
-        this.setState({isWrite:false});
-      }else{
-        this.setState({isWrite:true});
-      }
-    }
-    _touch_start(event){
-            event.preventDefault();
-          //  document.getElementsByClassName('.wenwen_text').css('background','#c1c1c1');
-          //  document.getElementsByClassName('.wenwen_text span').css('color','#fff');
-           //document.getElementsByClassName('.saying').show();
-           this.setState({saying:true});
-    }
 
-    RenderContent = (props) => {
-      if (props.message_type=="json"){
-        let ress=null;
-        if (typeof props.post_message === 'string') {
-          ress=JSON.parse(props.post_message);
-        }else{
-          ress=props.post_message;
-        }
-        let data=ress.data.list;
-        let out=ress.data.out;
-        if(null!=data){
-            return (
-              <Card style={{backgroundColor:'#f4f7f9'}}>
-                  <List>
-                        <Item
-                          multipleLine
-                          >
-                          {out.map((item) => {
-                              return <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
-                              {item.out_name}:{data[0][item.out_id.toUpperCase()]}
-                              </div> 
-                          }
-                          )} 
-                          </Item>
-                    {data.length>1? <Item>
-                      <a onClick={()=>this.showModal(data,out)} href="javascript:void(0)">查看更多详情</a>
-
-                     </Item>:''}
-                  </List>
-              </Card> 
-            );
-        }else{
-         
-        }
-      }else 
-      if (props.message_type=="file"){
-        let fileIcon='./../src/assets/icon/down.png';
-        let ress=null;
-        if (typeof props.post_message === 'string') {
-          ress=JSON.parse(props.post_message);
-        }else{
-          ress=props.post_message;
-        }
-        let data= ress.data.fileName;
-        let file= ress.data.filePath;
-        var fileExtension = file.substring(file.lastIndexOf('.') + 1);
-        fileExtension=fileExtension.toUpperCase();
-        if(fileExtension=='DOC' || fileExtension=='DOCX'){
-          fileIcon="./../src/assets/icon/word.png";
-        }else  if(fileExtension=='XLS' || fileExtension=='XLSX'){
-          fileIcon="./../src/assets/icon/excel.png";
-        }else  if(fileExtension=='PPT' || fileExtension=='PPTX'){
-          fileIcon="./../src/assets/icon/ppt.png";
-        }
-        return (<List style={{backgroundColor:'#f4f7f9',maxWidth:'370px'}}>
-                  <Item align="top" thumb={fileIcon} multipleLine>
-                    <a onClick={()=>this.domnFile(file)} href="javascript:void(0);" target="_black" style={{marginRight:'5px'}}>{data}</a>
-                    <Brief><a onClick={()=>this.domnFile(file)} href="javascript:void(0);" target="_black" style={{marginRight:'5px'}}>点击下载</a></Brief>
-                  </Item>
-                </List>
-        );
-      } else 
-      if (props.message_type=="text"){
-        return props.post_message;
-      }else 
-      if (props.message_type=="voice") {
-        return <audio src={props.post_message ? props.post_message : ''} controls />;
-      }else if(props.message_type=="question"){
-        return <List renderHeader={() => '常见问题'} className="my-list">
-            {props.data.map(item => (
-              <Item arrow="horizontal"
-                multipleLine
-                onClick={() => this.onQuestionClick(item.ai_question_id,item.ai_question)}
-               >
-                 <div  style={{fontSize:'14px',fontFamily:'微软雅黑',backgroundColor:'#F4F7F9'}}>
-                    {item.ai_question}
-                 </div>
-              </Item>
-            ))}
-          </List>
-      }
-      else{
-        return props.post_message;
-      }
-    };
-    async domnFile(filepath){
-      await fetch(url+'reportServer/uploadFile/downloadFile', {
-           method: 'POST',
-           headers: {
-             'Content-Type': 'application/json',
-             'credentials': JSON.stringify(localStorge.getStorage('userInfo') || '')
-           },
-           body:filepath
-         }).then(function (response) {
-           if (response.ok) {
-             response.blob().then((blob) => {
-               if(blob.size>0){
-               const a = window.document.createElement('a');
-               const downUrl = window.URL.createObjectURL(blob);// 获取 blob 本地文件连接 (blob 为纯二进制对象，不能够直接保存到磁盘上)
-                a.href = downUrl;
-                a.download = filepath.substr(filepath.lastIndexOf("/")+1);
-                a.click();
-               window.URL.revokeObjectURL(downUrl);
-             }else{
-               Toast.fail("文件已丢失，请重新导出下载！");
-             }
-             });
-           }
-         });
-           
-     }
-  handleStart(e){
-      this.setState({
-          saying:true,
-          btnText:"松开结束"
-      });
-  }
-  handleTouchMove(e) {
-      this.setState({
-          saying:false,
-          btnText:"正在录音"
-      });
-  }
-
-  handleTouchEnd (e) {
-      this.setState({
-          saying:false,
-          btnText:"按住录音"
-
-      });
-  }
   render() {
     var meg = this.state.meg
     return (
@@ -679,9 +660,10 @@ export default class ChatNew extends React.Component {
                         </span></li>
                   }
               }):''}
+              <div id="scrolld"></div>
               </PullToRefresh>
             </ul>
-            <div id="scrolld"></div>
+            
           </div>
          
           {/* {this.state.saying==true?<div className="saying"> <img src={require("../assets/saying.gif")}/></div>:''} */}
