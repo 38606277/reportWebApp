@@ -57,7 +57,7 @@ const AI = Loadable({
     loading: loading
 });
 const Chat = Loadable({
-    loader: () => import('./page/Chat.jsx'),
+    loader: () => import('./page/ChatNew.jsx'),
     loading: loading
 });
 

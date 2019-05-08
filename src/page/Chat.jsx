@@ -60,7 +60,7 @@ export default class Chat extends React.Component {
         openDragLoading: this.openDragLoading || true,//根据外面设置的开关改变自己的状态
         openScrollLoading: this.openScrollLoading || true},function(){
           this.fetchItems(true);
-          this.loadQuestion();
+          // this.loadQuestion();
         });
     }else{
       window.location.href="/My";
@@ -381,13 +381,13 @@ export default class Chat extends React.Component {
     })
     if(ist){
       let qryParam=[{in: {begindate: "", enddate: "", org_id: "", po_number: "", vendor_name: "电讯盈科"}}];
-      await HttpService.post('/reportServer/query/execqueryToExcel/2/87', JSON.stringify(qryParam))
-      .then(res=>{
+      // await HttpService.post('/reportServer/query/execqueryToExcel/2/87', JSON.stringify(qryParam))
+      // .then(res=>{
 
       // })
       // //首先进行函数查询
-      // await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
-      //   .then(res => {
+      await HttpService.post('/reportServer/nlp/getResult/' + newMessage, null)
+        .then(res => {
           if (res.resultCode == "1000") {
             if(undefined== res.data.filetype){
               res.data.filetype="json";

@@ -178,6 +178,7 @@ export default class ChatNew1 extends React.Component {
           pageSize={4}
           onScroll={() => { console.log('scroll'); }}
           scrollRenderAheadDistance={500}
+          onBeginRe
           onEndReached={this.onEndReached}
           onEndReachedThreshold={10}
         />
