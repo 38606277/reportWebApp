@@ -16,120 +16,159 @@ const Brief = Item.Brief;
 var recorder;
 const url = window.getServerUrl();
 export default class ChatNew extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      meg: '',
-      modal1: false,
-      isWrite: true,
-      saying: false,
-      data: [],
-      modelData: [],
-      modelOut: [],
-      userId: null,
-      to_userId: 0,
-      pageNumd: 1,
-      perPaged: 5,
-      userIcon: '',
-      fileIcon: './../src/assets/icon/down.png',
-      questionList: [],
-      btnText: "按住录音",
-      refreshing: false,
-      down: true,
-      height: document.documentElement.clientHeight,
-    }
-    this.page = 1;
-  }
-  componentDidMount() {
-      const hei = this.state.height - ReactDOM.findDOMNode(this.lv).offsetTop;
-      let userInfo = localStorge.getStorage('userInfo');
-      if (undefined != userInfo && null != userInfo && '' != userInfo) {
-        this.setState({ userId:userInfo.id,
-                userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon,
-                height: hei, refreshing: false,
-          },function(){
-              this.fetchItems(true);
-              // setTimeout(() => {
-              //   this.setState({
-              //     height: hei,
-              //   //  data: this.fetchItems(false), 
-              //     refreshing: false,
-                 
-              //   });
-              // }, 1500);
-            });
-       
-        // this.setState({ userId:userInfo.id,
-        //       userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon},
-        //   function(){
-        //       this.fetchItems(true);
-        //       this.loadQuestion();
-        //   });
-        this.loadQuestion();
-        this.initEvent();
-      }else{
-        window.location.href="/My";
+    constructor(props) {
+      super(props);
+      this.state = {
+        meg: '',
+        modal1: false,
+        isWrite: true,
+        saying: false,
+        data: [],
+        modelData: [],
+        modelOut: [],
+        userId: null,
+        to_userId: 0,
+        pageNumd: 1,
+        perPaged: 5,
+        userIcon: '',
+        fileIcon: './../src/assets/icon/down.png',
+        questionList: [],
+        btnText: "按住录音",
+        refreshing: false,
+        down: true,
+        height: document.documentElement.clientHeight,
       }
-  }
- 
-  //初始化音频
-  initEvent() {
-    var btnElem=document.getElementById("microphone");//获取ID
-    btnElem.addEventListener("touchstart", function(event) {
-        event.preventDefault();//阻止浏览器默认行为
-        HZRecorder.get(function (rec) {
-            recorder = rec;
-            recorder.start();
-        });
-    });
-    let that =this;
-    btnElem.addEventListener("touchend", function(event) {
-        event.preventDefault();
-        HZRecorder.get(function (rec) {
-            recorder = rec;
-            recorder.stop();
-        })
-        //发送音频片段
-        var data=recorder.getBlob();
-        if(data.duration!==0){
-            recorder.clear();
-            var dur=data.duration/10;
-            let formData = new FormData();
-            formData.append("file", data.blob);
-            HttpService.post("reportServer/MyVoiceApplication/uploadai",formData).then(response=>{
-                if(response.resultCode=="1000"){
-                  that.setState({meg:response.data.content});
-                }
-            });
-        }else{
-            console.log("没有声音输入");
-        } 
-    });
-  }
-    //获取服务器信息
-    fetchItems(isTrue) {
-      let newdata=[];
-      var anchorElement = document.getElementById("scrolld");
-        let mInfo={'from_userId':this.state.userId,'to_userId':this.state.to_userId,
+      this.page = 1;
+    }
+    componentDidMount() {
+        const hei = this.state.height - ReactDOM.findDOMNode(this.lv).offsetTop;
+        let userInfo = localStorge.getStorage('userInfo');
+        if (undefined != userInfo && null != userInfo && '' != userInfo) {
+          this.setState({ userId:userInfo.id,
+                  userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon,
+            },function(){
+              let mInfo={'from_userId':this.state.userId,'to_userId':this.state.to_userId,
               pageNumd:this.page,perPaged:5}
+              HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
+              .then(res => {
+                let list=res.data;
+                let newdata=[];
+                if(list.length>0){
+                  for(var i=0;i<list.length;i++){
+                    newdata.unshift(list[i]);
+                  }
+                  newdata=newdata.concat(this.state.data);
+                  ++this.page;
+                }else{
+                  newdata=newdata.concat(this.state.data);
+                }
+                this.setState({ refreshing: false, height: hei,data:newdata},function(){
+                  this.loadQuestion();
+                  var anchorElement = document.getElementById("scrolld");
+                      anchorElement.scrollIntoView();
+                });
+              });
+                // setTimeout(() => {
+                //   this.setState({
+                //     height: hei,
+                //     data: this.fetchItems(), 
+                //     refreshing: false,
+                //   });
+                // }, 1500);
+              });
+          this.initEvent();
+        }else{
+          window.location.href="/My";
+        }
+    }
+  
+    //初始化音频
+    initEvent() {
+      var btnElem=document.getElementById("microphone");//获取ID
+      btnElem.addEventListener("touchstart", function(event) {
+          event.preventDefault();//阻止浏览器默认行为
+          HZRecorder.get(function (rec) {
+              recorder = rec;
+              recorder.start();
+          });
+      });
+      let that =this;
+      btnElem.addEventListener("touchend", function(event) {
+          event.preventDefault();
+          HZRecorder.get(function (rec) {
+              recorder = rec;
+              recorder.stop();
+          })
+          //发送音频片段
+          var data=recorder.getBlob();
+          if(data.duration!==0){
+              recorder.clear();
+              var dur=data.duration/10;
+              let formData = new FormData();
+              formData.append("file", data.blob);
+              HttpService.post("reportServer/MyVoiceApplication/uploadai",formData).then(response=>{
+                  if(response.resultCode=="1000"){
+                    that.setState({meg:response.data.content});
+                  }
+              });
+          }else{
+              console.log("没有声音输入");
+          } 
+      });
+    }
+    //获取服务器信息
+    // async fetchItems(isTrue) {
+    //     let newdata=[];
+    //     let cc=[];
+    //     var anchorElement = document.getElementById("scrolld");
+    //       let mInfo={'from_userId':this.state.userId,'to_userId':this.state.to_userId,
+    //             pageNumd:this.page,perPaged:5}
+    //     await HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
+    //       .then(res => {
+    //         let list=res.data;
+    //         for(var i=0;i<list.length;i++){
+    //           newdata.unshift(list[i]);
+    //           // this.setState({data: [list[i],...this.state.data] });
+    //         }
+    //         cc=newdata.concat(this.state.data);
+    //         ++this.page;
+    //         // if(isTrue){
+    //         //   anchorElement.scrollIntoView();
+    //         //   // this.initRefresh();//初始化下拉刷新
+    //         //   // this.initScroll();//初始化滚动加载更多
+    //         // }
+    //       });
+    //       return cc;
+    // }
+    //下拉加载数据  
+    onRefreshs = () => {
+      this.setState({ refreshing: true },function(){
+        let mInfo={'from_userId':this.state.userId,'to_userId':this.state.to_userId,
+        pageNumd:this.page,perPaged:5}
         HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
         .then(res => {
-          
           let list=res.data;
-          ++this.page;
-          for(var i=0;i<list.length;i++){
-            this.setState({data: [list[i],...this.state.data] });
+          let newdata=[];
+          if(list.length>0){
+            for(var i=0;i<list.length;i++){
+              newdata.unshift(list[i]);
+            }
+            newdata=newdata.concat(this.state.data);
+            ++this.page;
+          }else{
+            newdata=newdata.concat(this.state.data);
           }
-          
-        
-          // this.refs.dropDownRefreshText.innerHTML = (dropDownRefreshText = XLJZ);
-          if(isTrue){
-            anchorElement.scrollIntoView();
-            // this.initRefresh();//初始化下拉刷新
-            // this.initScroll();//初始化滚动加载更多
-          }
+          this.setState({ refreshing: false, data:newdata });
         });
-  }
+      });
+      // setTimeout(() => {
+      //   let nd=this.fetchItems(false);
+      //   this.setState({ refreshing: false,
+      //     data:nd
+      //   });
+      //   //this.fetchItems(false)
+      // }, 600);
+    }
     //显示问答列表
     loadQuestion(){
       var anchorElement = document.getElementById("scrolld");
@@ -294,16 +333,7 @@ export default class ChatNew extends React.Component {
           }
       }
     }
-  //下拉加载数据  
-  onRefreshs = () => {
-    this.setState({ refreshing: true });
-    setTimeout(() => {
-      this.setState({ refreshing: false,
-       // data:this.fetchItems(false), 
-      });
-      this.fetchItems(false)
-    }, 600);
-  }
+  
    //回车发送消息
     onInputKeyUp(e){
         if(e.keyCode === 13){
@@ -488,7 +518,7 @@ export default class ChatNew extends React.Component {
               refreshing={this.state.refreshing}
               onRefresh={this.onRefreshs}
             >
-              {this.state.data != null ? this.state.data.map((elem, index) => {
+              {this.state.data.length>0 ? this.state.data.map((elem, index) => {
                 if (elem.from_userId == this.state.userId) {
                   return <li style={{ background: '#f5f5f9' }} >
                     <div style={{ textAlign: 'center', padding: '3px' }}>{moment(elem.message_time).format('YYYY-MM-DD HH:mm:ss')}</div>
