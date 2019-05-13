@@ -276,58 +276,13 @@ export default class ChatNew extends React.Component {
               .then(res => {
                 if (res.resultCode == "1000") {
                   this.setState({
-                    data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res.data.post_message,'message_type':res.data.filetype,to_userId: this.state.userId}]
+                    data: [...this.state.data, {
+                      from_userId:this.state.to_userId,
+                      'post_message':res.data.post_message,
+                      'message_type':res.data.message_type,
+                      to_userId: this.state.userId}]
                   });
                   anchorElement.scrollIntoView();
-
-            //       if(undefined== res.data.filetype){
-            //         res.data.filetype="json";
-            //       }
-            //       //数据保存到数据库
-            //       let responseInfo={'from_userId':this.state.to_userId,
-            //       'to_userId':this.state.userId,
-            //       'post_message':res,
-            //       'message_type':res.data.filetype,
-            //       'message_state':'0'
-            //       }
-            //         HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
-            //             .then(resChat => {
-            //             if (resChat.resultCode == "1000") {
-            //               this.setState({
-            //                 data: [...this.state.data, {from_userId:this.state.to_userId,'post_message':res,'message_type':res.data.filetype,to_userId: this.state.userId}]
-            //               });
-            //               anchorElement.scrollIntoView();
-            //             }
-            //         })
-            //     }
-            //   })
-            //   .catch((error) => {
-            //       Toast.fail(error);
-            //   });
-            // var that = this;
-            // fetch('https://api.ownthink.com/bot?spoken=' + message, {
-            //   method: 'POST',
-            //   type: 'cors'
-            // }).then(function (response) {
-            //   return response.json();
-            // }).then(function (detail) {
-            //   if (detail.message =="success") {
-            //     let responseInfo={'from_userId':that.state.to_userId,
-            //             'to_userId':that.state.userId,
-            //             'post_message':detail.data.info.text,
-            //             'message_type':'0',
-            //             'message_state':'0'
-            //           }
-            //     HttpService.post('/reportServer/chat/createChat', JSON.stringify(responseInfo))
-            //       .then(resChats => {
-            //         if (resChats.resultCode == "1000") {
-            //           return that.setState({
-            //             data: [...that.state.data, {from_userId: 0,'post_message':detail.data.info.text,to_userId: that.state.userId}]
-            //           },function(){
-            //             anchorElement.scrollIntoView();
-            //           });
-            //         }
-            //       })
               }
             })
           }
@@ -586,14 +541,15 @@ export default class ChatNew extends React.Component {
           </div> */}
         <Modal
           visible={this.state.modal1}
+          title="数据详情"
           transparent
           maskClosable={false}
           closable={true}
           onClose={this.onClose()}
           wrapProps={{ onTouchStart: this.onWrapTouchStart }}
-          style={{ height: '80%', width: '90%' }}
+          style={{ height: '85%', width: '90%' }}
         >
-          <div style={{ height: '100%', overflow: 'scroll', backgroundColor: '#f4f7f9' }}>
+          <div style={{ height: '100%', overflow: 'scroll', backgroundColor: '#f4f7f9',marginBottom:'30px' }}>
             <List>
               {this.state.modelData.map(val => (
                 <Item
