@@ -14,6 +14,17 @@ import "babel-polyfill";
 const Item = List.Item;
 const Brief = Item.Brief;
 var recorder;
+function closest(el, selector) {
+  const matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
+  while (el) {
+    if (matchesSelector.call(el, selector)) {
+      return el;
+    }
+    el = el.parentElement;
+  }
+  return null;
+}
+
 const url = window.getServerUrl();
 export default class ChatNew extends React.Component {
     constructor(props) {
