@@ -99,7 +99,7 @@ export default class Home extends React.Component {
           onClick={(e,index) => this.onChangeClick(e,index)} />
         </div> */}
 
-        <Carousel style={{marginTop:'20px'}}
+        <Carousel style={{marginTop:'40px'}}
           autoplay={false}
           infinite
           beforeChange={(from, to) => console.log(`slide from ${from} to ${to}`)}
