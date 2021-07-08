@@ -12,8 +12,8 @@ class Login extends React.Component {
         return (
             <div id="b">
                 <Row>
-                    <Col span={8}>col-8</Col>
-                    <Col span={8}><Card title="登录报表平台">
+                    <Col span={8}></Col>
+                    <Col span={8}><Card title="登录平台">
                         <Form className="login-form">
                             <FormItem>
                                 {getFieldDecorator('username', {
@@ -38,7 +38,7 @@ class Login extends React.Component {
                             </FormItem>
                         </Form>
                     </Card></Col>
-                    <Col span={8}>col-8</Col>
+                    <Col span={8}></Col>
                 </Row>
 
             </div>

@@ -55,7 +55,7 @@ export default class Chat extends React.Component {
     let userInfo = localStorge.getStorage('userInfo');
     if (undefined != userInfo && null != userInfo && '' != userInfo) {
       this.setState({ userId:userInfo.id,
-        userIcon:userInfo.icon==undefined?'':url+"/report/"+userInfo.icon,
+        userIcon:userInfo.icon==undefined?'':url+"/reportServer/"+userInfo.icon,
         translate: 0,
         openDragLoading: this.openDragLoading || true,//根据外面设置的开关改变自己的状态
         openScrollLoading: this.openScrollLoading || true},function(){

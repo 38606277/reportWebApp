@@ -463,7 +463,7 @@ export default class ChatNew extends React.Component {
         <Script url="../src/page/ai/jquery-3.2.1.min.js" />
         <Script url="../src/page/ai/record.js" />
         <div className="header" style={{ textAlign: 'center' }}>
-          <span style={{ textAlign: 'center' }}>PCCW智能机器人</span>
+          <span style={{ textAlign: 'center' }}>智能机器人</span>
           {/* <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>
               <span style={{float: "right"}} id="root"></span> */}
         </div>
@@ -525,7 +525,7 @@ export default class ChatNew extends React.Component {
                 </div>
               </div>
               <div className="smartnlp-power-by">
-              <p className="smartnlp-copy-right">Powered By PCCW机器人</p>
+              {/* <p className="smartnlp-copy-right">智能机器人</p> */}
               </div>
               <div onClick={this.sendMessage.bind(this)} style={{backgroundColor: 'rgb(45, 142, 242)'}} className="smartnlp-send-out smartnlp-theme-color smartnlp-send-out-pc">
                 <p >发送消息</p>
