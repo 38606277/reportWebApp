@@ -54,7 +54,7 @@
     "echarts": "^4.1.0",
     "less": "^3.8.1",
     "less-loader": "^4.1.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.21",
     "lodash-decorators": "^6.0.0",
     "prop-types": "15.6.0",
     "rc-pagination": "1.15.1",
