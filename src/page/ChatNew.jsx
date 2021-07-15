@@ -289,8 +289,8 @@ export default class ChatNew extends React.Component {
                   this.setState({
                     data: [...this.state.data, {
                       from_userId:this.state.to_userId,
-                      'post_message':res.data.post_message,
-                      'message_type':res.data.message_type,
+                      'post_message':res,
+                      'message_type':'json',
                       to_userId: this.state.userId}]
                   });
                   anchorElement.scrollIntoView();
