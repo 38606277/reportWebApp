@@ -5,7 +5,7 @@ const merge = require("webpack-merge");
 const webpackConfigProd = {
     mode: "production",
     plugins:[
-        new  CleanWebpackPlugin(["build"],{
+        new  CleanWebpackPlugin(["webapp"],{
         root: path.join(__dirname,"../")
         })
     ]

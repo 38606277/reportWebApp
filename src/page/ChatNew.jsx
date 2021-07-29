@@ -8,11 +8,11 @@ import Script from 'react-load-script';
 import moment from 'moment';
 import LocalStorge from '../util/LogcalStorge.jsx';
 const localStorge = new LocalStorge();
-//import 'antd-mobile/dist/antd-mobile.css';
 import './Chat.css';
 import "babel-polyfill";
 const Item = List.Item;
 const Brief = Item.Brief;
+
 var recorder;
 function closest(el, selector) {
   const matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
@@ -48,6 +48,8 @@ export default class ChatNew extends React.Component {
         refreshing: false,
         down: true,
         height: document.documentElement.clientHeight,
+        jqjs:url+'webapp/js/jquery-3.2.1.min.js',
+        recjs:url+'webapp/js/record.js'
       }
       this.page = 1;
     }
@@ -79,13 +81,6 @@ export default class ChatNew extends React.Component {
                       anchorElement.scrollIntoView();
                 });
               });
-                // setTimeout(() => {
-                //   this.setState({
-                //     height: hei,
-                //     data: this.fetchItems(), 
-                //     refreshing: false,
-                //   });
-                // }, 1500);
               });
           this.initEvent();
         }else{
@@ -98,6 +93,7 @@ export default class ChatNew extends React.Component {
       var btnElem=document.getElementById("microphone");//获取ID
       btnElem.addEventListener("touchstart", function(event) {
           event.preventDefault();//阻止浏览器默认行为
+          console.log(HZRecorder);
           HZRecorder.get(function (rec) {
               recorder = rec;
               recorder.start();
@@ -127,30 +123,7 @@ export default class ChatNew extends React.Component {
           } 
       });
     }
-    //获取服务器信息
-    // async fetchItems(isTrue) {
-    //     let newdata=[];
-    //     let cc=[];
-    //     var anchorElement = document.getElementById("scrolld");
-    //       let mInfo={'from_userId':this.state.userId,'to_userId':this.state.to_userId,
-    //             pageNumd:this.page,perPaged:5}
-    //     await HttpService.post('/reportServer/chat/getChatByuserID', JSON.stringify(mInfo))
-    //       .then(res => {
-    //         let list=res.data;
-    //         for(var i=0;i<list.length;i++){
-    //           newdata.unshift(list[i]);
-    //           // this.setState({data: [list[i],...this.state.data] });
-    //         }
-    //         cc=newdata.concat(this.state.data);
-    //         ++this.page;
-    //         // if(isTrue){
-    //         //   anchorElement.scrollIntoView();
-    //         //   // this.initRefresh();//初始化下拉刷新
-    //         //   // this.initScroll();//初始化滚动加载更多
-    //         // }
-    //       });
-    //       return cc;
-    // }
+   
     //下拉加载数据  
     onRefreshs = () => {
       this.setState({ refreshing: true },function(){
@@ -172,13 +145,6 @@ export default class ChatNew extends React.Component {
           this.setState({ refreshing: false, data:newdata });
         });
       });
-      // setTimeout(() => {
-      //   let nd=this.fetchItems(false);
-      //   this.setState({ refreshing: false,
-      //     data:nd
-      //   });
-      //   //this.fetchItems(false)
-      // }, 600);
     }
     //显示问答列表
     loadQuestion(){
@@ -460,8 +426,10 @@ export default class ChatNew extends React.Component {
     var meg = this.state.meg
     return (
       <div className="content" >
-        <Script url="../src/page/ai/jquery-3.2.1.min.js" />
-        <Script url="../src/page/ai/record.js" />
+        {/* <Script url={this.state.jqjs} />
+        <Script url={this.state.recjs} /> */}
+        {/* <Script url="../src/page/ai/jquery-3.2.1.min.js" />
+        <Script url="../src/page/ai/record.js" /> */}
         <div className="header" style={{ textAlign: 'center' }}>
           <span style={{ textAlign: 'center' }}>智能机器人</span>
           {/* <span style={{float: "left"}}><Link to={`/Main`}><img src={require("../assets/返回.svg")} style={{width:"20px",height:"20px",marginTop:'10px'}}/></Link></span>

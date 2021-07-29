@@ -15,7 +15,7 @@ module.exports = {
         // vendors: ['react','react-dom','react-router','antd'],
     },
     output: {
-        path: path.resolve(__dirname, './build'),
+        path: path.resolve(__dirname, './webapp'),
         filename: '[name].js'
     },
     devServer: {
@@ -150,7 +150,7 @@ module.exports = {
             favicon: './favicon.ico'
         }),
         new CleanWebpackPlugin(['dist',
-            'build'], {
+            'webapp'], {
             root:__dirname,
             verbose: true,
             dry: false,
